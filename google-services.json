@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057480747790",
+    "project_id": "ufrosustentableapp",
+    "storage_bucket": "ufrosustentableapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057480747790:android:e436d55a2915fff764855f",
+        "android_client_info": {
+          "package_name": "com.example.ufrosustentableapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlq-iF_MaXJdq8qCVSvKQsLzVjQDt40Lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
