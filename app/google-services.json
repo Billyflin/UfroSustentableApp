@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1057480747790",
+    "project_id": "ufrosustentableapp",
+    "storage_bucket": "ufrosustentableapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057480747790:android:e436d55a2915fff764855f",
+        "android_client_info": {
+          "package_name": "com.example.ufrosustentableapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057480747790-nvpojjphk3mbi5qf6d4odumlpq7gjhhe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ufrosustentableapp",
+            "certificate_hash": "013ec347ab6762749db58cc480c9e27cc4ab6a5d"
+          }
+        },
+        {
+          "client_id": "1057480747790-l7i4196tk6bur4vc0734l1mu43cge75d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlq-iF_MaXJdq8qCVSvKQsLzVjQDt40Lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057480747790-l7i4196tk6bur4vc0734l1mu43cge75d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
