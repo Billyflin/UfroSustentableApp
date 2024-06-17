@@ -63,7 +63,9 @@ fun GoogleSignInButton(
         Box(
             modifier = Modifier
                 .padding(end =0.dp).size(iconSize.dp)
-                .paint(painter = painterResource(id = R.drawable.google_logo))
+                .paint(
+                    painter = painterResource(id = R.drawable.google_logo)
+                )
         )
     }
 

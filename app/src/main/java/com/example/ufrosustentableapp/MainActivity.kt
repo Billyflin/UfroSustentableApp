@@ -10,10 +10,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -70,6 +78,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,10 +122,10 @@ fun AppNavHost(
         navController = navController,
         startDestination = if (user == null) ScreenLogin else ScreenMap
     ) {
-        composable(ScreenLogin) {
+        composable<ScreenLogin> {
             LoginScreen(token = token, launcher = launcher, context = context)
         }
-        composable(ScreenMap) {
+        composable<ScreenMap> {
             LoggedInContent(user, navController) {
                 Firebase.auth.signOut()
                 navController.navigate(ScreenLogin) {
@@ -124,11 +133,11 @@ fun AppNavHost(
                 }
             }
         }
-        composable(ScreenB) { backStackEntry ->
+        composable<ScreenB> { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")
             Text("Screen B: $name")
         }
-        composable(ScreenQrScanner) {
+        composable<ScreenQrScanner> {
             Text("QR Scanner")
         }
     }
@@ -136,19 +145,47 @@ fun AppNavHost(
 
 @Composable
 fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        GoogleSignInButton(onClick = {
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(token)
-                .requestEmail()
-                .requestProfile()
-                .build()
-            val signInClient = GoogleSignIn.getClient(context, gso)
-            val signInIntent = signInClient.signInIntent
-            launcher.launch(signInIntent)
-        })
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = if (isSystemInDarkTheme()) listOf(Color(0xFF2A5C2C), Color(0xFF3E8717))
+                    else
+                        listOf(Color.White, Color(0xFF3E8717)),
+                    startY = 10f,
+                    endY = 3000f
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo",
+                colorFilter = if (isSystemInDarkTheme())ColorFilter.tint(Color(0xFFA9D194)) else null,
+                modifier = Modifier
+                    .size(320.dp)
+                    .padding(bottom = 26.dp)
+            )
+            GoogleSignInButton(onClick = {
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(token)
+                    .requestEmail()
+                    .requestProfile()
+                    .build()
+                val signInClient = GoogleSignIn.getClient(context, gso)
+                val signInIntent = signInClient.signInIntent
+                launcher.launch(signInIntent)
+            })
+        }
     }
 }
+
 
 @Composable
 fun LoggedInContent(user: FirebaseUser?, navController: NavHostController, onSignOut: () -> Unit) {
@@ -178,10 +215,12 @@ fun LoggedInContent(user: FirebaseUser?, navController: NavHostController, onSig
                         .build(),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
-                    modifier = Modifier.size(96.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clip(CircleShape)
                 )
                 Button(onClick = {
-                    navController.navigate(ScreenB + "?name=${user?.displayName}")
+                    navController.navigate(ScreenB(name=user!!.displayName))
                 }) {
                     Text("Go to Screen B")
                 }
@@ -245,12 +284,19 @@ fun BottomNavigationBar(navController: NavHostController) {
     )
 }
 
-const val ScreenLogin = "login"
-const val ScreenMap = "map"
-const val ScreenB = "screenB"
-const val ScreenQrScanner = "qrScanner"
+@Serializable
+object ScreenInit
+@Serializable
+object ScreenLogin
 
+@Serializable
+object ScreenMap
 
+@Serializable
+data class ScreenB(val name: String?)
+
+@Serializable
+object ScreenQrScanner
 
 
 
