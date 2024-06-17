@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -75,6 +77,9 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.onetapcompose)
+
+    implementation (libs.maps.compose)
+    implementation (libs.maps.ktx)
 
 
     implementation (libs.coil.compose)
