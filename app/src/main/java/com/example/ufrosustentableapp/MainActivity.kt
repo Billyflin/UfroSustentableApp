@@ -10,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,7 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +58,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -70,7 +70,6 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,103 +78,64 @@ class MainActivity : ComponentActivity() {
         setContent {
             UfroSustentableAppTheme {
                 val navController = rememberNavController()
-                Scaffold(
-                    bottomBar = {
-                        BottomNavigationBar(navController)
-                    },
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { /* Acción del FAB */ },
-                            modifier = Modifier.padding(bottom = 16.dp) // Ajusta el padding para mover el FAB hacia abajo
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-                                contentDescription = "QR Scanner",
-                                modifier = Modifier.size(36.dp) // Ajusta el tamaño del ícono
-                            )
-                        }
-                    },
-                    floatingActionButtonPosition = FabPosition.Center
-                ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        AppNavHost(navController)
+                var user by remember { mutableStateOf(Firebase.auth.currentUser) }
+                val launcher = rememberFirebaseAuthLauncher(
+                    onAuthComplete = { result -> user = result.user },
+                    onAuthError = { user = null }
+                )
+                val token = stringResource(R.string.default_web_client_id)
+                val context = LocalContext.current
+
+                DisposableEffect(Unit) {
+                    val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+                        user = auth.currentUser
+                    }
+                    Firebase.auth.addAuthStateListener(authStateListener)
+                    onDispose {
+                        Firebase.auth.removeAuthStateListener(authStateListener)
                     }
                 }
+
+                AppNavHost(navController, user, token, launcher, context)
             }
         }
     }
 }
-
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    BottomAppBar(
-        actions = {
-            IconButton(onClick = {
-                navController.navigate("ScreenA") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }) {
-                Icon(Icons.Default.Home, contentDescription = "Screen A")
-            }
-            Spacer(modifier = Modifier.weight(1f, true)) // This is to balance the FAB in the center
-            IconButton(onClick = {
-                navController.navigate("ScreenB") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }) {
-                Icon(Icons.Default.Person, contentDescription = "Screen B")
-            }
+fun AppNavHost(
+    navController: NavHostController,
+    user: FirebaseUser?,
+    token: String,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    context: Context
+) {
+    NavHost(
+        navController = navController,
+        startDestination = if (user == null) ScreenLogin else ScreenMap
+    ) {
+        composable(ScreenLogin) {
+            LoginScreen(token = token, launcher = launcher, context = context)
         }
-    )
-}
-
-
-
-@Composable
-fun AppNavHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "ScreenA") {
-        composable("ScreenA") {
-            ScreenAContent(navController)
-        }
-        composable("ScreenB") { backStackEntry ->
-            val args = backStackEntry.arguments?.getString("name")
-            ScreenBContent(ScreenB(args))
-        }
-    }
-}
-
-@Composable
-fun ScreenAContent(navController: NavHostController) {
-    var user by remember { mutableStateOf(Firebase.auth.currentUser) }
-    val launcher = rememberFirebaseAuthLauncher(
-        onAuthComplete = { result -> user = result.user },
-        onAuthError = { user = null }
-    )
-    val token = stringResource(R.string.default_web_client_id)
-    val context = LocalContext.current
-
-    LaunchedEffect(user) {
-        user = Firebase.auth.currentUser
-    }
-
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            if (user == null) {
-                NotLoggedInContent(token, launcher, context)
-            } else {
-                LoggedInContent(user, navController) {
-                    Firebase.auth.signOut()
-                    user = null
+        composable(ScreenMap) {
+            LoggedInContent(user, navController) {
+                Firebase.auth.signOut()
+                navController.navigate(ScreenLogin) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             }
         }
+        composable(ScreenB) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name")
+            Text("Screen B: $name")
+        }
+        composable(ScreenQrScanner) {
+            Text("QR Scanner")
+        }
     }
 }
 
 @Composable
-fun NotLoggedInContent(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
+fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         GoogleSignInButton(onClick = {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -192,51 +152,114 @@ fun NotLoggedInContent(token: String, launcher: ManagedActivityResultLauncher<In
 
 @Composable
 fun LoggedInContent(user: FirebaseUser?, navController: NavHostController, onSignOut: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(user?.photoUrl)
-                .crossfade(true)
-                .build(),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier = Modifier
-                .size(96.dp)
-                .clip(CircleShape)
-        )
-        Button(onClick = {
-            navController.navigate("ScreenB?name=${user?.displayName}")
-        }) {
-            Text("Go to Screen B")
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navController) },
+        floatingActionButton = {
+            FloatingActionButton(
+                shape = CircleShape,
+                onClick = { navController.navigate(ScreenQrScanner) },
+                modifier = Modifier.padding(bottom = 16.dp) // Ajusta el padding para mover el FAB hacia abajo
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
+                    contentDescription = "QR Scanner",
+                    modifier = Modifier.size(36.dp) // Ajusta el tamaño del ícono
+                )
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(user?.photoUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier.size(96.dp).clip(CircleShape)
+                )
+                Button(onClick = {
+                    navController.navigate(ScreenB + "?name=${user?.displayName}")
+                }) {
+                    Text("Go to Screen B")
+                }
+                Spacer(Modifier.height(8.dp))
+                Text("Welcome ${user?.displayName}")
+                Spacer(Modifier.height(10.dp))
+                Button(onClick = {
+                    onSignOut()
+                }) {
+                    Text("Sign out")
+                }
+                MapsExample()
+            }
         }
-        Spacer(Modifier.height(8.dp))
-        Text("Welcome ${user?.displayName}")
-        Spacer(Modifier.height(10.dp))
-        Button(onClick = {
-            onSignOut()
-        }) {
-            Text("Sign out")
-        }
-        MapsExample()
     }
 }
 
 @Composable
-fun ScreenBContent(args: ScreenB) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = args.name ?: "")
+fun rememberFirebaseAuthLauncher(
+    onAuthComplete: (AuthResult) -> Unit,
+    onAuthError: (ApiException) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    val scope = rememberCoroutineScope()
+    return rememberLauncherForActivityResult(StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+            scope.launch {
+                val authResult = Firebase.auth.signInWithCredential(credential).await()
+                onAuthComplete(authResult)
+            }
+        } catch (e: ApiException) {
+            onAuthError(e)
+        }
     }
 }
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    BottomAppBar(
+        actions = {
+            IconButton(onClick = {
+                navController.navigate(ScreenMap) {
+                    popUpTo(navController.graph.startDestinationId)
+                    launchSingleTop = true
+                }
+            }) {
+                Icon(Icons.Default.Home, contentDescription = "Screen A")
+            }
+            Spacer(modifier = Modifier.weight(1f, true)) // This is to balance the FAB in the center
+            IconButton(onClick = {
+                navController.navigate(ScreenB) {
+                    popUpTo(navController.graph.startDestinationId)
+                    launchSingleTop = true
+                }
+            }) {
+                Icon(Icons.Default.Person, contentDescription = "Screen B")
+            }
+        }
+    )
+}
+
+const val ScreenLogin = "login"
+const val ScreenMap = "map"
+const val ScreenB = "screenB"
+const val ScreenQrScanner = "qrScanner"
+
+
+
+
+
 
 @Composable
 fun MapsExample() {
     val universidadDeLaFrontera = LatLng(-38.74658429580099, -72.6157555230996)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 16f)
+        CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 16f).also { position = it }
     }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -257,27 +280,3 @@ fun MapsExample() {
         )
     }
 }
-
-@Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit,
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-    val scope = rememberCoroutineScope()
-    return rememberLauncherForActivityResult(StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            scope.launch {
-                val authResult = Firebase.auth.signInWithCredential(credential).await()
-                onAuthComplete(authResult)
-            }
-        } catch (e: ApiException) {
-            onAuthError(e)
-        }
-    }
-}
-
-@Serializable
-data class ScreenB(val name: String?)
