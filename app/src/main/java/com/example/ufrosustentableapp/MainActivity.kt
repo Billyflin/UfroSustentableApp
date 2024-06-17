@@ -3,7 +3,6 @@ package com.example.ufrosustentableapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.BottomAppBar
@@ -44,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -65,6 +64,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -84,10 +84,15 @@ class MainActivity : ComponentActivity() {
                         BottomNavigationBar(navController)
                     },
                     floatingActionButton = {
-                        FloatingActionButton(onClick = { /* Acción del FAB */
-                         Toast.makeText(this, "FAB clicked", Toast.LENGTH_SHORT).show()
-                        }) {
-                            Icon(Icons.Default.Add, contentDescription = null)
+                        FloatingActionButton(
+                            onClick = { /* Acción del FAB */ },
+                            modifier = Modifier.padding(bottom = 16.dp) // Ajusta el padding para mover el FAB hacia abajo
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
+                                contentDescription = "QR Scanner",
+                                modifier = Modifier.size(36.dp) // Ajusta el tamaño del ícono
+                            )
                         }
                     },
                     floatingActionButtonPosition = FabPosition.Center
@@ -229,16 +234,19 @@ fun ScreenBContent(args: ScreenB) {
 
 @Composable
 fun MapsExample() {
-    val temuco = LatLng(-38.74, -72.61)
+    val universidadDeLaFrontera = LatLng(-38.74658429580099, -72.6157555230996)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(temuco, 13f)
+        position = CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 16f)
     }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        uiSettings = MapUiSettings(
+            zoomControlsEnabled = false
+        )
     ) {
         Marker(
-            state = MarkerState(position = temuco),
+            state = MarkerState(position = universidadDeLaFrontera),
             title = "Temuco",
             snippet = "Temuco, Chile"
         )

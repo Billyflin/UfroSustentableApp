@@ -5,7 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -23,7 +23,6 @@ import com.example.ufrosustentableapp.R
 @Composable
 fun GoogleSignInButton(
     onClick: () -> Unit, // Función a ejecutar al hacer clic
-    modifier: Modifier = Modifier,
     shape: Shape = ButtonDefaults.shape,
     theme: GoogleButtonTheme = if (isSystemInDarkTheme()) GoogleButtonTheme.Dark else GoogleButtonTheme.Light,
     colors: ButtonColors = ButtonDefaults.buttonColors(
@@ -49,11 +48,13 @@ fun GoogleSignInButton(
         )
 
         GoogleButtonTheme.Neutral -> null
-    }
-    ) {
+
+    },
+    iconSize: Int = 50
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier.width( 40.dp ),
+        modifier = Modifier.size(72.dp),
         shape = shape,
         colors = colors,
         contentPadding = PaddingValues(horizontal = 9.5.dp),
@@ -61,7 +62,7 @@ fun GoogleSignInButton(
     ) {
         Box(
             modifier = Modifier
-                .padding(end =0.dp)
+                .padding(end =0.dp).size(iconSize.dp)
                 .paint(painter = painterResource(id = R.drawable.google_logo))
         )
     }
@@ -71,7 +72,8 @@ fun GoogleSignInButton(
 @Preview
 @Composable
 fun DarkGoogleSignInButtonPreview() {
-    GoogleSignInButton(onClick = {},
+    GoogleSignInButton(
+        onClick = {},
         theme = GoogleButtonTheme.Dark
     )
 }
@@ -79,7 +81,8 @@ fun DarkGoogleSignInButtonPreview() {
 @Preview
 @Composable
 fun LightGoogleSignInButtonPreview() {
-    GoogleSignInButton(onClick = {},
+    GoogleSignInButton(
+        onClick = {},
         theme = GoogleButtonTheme.Light
     )
 }
