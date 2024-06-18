@@ -9,7 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.ufrosustentableapp.Screen.HistoryScreen
+import com.example.ufrosustentableapp.Screen.LoginScreen
+import com.example.ufrosustentableapp.Screen.MapScreen
 import com.example.ufrosustentableapp.Screen.ProfileScreen
+import com.example.ufrosustentableapp.Screen.QrScannerScreen
+import com.example.ufrosustentableapp.Screen.RewardsScreen
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -30,7 +35,7 @@ fun AppNavHost(
             LoginScreen(token = token, launcher = launcher, context = context)
         }
         composable<ScreenMap> {
-            LoggedInContent()
+            MapScreen()
         }
         composable<ScreenB> { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")
