@@ -1,4 +1,4 @@
-package com.example.ufrosustentableapp.Screen
+package com.example.ufrosustentableapp.screen
 
 import android.Manifest
 import android.content.pm.PackageManager

@@ -1,4 +1,4 @@
-package com.example.ufrosustentableapp.Screen
+package com.example.ufrosustentableapp.screen
 
 import android.content.Context
 import android.content.Intent

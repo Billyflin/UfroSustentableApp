@@ -1,4 +1,4 @@
-package com.example.ufrosustentableapp.Screen
+package com.example.ufrosustentableapp.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
