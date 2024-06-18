@@ -3,6 +3,7 @@ package com.example.ufrosustentableapp
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ufrosustentableapp.presentation.BottomNavigationBar
 import com.example.ufrosustentableapp.ui.theme.AppTheme
@@ -73,6 +75,8 @@ class MainActivity : ComponentActivity() {
                         Firebase.auth.removeAuthStateListener(authStateListener)
                     }
                 }
+                val backstackEntry = navController.currentBackStackEntryAsState()
+                val currentScreen = backstackEntry.value.fromRoute()
 
                 Scaffold(
                     topBar = {
@@ -93,7 +97,8 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     bottomBar = {
-                        if (user != null){
+                        if (user != null && (currentScreen.toString() != "ScreenQrScanner")){
+                            Log.d("BottomBar", ((currentScreen.toString() == "ScreenQrScanner").toString()) )
                             BottomNavigationBar(navController, user)
                         }
                     }

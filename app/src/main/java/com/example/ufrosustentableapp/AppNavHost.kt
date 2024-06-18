@@ -6,14 +6,15 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.ufrosustentableapp.screen.CameraScreen
 import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
-import com.example.ufrosustentableapp.screen.QrScannerScreen
 import com.example.ufrosustentableapp.screen.RewardsScreen
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -42,7 +43,7 @@ fun AppNavHost(
             Text("Screen B: $name")
         }
         composable<ScreenQrScanner> {
-            QrScannerScreen()
+            CameraScreen()
         }
         composable<ScreenRewards> {
             RewardsScreen()
@@ -59,4 +60,8 @@ fun AppNavHost(
             }
         }
     }
+}
+
+fun NavBackStackEntry?.fromRoute(): String? {
+    return this?.destination?.route?.substringAfterLast(".")
 }
