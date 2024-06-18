@@ -1,41 +1,56 @@
 package com.example.ufrosustentableapp
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.util.Size
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.FabPosition
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +67,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -76,9 +94,18 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.Serializable
+import java.util.concurrent.Executors
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,11 +132,115 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+
                 AppNavHost(navController, user, token, launcher, context)
+
             }
         }
     }
 }
+@Composable
+fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(146.dp)
+            .padding(bottom = 70.dp)
+            .background(Color.Transparent)
+        ,
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Surface(
+            shape = RoundedCornerShape(percent = 20),
+            color = Color.White,
+            shadowElevation = 8.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(176.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                IconButton(onClick = {
+                    navController.navigate(ScreenMap) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }) {
+                    Icon(Icons.Default.Home,  modifier = Modifier
+                        .size(30.dp),
+                        contentDescription = "Inicio", tint = Color.Gray)
+                }
+
+                IconButton(onClick = {
+                    navController.navigate(ScreenHistory) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }) {
+                    Icon(Icons.Default.DateRange,  modifier = Modifier
+                        .size(30.dp),
+                        contentDescription = "Historial", tint = Color.Gray)
+                }
+
+                Spacer(modifier = Modifier.width(56.dp)) // Espacio para el FAB
+
+                IconButton(onClick = {
+                    navController.navigate(ScreenRewards) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }) {
+                    Icon(Icons.Default.Star,
+                        contentDescription = "Recompensas",
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .size(30.dp)
+
+                    )
+                }
+
+                IconButton(onClick = {
+                    navController.navigate(ScreenProfile) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(user?.photoUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    )
+                }
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { navController.navigate(ScreenQrScanner) },
+            containerColor = Color(0xFF00AA5B),
+            contentColor = Color.White,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = (-18).dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
+                contentDescription = "QR Scanner",
+                modifier = Modifier.size(36.dp)
+            )
+        }
+    }
+}
+
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -126,22 +257,106 @@ fun AppNavHost(
             LoginScreen(token = token, launcher = launcher, context = context)
         }
         composable<ScreenMap> {
-            LoggedInContent(user, navController) {
-                Firebase.auth.signOut()
-                navController.navigate(ScreenLogin) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
-            }
+            LoggedInContent(user)
         }
         composable<ScreenB> { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")
             Text("Screen B: $name")
         }
         composable<ScreenQrScanner> {
-            Text("QR Scanner")
+            QrScannerScreen()
+        }
+        composable<ScreenRewards> {
+            RewardsScreen()
+        }
+        composable<ScreenHistory> {
+            HistoryScreen()
+        }
+        composable<ScreenProfile> {
+            ProfileScreen(user){
+                Firebase.auth.signOut()
+                navController.navigate(ScreenLogin) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            }
         }
     }
 }
+
+@Composable
+fun ProfileScreen(user: FirebaseUser?, content: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(user?.photoUrl)
+                    .crossfade(true)
+                    .build(),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(128.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(user?.displayName ?: "Usuario")
+            Spacer(Modifier.height(16.dp))
+            FloatingActionButton(
+                onClick = {
+                    content()
+                },
+                containerColor = Color(0xFF00AA5B),
+                contentColor = Color.White
+            ) {
+                Text("Cerrar sesión")
+            }
+        }
+    }
+
+}
+
+@Composable
+fun HistoryScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("History Screen")
+    }
+}
+
+@Composable
+fun rememberFirebaseAuthLauncher(onAuthComplete: (AuthResult) -> Unit,onAuthError: (ApiException) -> Unit): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    val scope = rememberCoroutineScope()
+    return rememberLauncherForActivityResult(StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+            scope.launch {
+                val authResult = Firebase.auth.signInWithCredential(credential).await()
+                onAuthComplete(authResult)
+            }
+        } catch (e: ApiException) {
+            onAuthError(e)
+        }
+    }
+}
+
+
+@Composable
+fun RewardsScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Rewards Screen")
+    }
+}
+
 
 @Composable
 fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
@@ -188,106 +403,25 @@ fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, A
 
 
 @Composable
-fun LoggedInContent(user: FirebaseUser?, navController: NavHostController, onSignOut: () -> Unit) {
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
-                onClick = { navController.navigate(ScreenQrScanner) },
-                modifier = Modifier.padding(bottom = 16.dp) // Ajusta el padding para mover el FAB hacia abajo
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-                    contentDescription = "QR Scanner",
-                    modifier = Modifier.size(36.dp) // Ajusta el tamaño del ícono
-                )
-            }
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(user?.photoUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(96.dp)
-                        .clip(CircleShape)
-                )
-                Button(onClick = {
-                    navController.navigate(ScreenB(name=user!!.displayName))
-                }) {
-                    Text("Go to Screen B")
-                }
-                Spacer(Modifier.height(8.dp))
-                Text("Welcome ${user?.displayName}")
-                Spacer(Modifier.height(10.dp))
-                Button(onClick = {
-                    onSignOut()
-                }) {
-                    Text("Sign out")
-                }
-                MapsExample()
-            }
+fun LoggedInContent(user: FirebaseUser?) {
+    Box {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Welcome ${user?.displayName}")
+            Spacer(Modifier.height(10.dp))
+            MapsExample()
         }
     }
 }
 
-@Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-    val scope = rememberCoroutineScope()
-    return rememberLauncherForActivityResult(StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            scope.launch {
-                val authResult = Firebase.auth.signInWithCredential(credential).await()
-                onAuthComplete(authResult)
-            }
-        } catch (e: ApiException) {
-            onAuthError(e)
-        }
-    }
-}
 
+@androidx.compose.ui.tooling.preview.Preview
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    BottomAppBar(
-        actions = {
-            IconButton(onClick = {
-                navController.navigate(ScreenMap) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }) {
-                Icon(Icons.Default.Home, contentDescription = "Screen A")
-            }
-            Spacer(modifier = Modifier.weight(1f, true)) // This is to balance the FAB in the center
-            IconButton(onClick = {
-                navController.navigate(ScreenB) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }) {
-                Icon(Icons.Default.Person, contentDescription = "Screen B")
-            }
-        }
-    )
+fun NavBarPreview() {
+    BottomNavigationBar(rememberNavController(), null)
 }
-
-@Serializable
-object ScreenInit
 @Serializable
 object ScreenLogin
+
 
 @Serializable
 object ScreenMap
@@ -298,8 +432,14 @@ data class ScreenB(val name: String?)
 @Serializable
 object ScreenQrScanner
 
+@Serializable
+object ScreenRewards
 
+@Serializable
+object ScreenHistory
 
+@Serializable
+object ScreenProfile
 
 @Composable
 fun MapsExample() {
@@ -324,5 +464,112 @@ fun MapsExample() {
             title = "Padre Las Casas",
             snippet = "Padre Las Casas, Chile"
         )
+    }
+}
+
+@Composable
+fun QrScannerScreen() {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        hasCameraPermission = isGranted
+    }
+
+    LaunchedEffect(key1 = true) {
+        if (!hasCameraPermission) {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (hasCameraPermission) {
+            AndroidView(
+                factory = { context ->
+                    PreviewView(context).apply {
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+                        cameraProviderFuture.addListener({
+                            val cameraProvider = cameraProviderFuture.get()
+                            val preview = Preview.Builder().build().also {
+                                it.setSurfaceProvider(this.surfaceProvider)
+                            }
+
+                            val imageAnalysis = ImageAnalysis.Builder()
+                                .setTargetResolution(Size(1280, 720))
+                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                .build()
+                                .also {
+                                    it.setAnalyzer(Executors.newSingleThreadExecutor(), QRCodeAnalyzer { qrCode ->
+                                        Log.d("QrScanner", "QR Code scanned: $qrCode")
+                                        // Manejar el resultado del escaneo del QR aquí
+
+                                        Toast.makeText(context, qrCode, Toast.LENGTH_SHORT).show()
+                                    })
+                                }
+
+                            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                            try {
+                                cameraProvider.unbindAll()
+                                cameraProvider.bindToLifecycle(
+                                    lifecycleOwner, cameraSelector, preview, imageAnalysis
+                                )
+                            } catch (exc: Exception) {
+                                Log.e("CameraXApp", "Use case binding failed", exc)
+                            }
+                        }, ContextCompat.getMainExecutor(context))
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Text(
+                text = "Por favor, permite el acceso a la cámara para escanear códigos QR",
+            )
+        }
+    }
+}
+
+
+class QRCodeAnalyzer(private val onQrCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
+
+    private val reader = MultiFormatReader().apply {
+        setHints(mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
+    }
+    override fun analyze(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image
+        if (mediaImage != null) {
+            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+            val buffer = mediaImage.planes[0].buffer
+            val bytes = ByteArray(buffer.remaining())
+            buffer.get(bytes)
+            val source = PlanarYUVLuminanceSource(
+                bytes,
+                mediaImage.width,
+                mediaImage.height,
+                0,
+                0,
+                mediaImage.width,
+                mediaImage.height,
+                false
+            )
+            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+            try {
+                val result = reader.decode(binaryBitmap)
+                onQrCodeScanned(result.text)
+            } catch (e: NotFoundException) {
+                // No QR code found
+            } finally {
+                imageProxy.close()
+            }
+        }
     }
 }
