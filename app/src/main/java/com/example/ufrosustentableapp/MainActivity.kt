@@ -1,6 +1,7 @@
 package com.example.ufrosustentableapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -46,6 +47,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,6 +75,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -108,6 +111,7 @@ import java.util.concurrent.Executors
 
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -133,8 +137,15 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-                AppNavHost(navController, user, token, launcher, context)
-
+                Scaffold(
+                    bottomBar = {
+                        if (user != null){
+                            BottomNavigationBar(navController, user)
+                        }
+                    }
+                ) {
+                    AppNavHost(navController, user, token, launcher, context)
+                }
             }
         }
     }
