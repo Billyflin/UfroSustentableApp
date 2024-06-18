@@ -1,6 +1,7 @@
 package com.example.ufrosustentableapp.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,13 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.ufrosustentableapp.R
+import com.example.ufrosustentableapp.ScreenRewardConfimation
 
 
 @Composable
-fun RewardsScreen(userPoints: Int, rewards: List<RewardItem>) {
+fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: List<RewardItem>) {
     val colorScheme = MaterialTheme.colorScheme
 
     Column(
@@ -88,24 +90,31 @@ fun RewardsScreen(userPoints: Int, rewards: List<RewardItem>) {
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             items(rewards) { reward ->
-                RewardCard(reward = reward)
+                RewardCard(navController, reward, userPoints)
             }
         }
     }
 }
 
 @Composable
-fun RewardCard(reward: RewardItem) {
+fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints: Int) {
     val colorScheme = MaterialTheme.colorScheme
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable {
+                navController.navigate(ScreenRewardConfimation(
+                    rewardTitle = reward.title,
+                    rewardCost = reward.pointsRequired,
+                    userPoints = userPoints
+                ))
+        },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.surface,
             contentColor = colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -137,15 +146,3 @@ fun RewardCard(reward: RewardItem) {
 
 data class RewardItem(val title: String, val pointsRequired: Int)
 
-@Preview(showBackground = true)
-@Composable
-fun RewardsScreenPreview() {
-    RewardsScreen(
-        userPoints = 1500,
-        rewards = listOf(
-            RewardItem("Café Gratis", 500),
-            RewardItem("Descuento en Tienda", 1000),
-            RewardItem("Entrada al Cine", 1500)
-        )
-    )
-}

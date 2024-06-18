@@ -10,11 +10,13 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.ufrosustentableapp.screen.CameraScreen
 import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
+import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
 import com.example.ufrosustentableapp.screen.RewardItem
 import com.example.ufrosustentableapp.screen.RewardsScreen
 import com.google.firebase.auth.FirebaseUser
@@ -55,6 +57,7 @@ fun AppNavHost(
         }
         composable<ScreenRewards> {
             RewardsScreen(
+                navController = navController,
                 userPoints = 1500,
                 rewards = listOf(
                     RewardItem("Café Gratis", 500),
@@ -66,6 +69,15 @@ fun AppNavHost(
                     RewardItem("Descuento en Tecnología", 3500),
                     RewardItem("Descuento en Viajes", 4000),
                 )
+            )
+        }
+        composable<ScreenRewardConfimation> {
+            val args = it.toRoute<ScreenRewardConfimation>()
+            RewardConfirmationScreen(
+                navController = navController,
+                rewardTitle = args.rewardTitle,
+                rewardCost = args.rewardCost,
+                userPoints = args.userPoints
             )
         }
         composable<ScreenHistory> {

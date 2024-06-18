@@ -159,6 +159,8 @@ object ScreenQrScanner
 object ScreenRewards
 
 @Serializable
+data class ScreenRewardConfimation(val rewardTitle:String, val rewardCost:Int, val userPoints:Int)
+@Serializable
 object ScreenHistory
 
 @Serializable
