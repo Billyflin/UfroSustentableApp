@@ -6,6 +6,7 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,6 +17,7 @@ import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
+import com.example.ufrosustentableapp.screen.RecyclingPoint
 import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
 import com.example.ufrosustentableapp.screen.RewardItem
 import com.example.ufrosustentableapp.screen.RewardsScreen
@@ -36,7 +38,8 @@ fun AppNavHost(
     isDarkMode: Boolean,
     onToggleDarkMode: () -> Unit,
     isDynamicColor: Boolean,
-    onToggleDynamicColor: () -> Unit
+    onToggleDynamicColor: () -> Unit,
+    recyclingPoints: SnapshotStateList<RecyclingPoint>
 ) {
     NavHost(
         navController = navController,
@@ -46,7 +49,7 @@ fun AppNavHost(
             LoginScreen(token = token, launcher = launcher, context = context)
         }
         composable<ScreenMap> {
-            MapScreen()
+            MapScreen(recyclingPoints)
         }
         composable<ScreenB> { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")

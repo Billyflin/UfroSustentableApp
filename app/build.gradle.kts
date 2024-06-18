@@ -27,11 +27,17 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+
         }
     }
     compileOptions {
@@ -56,7 +62,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.compose.animation:animation:1.0.0")
+    implementation(libs.androidx.animation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -76,6 +82,7 @@ dependencies {
     implementation(libs.play.services.mlkit.text.recognition)
     implementation(libs.androidx.benchmark.macro)
     implementation(libs.androidx.navigation.testing)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -90,6 +97,8 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.onetapcompose)
+    implementation (libs.guava)
+
 
     implementation (libs.maps.compose)
     implementation (libs.maps.ktx)

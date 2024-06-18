@@ -43,7 +43,7 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
     val colorScheme = MaterialTheme.colorScheme
     val isRedeemable = userPoints >= reward.pointsRequired
     val targetColor = if (isRedeemable) colorScheme.primary else colorScheme.surface
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "")
     val containerColor by transition.animateColor(
         initialValue = targetColor,
         targetValue = Color(0x9F73DA80),

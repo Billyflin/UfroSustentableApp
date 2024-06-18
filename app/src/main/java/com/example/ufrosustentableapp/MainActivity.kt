@@ -3,6 +3,7 @@ package com.example.ufrosustentableapp
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,6 +22,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ufrosustentableapp.presentation.BottomNavigationBar
+import com.example.ufrosustentableapp.screen.RecyclingPoint
 import com.example.ufrosustentableapp.ui.theme.AppTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
@@ -42,6 +45,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -82,7 +86,24 @@ class MainActivity : ComponentActivity() {
 
                 val backstackEntry = navController.currentBackStackEntryAsState()
                 val currentScreen = backstackEntry.value?.destination?.route
+                val recyclingPoints = remember { mutableStateListOf<RecyclingPoint>() }
 
+                Firebase.firestore.collection("recycling_points")
+                    .get()
+                    .addOnSuccessListener { result ->
+                        for (document in result) {
+                            val point = RecyclingPoint(
+                                latitude = document.getDouble("latitude") ?: 0.0,
+                                longitude = document.getDouble("longitude") ?: 0.0,
+                                description = document.getString("description") ?: ""
+                            )
+                            recyclingPoints.add(point)
+                            Log.d("MainActivity", "${document.id} => ${document.data}")
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.w("MainActivity", "Error getting documents: ", exception)
+                    }
                 Scaffold(
                     topBar = {
                         if (user != null) {
@@ -116,7 +137,9 @@ class MainActivity : ComponentActivity() {
                         isDarkMode = isDarkMode,
                         onToggleDarkMode = { isDarkMode = !isDarkMode },
                         isDynamicColor = isDynamicColor,
-                        onToggleDynamicColor = { isDynamicColor = !isDynamicColor }
+                        onToggleDynamicColor = { isDynamicColor = !isDynamicColor },
+                        recyclingPoints = recyclingPoints
+
                     )
                 }
             }
