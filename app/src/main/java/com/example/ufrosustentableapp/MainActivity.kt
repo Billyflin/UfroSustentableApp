@@ -29,27 +29,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -60,11 +48,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -72,15 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.example.ufrosustentableapp.presentation.BottomNavigationBar
 import com.example.ufrosustentableapp.presentation.GoogleSignInButton
-import com.example.ufrosustentableapp.ui.theme.UfroSustentableAppTheme
+import com.example.ufrosustentableapp.ui.theme.AppTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -88,7 +69,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -111,12 +91,13 @@ import java.util.concurrent.Executors
 
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            UfroSustentableAppTheme {
+            AppTheme {
                 val navController = rememberNavController()
                 var user by remember { mutableStateOf(Firebase.auth.currentUser) }
                 val launcher = rememberFirebaseAuthLauncher(
@@ -136,8 +117,24 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-
                 Scaffold(
+                    topBar = {
+                        if (user != null) {
+                             TopAppBar(
+                                title = { Text("Ufro Sustentable") },
+                                navigationIcon = {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.logo),
+                                        contentDescription = "Logo",
+                                        colorFilter = if (isSystemInDarkTheme()) ColorFilter.tint(Color(0xFFA9D194)) else null,
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .padding(8.dp)
+                                    )
+                                }
+                             )
+                        }
+                    },
                     bottomBar = {
                         if (user != null){
                             BottomNavigationBar(navController, user)
@@ -149,184 +146,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-@Composable
-fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(146.dp)
-            .padding(bottom = 70.dp)
-            .background(Color.Transparent)
-        ,
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Surface(
-            shape = RoundedCornerShape(percent = 20),
-            color = Color.White,
-            shadowElevation = 8.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(176.dp)
-                .padding(horizontal = 16.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                IconButton(onClick = {
-                    navController.navigate(ScreenMap) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(Icons.Default.Home,  modifier = Modifier
-                        .size(30.dp),
-                        contentDescription = "Inicio", tint = Color.Gray)
-                }
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenHistory) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(Icons.Default.DateRange,  modifier = Modifier
-                        .size(30.dp),
-                        contentDescription = "Historial", tint = Color.Gray)
-                }
-
-                Spacer(modifier = Modifier.width(56.dp)) // Espacio para el FAB
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenRewards) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(Icons.Default.Star,
-                        contentDescription = "Recompensas",
-                        tint = Color.Gray,
-                        modifier = Modifier
-                            .size(30.dp)
-
-                    )
-                }
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenProfile) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(user?.photoUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                    )
-                }
-            }
-        }
-
-        FloatingActionButton(
-            onClick = { navController.navigate(ScreenQrScanner) },
-            containerColor = Color(0xFF00AA5B),
-            contentColor = Color.White,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-18).dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-                contentDescription = "QR Scanner",
-                modifier = Modifier.size(36.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun AppNavHost(
-    navController: NavHostController,
-    user: FirebaseUser?,
-    token: String,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    context: Context
-) {
-    NavHost(
-        navController = navController,
-        startDestination = if (user == null) ScreenLogin else ScreenMap
-    ) {
-        composable<ScreenLogin> {
-            LoginScreen(token = token, launcher = launcher, context = context)
-        }
-        composable<ScreenMap> {
-            LoggedInContent(user)
-        }
-        composable<ScreenB> { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name")
-            Text("Screen B: $name")
-        }
-        composable<ScreenQrScanner> {
-            QrScannerScreen()
-        }
-        composable<ScreenRewards> {
-            RewardsScreen()
-        }
-        composable<ScreenHistory> {
-            HistoryScreen()
-        }
-        composable<ScreenProfile> {
-            ProfileScreen(user){
-                Firebase.auth.signOut()
-                navController.navigate(ScreenLogin) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ProfileScreen(user: FirebaseUser?, content: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(user?.photoUrl)
-                    .crossfade(true)
-                    .build(),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(128.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(user?.displayName ?: "Usuario")
-            Spacer(Modifier.height(16.dp))
-            FloatingActionButton(
-                onClick = {
-                    content()
-                },
-                containerColor = Color(0xFF00AA5B),
-                contentColor = Color.White
-            ) {
-                Text("Cerrar sesión")
-            }
-        }
-    }
-
 }
 
 @Composable
@@ -371,16 +190,20 @@ fun RewardsScreen() {
 
 @Composable
 fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
+    val colorScheme = MaterialTheme.colorScheme
+    val gradientColors = if (isSystemInDarkTheme())
+        listOf(colorScheme.secondary, colorScheme.primary)
+    else
+        listOf(Color.White, colorScheme.primary)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = if (isSystemInDarkTheme()) listOf(Color(0xFF2A5C2C), Color(0xFF3E8717))
-                    else
-                        listOf(Color.White, Color(0xFF3E8717)),
-                    startY = 10f,
-                    endY = 3000f
+                    colors = gradientColors,
+                    startY = 0f,
+                    endY = 1000f
                 )
             ),
         contentAlignment = Alignment.Center
@@ -393,7 +216,7 @@ fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, A
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                colorFilter = if (isSystemInDarkTheme())ColorFilter.tint(Color(0xFFA9D194)) else null,
+                colorFilter = if (isSystemInDarkTheme()) ColorFilter.tint(colorScheme.secondary) else null,
                 modifier = Modifier
                     .size(320.dp)
                     .padding(bottom = 26.dp)
@@ -413,23 +236,18 @@ fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, A
 }
 
 
+
 @Composable
-fun LoggedInContent(user: FirebaseUser?) {
+fun LoggedInContent() {
     Box {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Welcome ${user?.displayName}")
-            Spacer(Modifier.height(10.dp))
             MapsExample()
         }
     }
 }
 
 
-@androidx.compose.ui.tooling.preview.Preview
-@Composable
-fun NavBarPreview() {
-    BottomNavigationBar(rememberNavController(), null)
-}
+
 @Serializable
 object ScreenLogin
 
