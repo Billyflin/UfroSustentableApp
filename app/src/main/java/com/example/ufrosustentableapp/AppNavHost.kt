@@ -15,18 +15,26 @@ import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
+import com.example.ufrosustentableapp.screen.RewardItem
 import com.example.ufrosustentableapp.screen.RewardsScreen
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+fun NavBackStackEntry?.fromRoute(): String? {
+    return this?.destination?.route?.substringAfterLast(".")
+}
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     user: FirebaseUser?,
     token: String,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    context: Context
+    context: Context,
+    isDarkMode: Boolean,
+    onToggleDarkMode: () -> Unit,
+    isDynamicColor: Boolean,
+    onToggleDynamicColor: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -46,22 +54,37 @@ fun AppNavHost(
             CameraScreen()
         }
         composable<ScreenRewards> {
-            RewardsScreen()
+            RewardsScreen(
+                userPoints = 1500,
+                rewards = listOf(
+                    RewardItem("Café Gratis", 500),
+                    RewardItem("Descuento en Tienda", 1000),
+                    RewardItem("Entrada al Cine", 1500),
+                    RewardItem("Descuento en Restaurante", 2000),
+                    RewardItem("Descuento en Librería", 2500),
+                    RewardItem("Descuento en Ropa", 3000),
+                    RewardItem("Descuento en Tecnología", 3500),
+                    RewardItem("Descuento en Viajes", 4000),
+                )
+            )
         }
         composable<ScreenHistory> {
             HistoryScreen()
         }
         composable<ScreenProfile> {
-            ProfileScreen(user){
-                Firebase.auth.signOut()
-                navController.navigate(ScreenLogin) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            ProfileScreen(
+                user = user,
+                onToggleDarkMode = onToggleDarkMode,
+                onToggleDynamicColor = onToggleDynamicColor,
+                isDarkMode = isDarkMode,
+                isDynamicColor = isDynamicColor,
+                onLogout = {
+                    Firebase.auth.signOut()
+                    navController.navigate("ScreenLogin") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
                 }
-            }
+            )
         }
     }
-}
-
-fun NavBackStackEntry?.fromRoute(): String? {
-    return this?.destination?.route?.substringAfterLast(".")
 }

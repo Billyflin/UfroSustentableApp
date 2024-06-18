@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.barcode.scanning.common)
     implementation(libs.play.services.mlkit.barcode.scanning)
     implementation(libs.play.services.mlkit.text.recognition)
+    implementation(libs.androidx.benchmark.macro)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

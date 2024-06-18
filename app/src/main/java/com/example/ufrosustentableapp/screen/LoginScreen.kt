@@ -54,7 +54,7 @@ fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, A
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.ufro_sustentable_app_logo),
                 contentDescription = "Logo",
                 colorFilter = if (isSystemInDarkTheme()) ColorFilter.tint(colorScheme.secondary) else null,
                 modifier = Modifier

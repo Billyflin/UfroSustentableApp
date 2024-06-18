@@ -3,7 +3,6 @@ package com.example.ufrosustentableapp
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,7 +55,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppTheme {
+            var isDarkMode by remember { mutableStateOf(false) }
+            var isDynamicColor by remember { mutableStateOf(false) }
+            AppTheme(
+                darkTheme = isDarkMode,
+                dynamicColor = isDynamicColor
+            ) {
                 val navController = rememberNavController()
                 var user by remember { mutableStateOf(Firebase.auth.currentUser) }
                 val launcher = rememberFirebaseAuthLauncher(
@@ -75,17 +79,18 @@ class MainActivity : ComponentActivity() {
                         Firebase.auth.removeAuthStateListener(authStateListener)
                     }
                 }
+
                 val backstackEntry = navController.currentBackStackEntryAsState()
-                val currentScreen = backstackEntry.value.fromRoute()
+                val currentScreen = backstackEntry.value?.destination?.route
 
                 Scaffold(
                     topBar = {
                         if (user != null) {
-                             TopAppBar(
+                            TopAppBar(
                                 title = { Text("Sustentable") },
                                 navigationIcon = {
                                     Image(
-                                        painter = painterResource(id = R.drawable.logo),
+                                        painter = painterResource(id = R.drawable.ufro_sustentable_app_logo),
                                         contentDescription = "Logo",
                                         colorFilter = if (isSystemInDarkTheme()) ColorFilter.tint(Color(0xFFA9D194)) else null,
                                         modifier = Modifier
@@ -93,17 +98,26 @@ class MainActivity : ComponentActivity() {
                                             .padding(8.dp)
                                     )
                                 }
-                             )
+                            )
                         }
                     },
                     bottomBar = {
-                        if (user != null && (currentScreen.toString() != "ScreenQrScanner")){
-                            Log.d("BottomBar", ((currentScreen.toString() == "ScreenQrScanner").toString()) )
+                        if (user != null && currentScreen != "ScreenQrScanner") {
                             BottomNavigationBar(navController, user)
                         }
                     }
                 ) {
-                    AppNavHost(navController, user, token, launcher, context)
+                    AppNavHost(
+                        navController = navController,
+                        user = user,
+                        token = token,
+                        launcher = launcher,
+                        context = context,
+                        isDarkMode = isDarkMode,
+                        onToggleDarkMode = { isDarkMode = !isDarkMode },
+                        isDynamicColor = isDynamicColor,
+                        onToggleDynamicColor = { isDynamicColor = !isDynamicColor }
+                    )
                 }
             }
         }
