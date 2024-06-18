@@ -27,6 +27,7 @@ barcodeScanningCommon = "17.0.0"
 playServicesMlkitBarcodeScanning = "18.3.0"
 playServicesMlkitTextRecognition = "19.0.0"
 benchmarkMacro = "1.2.4"
+navigationTesting = "2.7.7"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
@@ -64,6 +65,7 @@ barcode-scanning-common = { group = "com.google.mlkit", name = "barcode-scanning
 play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
 play-services-mlkit-text-recognition = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition", version.ref = "playServicesMlkitTextRecognition" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro", version.ref = "benchmarkMacro" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -56,6 +56,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.compose.animation:animation:1.0.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -74,6 +75,7 @@ dependencies {
     implementation(libs.play.services.mlkit.barcode.scanning)
     implementation(libs.play.services.mlkit.text.recognition)
     implementation(libs.androidx.benchmark.macro)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
