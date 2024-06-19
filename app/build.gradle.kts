@@ -100,8 +100,8 @@ dependencies {
     implementation (libs.guava)
     implementation (libs.androidx.material.icons.extended)
 //    implementation (libs.androidx.material.symbols.core)
-
-
+//implementation gson
+    implementation(libs.gson)
     implementation (libs.maps.compose)
     implementation (libs.maps.ktx)
 
