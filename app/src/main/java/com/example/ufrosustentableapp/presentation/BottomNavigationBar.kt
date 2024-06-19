@@ -16,8 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +45,7 @@ import com.example.ufrosustentableapp.ScreenQrScanner
 import com.example.ufrosustentableapp.ScreenRewards
 import com.google.firebase.auth.FirebaseUser
 
+
 @Composable
 fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
     Box(
@@ -57,7 +58,7 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
     ) {
         Surface(
             shape = RoundedCornerShape(percent = 20),
-            color = MaterialTheme.colorScheme.surface,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shadowElevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,9 +77,9 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                     }
                 }) {
                     Icon(
-                        Icons.Default.Home,
+                        imageVector = Icons.Rounded.Map,
                         contentDescription = "Inicio",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -92,12 +93,12 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                     Icon(
                         Icons.Default.DateRange,
                         contentDescription = "Historial",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(30.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(56.dp)) // Espacio para el FAB
+                Spacer(modifier = Modifier.width(56.dp))
 
                 IconButton(onClick = {
                     navController.navigate(ScreenRewards) {
@@ -108,7 +109,7 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                     Icon(
                         Icons.Default.Star,
                         contentDescription = "Recompensas",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(30.dp)
                     )
                 }

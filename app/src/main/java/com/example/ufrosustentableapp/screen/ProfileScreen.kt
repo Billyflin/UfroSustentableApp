@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseUser
 
 
@@ -40,7 +42,9 @@ fun ProfileScreen(
     onToggleDarkMode: () -> Unit,
     onToggleDynamicColor: () -> Unit,
     isDarkMode: Boolean,
-    isDynamicColor: Boolean
+    isDynamicColor: Boolean,
+    onChangeContrastLevel: (ContrastLevel) -> Unit,
+    contrastLevel: ContrastLevel,
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
@@ -102,6 +106,33 @@ fun ProfileScreen(
                 onCheckedChange = onToggleDynamicColor,
                 colorScheme = colorScheme
             )
+            if (!isDynamicColor) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Button(
+                    onClick = { onChangeContrastLevel(ContrastLevel.NORMAL) },
+                    enabled = contrastLevel != ContrastLevel.NORMAL
+                ) {
+                    Text(text = "Normal")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { onChangeContrastLevel(ContrastLevel.MEDIUM) },
+                    enabled = contrastLevel != ContrastLevel.MEDIUM
+                ) {
+                    Text(text = "Medio")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { onChangeContrastLevel(ContrastLevel.HIGH) },
+                    enabled = contrastLevel != ContrastLevel.HIGH
+                ) {
+                    Text(text = "Alto")
+                }
+            }
+        }
         }
     }
 }

@@ -21,6 +21,7 @@ import com.example.ufrosustentableapp.screen.RecyclingPoint
 import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
 import com.example.ufrosustentableapp.screen.RewardItem
 import com.example.ufrosustentableapp.screen.RewardsScreen
+import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -39,6 +40,8 @@ fun AppNavHost(
     onToggleDarkMode: () -> Unit,
     isDynamicColor: Boolean,
     onToggleDynamicColor: () -> Unit,
+    contrastLevel: ContrastLevel,
+    onChangeContrastLevel: (ContrastLevel) -> Unit,
     recyclingPoints: SnapshotStateList<RecyclingPoint>
 ) {
     NavHost(
@@ -98,7 +101,9 @@ fun AppNavHost(
                     navController.navigate("ScreenLogin") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
-                }
+                },
+                onChangeContrastLevel = onChangeContrastLevel,
+                contrastLevel = contrastLevel
             )
         }
     }

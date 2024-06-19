@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,17 +36,26 @@ import com.example.ufrosustentableapp.R
 import com.example.ufrosustentableapp.ScreenRewardConfimation
 import com.example.ufrosustentableapp.screen.RewardItem
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints: Int) {
     val colorScheme = MaterialTheme.colorScheme
     val isRedeemable = userPoints >= reward.pointsRequired
-    val targetColor = if (isRedeemable) colorScheme.primary else colorScheme.surface
+    if (isRedeemable) colorScheme.primary else colorScheme.surface
     val transition = rememberInfiniteTransition(label = "")
     val containerColor by transition.animateColor(
-        initialValue = targetColor,
-        targetValue = Color(0x9F73DA80),
+        initialValue = colorScheme.primary,
+        targetValue = colorScheme.primaryContainer,
         label = "containerColor",
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val transitionIcon = rememberInfiniteTransition(label = "")
+    val containerColorIcon by transitionIcon.animateColor(
+        initialValue = colorScheme.onPrimary,
+        targetValue = colorScheme.onPrimaryContainer,
+        label = "containerColorIcon",
         animationSpec = infiniteRepeatable(
             animation = tween(1500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
@@ -68,7 +76,7 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
             }.background(Color.Transparent),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isRedeemable) containerColor else colorScheme.surface ,
+            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow ,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -79,22 +87,20 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
             Icon(
                 painter = painterResource(id = R.drawable.baseline_emoji_events_20), // Reemplaza con tu icono de recompensa
                 contentDescription = reward.title,
-                tint = if (isRedeemable) colorScheme.surface else colorScheme.primary,
-                modifier = Modifier.size(48.dp).background(Color.Transparent)
+                tint = if (isRedeemable) containerColorIcon else colorScheme.primary,
+                modifier = Modifier.size(48.dp)
             )
             Spacer(Modifier.width(16.dp).background(Color.Transparent))
             Column {
                 Text(
                     text = reward.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.onSurface,
-                    modifier = Modifier.background(Color.Transparent)
+                    color = if (isRedeemable) containerColorIcon else colorScheme.onSurface
                 )
                 Text(
                     text = "${reward.pointsRequired} puntos",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = colorScheme.onSurface.copy(alpha = 0.7f),
-                    modifier = Modifier.background(Color.Transparent)
+                    color = if (isRedeemable) containerColorIcon.copy(alpha = 0.6f) else colorScheme.onSurfaceVariant
                 )
             }
         }

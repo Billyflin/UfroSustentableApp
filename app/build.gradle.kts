@@ -98,6 +98,8 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.onetapcompose)
     implementation (libs.guava)
+    implementation (libs.androidx.material.icons.extended)
+//    implementation (libs.androidx.material.symbols.core)
 
 
     implementation (libs.maps.compose)

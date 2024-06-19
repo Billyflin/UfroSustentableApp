@@ -15,6 +15,8 @@ composeBom = "2024.06.00"
 composeNavigation = "2.8.0-beta03"
 mapsCompose = "5.0.3"
 mapsKtx = "5.0.0"
+materialIconsExtended = "1.6.8"
+#materialSymbolsCore = "1.0.0-alpha03"
 onetapcompose = "1.0.12"
 playServicesAuth = "21.2.0"
 firebaseCrashlytics = "19.0.1"
@@ -36,6 +38,8 @@ firebaseFirestoreKtx = "25.0.0"
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+#androidx-material-symbols-core = { module = "androidx.compose.material:material-symbols-core", version.ref = "materialSymbolsCore" }
 coil-compose = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version = "23.0.0" }

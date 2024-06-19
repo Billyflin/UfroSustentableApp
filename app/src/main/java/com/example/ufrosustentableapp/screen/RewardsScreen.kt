@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -39,16 +38,17 @@ import com.example.ufrosustentableapp.presentation.RewardCard
 fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: List<RewardItem>) {
     val colorScheme = MaterialTheme.colorScheme
 
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "")
     val containerColor by transition.animateColor(
         initialValue = colorScheme.primary,
-        targetValue = Color(0x9F73DA80),
+        targetValue = colorScheme.primaryContainer,
         label = "containerColor",
         animationSpec = infiniteRepeatable(
             animation = tween(1500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -59,7 +59,7 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         Text(
             text = "Tus Puntos",
             style = MaterialTheme.typography.headlineMedium,
-            color = colorScheme.onBackground,
+            color = colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -69,7 +69,7 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
                 .padding(bottom = 16.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorScheme.surface,
+                containerColor = colorScheme.surfaceContainerHigh,
                 contentColor = colorScheme.onSurface
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -96,7 +96,7 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         Text(
             text = "Premios Disponibles",
             style = MaterialTheme.typography.headlineMedium,
-            color = colorScheme.onBackground,
+            color = colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 

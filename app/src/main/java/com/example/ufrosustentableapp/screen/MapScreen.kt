@@ -30,6 +30,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
+
     Box {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             val localContext = LocalContext.current
@@ -45,7 +46,7 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
             }
             val universidadDeLaFrontera = LatLng(-38.74658429580099, -72.6157555230996)
             val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 16f)
+                position = CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 17f)
             }
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
@@ -101,3 +102,4 @@ data class RecyclingPoint(
     val longitude: Double,
     val description: String
 )
+
