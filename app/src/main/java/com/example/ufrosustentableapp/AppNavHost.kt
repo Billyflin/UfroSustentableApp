@@ -60,7 +60,7 @@ fun AppNavHost(
             Text("Screen B: $name")
         }
         composable<ScreenQrScanner> {
-            CameraScreen( onDocumentFound = { navController.navigate("ScreenRecycleForm/$it") })
+            CameraScreen( onDocumentFound = { navController.navigate(ScreenRecycleForm(document=it)) })
         }
         composable<ScreenRecycleForm> {
             val args = it.toRoute<ScreenRecycleForm>()
