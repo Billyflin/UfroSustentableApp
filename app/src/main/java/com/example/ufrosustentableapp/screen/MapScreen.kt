@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,13 +52,16 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
     }
     val colorScheme = MaterialTheme.colorScheme
 
-    val mapProperties = remember {
+    val mapProperties = remember(locationPermissionGranted.value) {
         MapProperties(
+            isBuildingEnabled = true,
+            isIndoorEnabled = true,
             isMyLocationEnabled = locationPermissionGranted.value,
 //          Usar el color scheme para el estilo del mapa
             mapStyleOptions = createFromScheme(colorScheme)
         )
     }
+    Log.d("MapScreen", "MapScreen: ${locationPermissionGranted.value}")
 
     Box {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -67,7 +71,6 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
                 properties = mapProperties,
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
-                    myLocationButtonEnabled = true,
                 )
             ) {
                 Marker(

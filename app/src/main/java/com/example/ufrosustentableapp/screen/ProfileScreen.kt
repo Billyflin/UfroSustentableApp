@@ -88,51 +88,50 @@ fun ProfileScreen(
             ) {
                 Text("Cerrar sesión")
             }
-
-            Spacer(Modifier.height(16.dp))
-
+            if (!isDynamicColor) {
+                Spacer(Modifier.height(24.dp))
+                Text(text = "Contraste", color = colorScheme.onBackground)
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Button(
+                        onClick = { onChangeContrastLevel(ContrastLevel.NORMAL) },
+                        enabled = contrastLevel != ContrastLevel.NORMAL
+                    ) {
+                        Text(text = "Normal")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = { onChangeContrastLevel(ContrastLevel.MEDIUM) },
+                        enabled = contrastLevel != ContrastLevel.MEDIUM
+                    ) {
+                        Text(text = "Medio")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = { onChangeContrastLevel(ContrastLevel.HIGH) },
+                        enabled = contrastLevel != ContrastLevel.HIGH
+                    ) {
+                        Text(text = "Alto")
+                    }
+                }
+            }
             SwitchSetting(
                 title = "Modo oscuro",
                 isChecked = isDarkMode,
                 onCheckedChange = onToggleDarkMode,
                 colorScheme = colorScheme
             )
-
-            Spacer(Modifier.height(16.dp))
-
             SwitchSetting(
                 title = "Colores dinámicos",
                 isChecked = isDynamicColor,
                 onCheckedChange = onToggleDynamicColor,
                 colorScheme = colorScheme
             )
-            if (!isDynamicColor) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Button(
-                    onClick = { onChangeContrastLevel(ContrastLevel.NORMAL) },
-                    enabled = contrastLevel != ContrastLevel.NORMAL
-                ) {
-                    Text(text = "Normal")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = { onChangeContrastLevel(ContrastLevel.MEDIUM) },
-                    enabled = contrastLevel != ContrastLevel.MEDIUM
-                ) {
-                    Text(text = "Medio")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = { onChangeContrastLevel(ContrastLevel.HIGH) },
-                    enabled = contrastLevel != ContrastLevel.HIGH
-                ) {
-                    Text(text = "Alto")
-                }
-            }
-        }
+            Spacer(modifier = Modifier.width(30.dp))
+
         }
     }
 }

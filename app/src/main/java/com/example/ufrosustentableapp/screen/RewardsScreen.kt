@@ -53,7 +53,7 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         modifier = Modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(top = 70.dp, bottom = 147.dp)
+            .padding(top = 70.dp, bottom = 110.dp)
             .padding(16.dp)
     ) {
         Text(
@@ -102,7 +102,8 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).fillMaxSize()
         ) {
             items(rewards) { reward ->
                 RewardCard(navController, reward, userPoints)

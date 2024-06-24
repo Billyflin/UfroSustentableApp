@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,8 +60,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var isDarkMode by remember { mutableStateOf(false) }
-            var isDynamicColor by remember { mutableStateOf(false) }
+            val initColor=isSystemInDarkTheme()
+            var isDarkMode by remember { mutableStateOf(initColor) }
+            var isDynamicColor by remember { mutableStateOf(true) }
             var contrastLevel by remember { mutableStateOf(ContrastLevel.NORMAL) }
             AppTheme(
                 darkTheme = isDarkMode,
