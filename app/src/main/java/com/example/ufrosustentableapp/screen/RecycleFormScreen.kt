@@ -38,16 +38,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
-import androidx.navigation.testing.TestNavHostController
+import com.example.ufrosustentableapp.RecyclingPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecycleFormScreen(navController: NavHostController, document: String) {
+fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoint?) {
     val context = LocalContext.current
 
     var expanded by remember { mutableStateOf(false) }
@@ -73,7 +72,8 @@ fun RecycleFormScreen(navController: NavHostController, document: String) {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             cameraLauncher.launch(intent)
         } else {
-            // Permission denied
+            // Handle permission denied
+
         }
     }
 
@@ -96,6 +96,8 @@ fun RecycleFormScreen(navController: NavHostController, document: String) {
             .padding(top = 70.dp, bottom = 110.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        document?.let { Text(text = it.description) }
         Text(
             text = "Completa la siguiente información para ganar puntos",
             style = MaterialTheme.typography.titleLarge,
@@ -205,8 +207,10 @@ fun RecycleFormScreen(navController: NavHostController, document: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RecycleFormScreenPreview() {
-    RecycleFormScreen(navController = TestNavHostController(LocalContext.current), document = "Hola")
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RecycleFormScreenPreview() {
+//    RecycleFormScreen(navController = TestNavHostController(LocalContext.current),
+//        description = "Punto de reciclaje"
+//    )
+//}

@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ufrosustentableapp.presentation.BottomNavigationBar
-import com.example.ufrosustentableapp.screen.RecyclingPoint
 import com.example.ufrosustentableapp.ui.theme.AppTheme
 import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -173,28 +172,3 @@ fun rememberFirebaseAuthLauncher(onAuthComplete: (AuthResult) -> Unit,onAuthErro
     }
 }
 
-@Serializable
-object ScreenLogin
-
-@Serializable
-object ScreenMap
-
-@Serializable
-data class ScreenB(val name: String?)
-
-@Serializable
-object ScreenQrScanner
-
-@Serializable
-object ScreenRewards
-
-@Serializable
-data class ScreenRewardConfimation(val rewardTitle:String, val rewardCost:Int, val userPoints:Int)
-@Serializable
-object ScreenHistory
-
-@Serializable
-object ScreenProfile
-
-@Serializable
-data class ScreenRecycleForm(val document: String)

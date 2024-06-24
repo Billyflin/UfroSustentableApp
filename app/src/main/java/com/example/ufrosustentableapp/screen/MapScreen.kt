@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.example.ufrosustentableapp.R
+import com.example.ufrosustentableapp.RecyclingPoint
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -81,7 +82,9 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
                 )
                 recyclingPoints.forEach { point ->
                     Marker(
-                        state = MarkerState(position = LatLng(point.latitude, point.longitude)),
+                        state = MarkerState(position = LatLng(point.latitude,
+                            point.longitude
+                        )),
                         title = point.description,
                         snippet = "Punto de reciclaje",
                         icon = leafIcon.value
@@ -354,10 +357,4 @@ fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int):
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
-
-data class RecyclingPoint(
-    val latitude: Double,
-    val longitude: Double,
-    val description: String
-)
 

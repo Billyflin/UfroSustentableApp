@@ -2,6 +2,7 @@ package com.example.ufrosustentableapp.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -17,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.ufrosustentableapp.RecyclingPoint
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -25,7 +28,7 @@ import com.google.mlkit.vision.common.InputImage
 
 
 @Composable
-fun CameraScreen(onDocumentFound: (String) -> Unit) {
+fun CameraScreen(onDocumentFound: (RecyclingPoint?) -> Unit) {
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
@@ -65,7 +68,7 @@ fun CameraScreen(onDocumentFound: (String) -> Unit) {
 
 class BarcodeAnalyzer(
     private val context: Context,
-    private val onDocumentFound: (String) -> Unit
+    private val onDocumentFound: (RecyclingPoint?) -> Unit
 ) : ImageAnalysis.Analyzer {
 
     private val scanner = BarcodeScanning.getClient(
@@ -94,7 +97,9 @@ class BarcodeAnalyzer(
         docRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    onDocumentFound(documentId)
+                    Log.d("CameraScreen", "DocumentSnapshot data: ${document.data}")
+                    val recyclingPoint = document.toRecyclingPoint()
+                    onDocumentFound(recyclingPoint)
                 } else {
                     Toast.makeText(context, "Documento no encontrado", Toast.LENGTH_SHORT).show()
                 }
@@ -104,3 +109,15 @@ class BarcodeAnalyzer(
             }
     }
 }
+
+
+fun DocumentSnapshot.toRecyclingPoint(): RecyclingPoint? {
+    val data = this.data ?: return null
+
+    val latitude = data["latitude"] as? Double ?: return null
+    val longitude = data["longitude"] as? Double ?: return null
+    val description = data["description"] as? String ?: return null
+
+    return RecyclingPoint(latitude, longitude, description)
+}
+
