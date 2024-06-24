@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -24,7 +25,7 @@ import com.google.mlkit.vision.common.InputImage
 
 
 @Composable
-fun CameraScreen() {
+fun CameraScreen(onDocumentFound: (String) -> Unit) {
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
@@ -46,7 +47,7 @@ fun CameraScreen() {
                 val imageAnalysis = ImageAnalysis.Builder().build().apply {
                     setAnalyzer(
                         ContextCompat.getMainExecutor(context),
-                        BarcodeAnalyzer(context)
+                        BarcodeAnalyzer(context, onDocumentFound)
                     )
                 }
 
@@ -62,7 +63,10 @@ fun CameraScreen() {
     )
 }
 
-class BarcodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
+class BarcodeAnalyzer(
+    private val context: Context,
+    private val onDocumentFound: (String) -> Unit
+) : ImageAnalysis.Analyzer {
 
     private val scanner = BarcodeScanning.getClient(
         BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
@@ -75,12 +79,28 @@ class BarcodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
             scanner.process(inputImage)
                 .addOnSuccessListener { barcodes ->
                     barcodes.firstOrNull()?.rawValue?.let { rawValue ->
-                        Toast.makeText(context, rawValue, Toast.LENGTH_SHORT).show()
+                        checkDocumentExists(rawValue)
                     }
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
                 }
         }
+    }
+
+    private fun checkDocumentExists(documentId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("recycling_points").document(documentId)
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    onDocumentFound(documentId)
+                } else {
+                    Toast.makeText(context, "Documento no encontrado", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Error al acceder a Firestore", Toast.LENGTH_SHORT).show()
+            }
     }
 }

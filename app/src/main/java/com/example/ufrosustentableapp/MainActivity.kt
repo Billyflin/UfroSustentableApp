@@ -195,3 +195,6 @@ object ScreenHistory
 
 @Serializable
 object ScreenProfile
+
+@Serializable
+data class ScreenRecycleForm(val document: String)

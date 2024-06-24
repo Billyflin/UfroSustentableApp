@@ -17,6 +17,7 @@ import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
+import com.example.ufrosustentableapp.screen.RecycleFormScreen
 import com.example.ufrosustentableapp.screen.RecyclingPoint
 import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
 import com.example.ufrosustentableapp.screen.RewardItem
@@ -59,7 +60,14 @@ fun AppNavHost(
             Text("Screen B: $name")
         }
         composable<ScreenQrScanner> {
-            CameraScreen()
+            CameraScreen( onDocumentFound = { navController.navigate("ScreenRecycleForm/$it") })
+        }
+        composable<ScreenRecycleForm> {
+            val args = it.toRoute<ScreenRecycleForm>()
+            RecycleFormScreen(
+                navController = navController,
+                document = args.document
+            )
         }
         composable<ScreenRewards> {
             RewardsScreen(
@@ -87,7 +95,7 @@ fun AppNavHost(
             )
         }
         composable<ScreenHistory> {
-            HistoryScreen()
+            HistoryScreen( onCancel = {})
         }
         composable<ScreenProfile> {
             ProfileScreen(
@@ -108,3 +116,4 @@ fun AppNavHost(
         }
     }
 }
+
