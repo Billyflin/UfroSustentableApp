@@ -8,5 +8,7 @@ data class RecyclingRequest(
     val photoUrl: String,
     val status: RequestStatus,
     val requestTime: String,
-    val updateTime: String
+    val updateTime: String,
+    val description: String,
+    val reward: Int
 )

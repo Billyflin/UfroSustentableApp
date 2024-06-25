@@ -110,16 +110,22 @@ fun AppNavHost(
 
             request?.let { it2 ->
                 HistoryScreen(
-                    title = "Detalle de Solicitud",
                     activeProgressBar = when (it2.status) {
                         RequestStatus.PROCESSING -> 0
                         RequestStatus.VALIDATING -> 1
                         RequestStatus.REWARD -> 2
                         RequestStatus.UNKNOWN -> 0
+                        RequestStatus.REEDEMED -> 3
+                        RequestStatus.REJECTED -> 0
                     },
                     requestTime = it2.requestTime,
                     updateTime = it2.updateTime,
+                    imageUrl = it2.photoUrl,
+                    description = it2.description,
                     status = it2.status,
+                    reward = it2.reward,
+                    userId = user?.uid ?: "",
+                    requestId = args.requestId,
                     onCancel = { /* Lógica para cancelar */ }
                 )
             } ?: run {
@@ -154,7 +160,9 @@ fun getRequestById(requestId: String): State<RecyclingRequest?> {
                         photoUrl = document.getString("photoUrl") ?: "",
                         status = status,
                         requestTime = document.getTimestamp("timestamp")?.toDate()?.toString() ?: "",
-                        updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: ""
+                        updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: "",
+                        description = document.getString("description") ?: "",
+                        reward = document.getLong("reward")?.toInt() ?: 0
                     )
                     result.value = request
                 } else {

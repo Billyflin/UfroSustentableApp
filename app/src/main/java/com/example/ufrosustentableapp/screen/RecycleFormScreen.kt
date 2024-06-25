@@ -49,6 +49,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.testing.TestNavHostController
 import com.example.ufrosustentableapp.RecyclingPoint
 import com.example.ufrosustentableapp.ScreenHistory
+import com.example.ufrosustentableapp.model.RequestStatus
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -251,6 +252,7 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
                                         val quantityKg = kilos.toDoubleOrNull() ?: 0.0
 
                                         createRecyclingRequest(
+                                            recyclingPoint=recyclingPoint,
                                             userId = userId,
                                             materialType = materialType,
                                             quantityKg = quantityKg,
@@ -296,18 +298,22 @@ fun createRecyclingRequest(
     materialType: String,
     quantityKg: Double,
     photoUrl: String,
+    recyclingPoint: RecyclingPoint?,
     onComplete: (Boolean) -> Unit
 ) {
     val db = FirebaseFirestore.getInstance()
     val newRequestRef = db.collection("recycling_requests").document()
 
     val requestData = hashMapOf(
+        "description" to recyclingPoint?.description,
         "userId" to userId,
         "materialType" to materialType,
         "quantityKg" to quantityKg,
         "photoUrl" to photoUrl,
-        "status" to "pending",
-        "timestamp" to FieldValue.serverTimestamp()
+        "status" to RequestStatus.PROCESSING,
+        "timestamp" to FieldValue.serverTimestamp(),
+        "updateTime" to FieldValue.serverTimestamp(),
+        "reward" to 0
     )
 
     newRequestRef.set(requestData)
