@@ -73,16 +73,19 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
                         userPoints = userPoints
                     )
                 )
-            }.background(Color.Transparent),
+            }
+            .background(Color.Transparent),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow ,
+            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp).background(Color.Transparent)
+            modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Transparent)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_emoji_events_20), // Reemplaza con tu icono de recompensa
@@ -90,7 +93,10 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
                 tint = if (isRedeemable) containerColorIcon else colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
-            Spacer(Modifier.width(16.dp).background(Color.Transparent))
+            Spacer(
+                Modifier
+                    .width(16.dp)
+                    .background(Color.Transparent))
             Column {
                 Text(
                     text = reward.title,

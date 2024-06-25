@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -38,20 +39,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import androidx.navigation.testing.TestNavHostController
 import com.example.ufrosustentableapp.RecyclingPoint
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoint?) {
+fun RecycleFormScreen(navController: NavHostController?, data: String?) {
     val context = LocalContext.current
 
     var expanded by remember { mutableStateOf(false) }
     var selectedMaterial by remember { mutableStateOf("") }
     val materials = listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos")
+    var recyclingPoint: RecyclingPoint? = null
+    try {
+        Log.d("RecycleFormScreen", "Data: $data")
+        recyclingPoint = data?.let { Json.decodeFromString<RecyclingPoint>(data) }
+        Log.d("RecycleFormScreen", "Recycling Point: $recyclingPoint")
+    } catch (e: Exception) {
+        Log.d("RecycleFormScreen", "Error: ${e.message}")
+    }
 
     var kilos by remember { mutableStateOf("") }
     var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -83,6 +95,7 @@ fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoin
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 cameraLauncher.launch(intent)
             }
+
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -96,13 +109,23 @@ fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoin
             .padding(top = 70.dp, bottom = 110.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(text = "Estás en el punto de reciclaje")
+        recyclingPoint.let {
+            Text(
+                text = "${recyclingPoint?.description}",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 16.dp)
 
-        document?.let { Text(text = it.description) }
+            )
+        }
         Text(
             text = "Completa la siguiente información para ganar puntos",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            fontSize = 17.sp,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -189,7 +212,7 @@ fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoin
                 containerColor = if (capturedImage == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
                 contentColor = if (capturedImage == null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer,
 
-            )
+                )
         ) {
             Text(if (capturedImage == null) "Tomar Foto" else "Eliminar")
         }
@@ -207,10 +230,17 @@ fun RecycleFormScreen(navController: NavHostController?, document: RecyclingPoin
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun RecycleFormScreenPreview() {
-//    RecycleFormScreen(navController = TestNavHostController(LocalContext.current),
-//        description = "Punto de reciclaje"
-//    )
-//}
+@Preview(showBackground = true)
+@Composable
+fun RecycleFormScreenPreview() {
+    RecycleFormScreen(
+        navController = TestNavHostController(LocalContext.current),
+        data = """
+            {
+                "description": "Facultad de Ciencias Jurídicas y Empresariales UFRO",
+                "latitude": -38.736,
+                "longitude": -72.598
+            }
+        """.trimIndent()
+    )
+}

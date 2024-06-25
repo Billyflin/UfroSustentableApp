@@ -17,7 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun RewardConfirmationScreen(navController: NavHostController, rewardTitle: String, rewardCost: Int, userPoints: Int) {
+fun RewardConfirmationScreen(
+    navController: NavHostController,
+    rewardTitle: String,
+    rewardCost: Int,
+    userPoints: Int
+) {
     val colorScheme = MaterialTheme.colorScheme
     val remainingPoints = userPoints - rewardCost
 

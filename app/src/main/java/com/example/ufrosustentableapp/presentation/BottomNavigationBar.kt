@@ -139,14 +139,14 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
         FloatingActionButton(
             onClick = {
                 navController.navigate(ScreenQrScanner)
-                      },
+            },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .offset(y = (-18).dp)
         ) {
-            
+
             Icon(
                 painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
                 contentDescription = "QR Scanner",
@@ -155,7 +155,6 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
         }
     }
 }
-
 
 
 @Preview

@@ -27,7 +27,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, context: Context) {
+fun LoginScreen(
+    token: String,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    context: Context
+) {
     val colorScheme = MaterialTheme.colorScheme
     val gradientColors =
         listOf(colorScheme.primary, colorScheme.primaryContainer)
@@ -52,7 +56,7 @@ fun LoginScreen(token: String, launcher: ManagedActivityResultLauncher<Intent, A
             Image(
                 painter = painterResource(id = R.drawable.ufro_sustentable_app_logo),
                 contentDescription = "Logo",
-                colorFilter =  ColorFilter.tint(colorScheme.onPrimaryContainer) ,
+                colorFilter = ColorFilter.tint(colorScheme.onPrimaryContainer),
                 modifier = Modifier
                     .size(320.dp)
                     .padding(bottom = 26.dp)

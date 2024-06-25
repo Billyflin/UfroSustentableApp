@@ -19,16 +19,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.ufrosustentableapp.RecyclingPoint
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 @Composable
-fun CameraScreen(onDocumentFound: (RecyclingPoint?) -> Unit) {
+fun CameraScreen(onDocumentFound: (String?) -> Unit) {
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
@@ -68,7 +69,7 @@ fun CameraScreen(onDocumentFound: (RecyclingPoint?) -> Unit) {
 
 class BarcodeAnalyzer(
     private val context: Context,
-    private val onDocumentFound: (RecyclingPoint?) -> Unit
+    private val onDocumentFound: (String?) -> Unit
 ) : ImageAnalysis.Analyzer {
 
     private val scanner = BarcodeScanning.getClient(
@@ -97,9 +98,14 @@ class BarcodeAnalyzer(
         docRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    Log.d("CameraScreen", "DocumentSnapshot data: ${document.data}")
-                    val recyclingPoint = document.toRecyclingPoint()
-                    onDocumentFound(recyclingPoint)
+                    Log.d("CameraScreen", "DocumentSnapshot data: ${document.data.toString()}")
+                    val recyclingPoint = RecyclingPoint(
+                        latitude = document.data?.get("latitude") as Double,
+                        longitude = document.data?.get("longitude") as Double,
+                        description = document.data?.get("description") as String
+                    )
+                    val recyclingPointString = Json.encodeToString(recyclingPoint)
+                    onDocumentFound(recyclingPointString)
                 } else {
                     Toast.makeText(context, "Documento no encontrado", Toast.LENGTH_SHORT).show()
                 }
@@ -110,14 +116,4 @@ class BarcodeAnalyzer(
     }
 }
 
-
-fun DocumentSnapshot.toRecyclingPoint(): RecyclingPoint? {
-    val data = this.data ?: return null
-
-    val latitude = data["latitude"] as? Double ?: return null
-    val longitude = data["longitude"] as? Double ?: return null
-    val description = data["description"] as? String ?: return null
-
-    return RecyclingPoint(latitude, longitude, description)
-}
 

@@ -1,4 +1,5 @@
 package com.example.ufrosustentableapp.ui.theme
+
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -272,11 +273,13 @@ fun AppTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> when (contrastLevel) {
             ContrastLevel.NORMAL -> darkScheme
             ContrastLevel.MEDIUM -> mediumContrastDarkColorScheme
             ContrastLevel.HIGH -> highContrastDarkColorScheme
         }
+
         else -> when (contrastLevel) {
             ContrastLevel.NORMAL -> lightScheme
             ContrastLevel.MEDIUM -> mediumContrastLightColorScheme

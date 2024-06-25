@@ -49,7 +49,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Serializable
 
 
 class MainActivity : ComponentActivity() {
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val initColor=isSystemInDarkTheme()
+            val initColor = isSystemInDarkTheme()
             var isDarkMode by remember { mutableStateOf(initColor) }
             var isDynamicColor by remember { mutableStateOf(true) }
             var contrastLevel by remember { mutableStateOf(ContrastLevel.NORMAL) }
@@ -146,7 +145,7 @@ class MainActivity : ComponentActivity() {
                         onChangeContrastLevel = { newLevel -> contrastLevel = newLevel },
                         contrastLevel = contrastLevel,
 
-                    )
+                        )
                 }
             }
         }
@@ -155,7 +154,10 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun rememberFirebaseAuthLauncher(onAuthComplete: (AuthResult) -> Unit,onAuthError: (ApiException) -> Unit): ManagedActivityResultLauncher<Intent, ActivityResult> {
+fun rememberFirebaseAuthLauncher(
+    onAuthComplete: (AuthResult) -> Unit,
+    onAuthError: (ApiException) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
     val scope = rememberCoroutineScope()
     return rememberLauncherForActivityResult(StartActivityForResult()) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)

@@ -103,7 +103,9 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 16.dp),
-            modifier = Modifier.padding(bottom = 16.dp).fillMaxSize()
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .fillMaxSize()
         ) {
             items(rewards) { reward ->
                 RewardCard(navController, reward, userPoints)
@@ -111,7 +113,6 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         }
     }
 }
-
 
 
 data class RewardItem(val title: String, val pointsRequired: Int)

@@ -82,9 +82,12 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
                 )
                 recyclingPoints.forEach { point ->
                     Marker(
-                        state = MarkerState(position = LatLng(point.latitude,
-                            point.longitude
-                        )),
+                        state = MarkerState(
+                            position = LatLng(
+                                point.latitude,
+                                point.longitude
+                            )
+                        ),
                         title = point.description,
                         snippet = "Punto de reciclaje",
                         icon = leafIcon.value
@@ -97,13 +100,16 @@ fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
 
 fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
     return try {
-        MapStyleOptions("""
+        MapStyleOptions(
+            """
         [
             {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -111,7 +117,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -119,7 +127,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -128,7 +138,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -137,7 +149,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -146,7 +160,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -155,7 +171,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.background.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -164,7 +182,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.surface.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.surface.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -173,7 +193,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -182,7 +204,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -191,7 +215,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -200,7 +226,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -209,7 +237,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onSecondaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onSecondaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -218,7 +248,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -227,7 +259,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onBackground.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onBackground.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -236,7 +270,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.background.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -245,7 +281,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -254,7 +292,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -263,7 +303,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -272,7 +314,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -281,7 +325,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -290,7 +336,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.stroke",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.background.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -299,7 +347,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primary.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -308,7 +358,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -317,7 +369,9 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "geometry",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.surface.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.surface.toArgb()).substring(2)
+            }"
                     }
                 ]
             },
@@ -326,12 +380,15 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
                 "elementType": "labels.text.fill",
                 "stylers": [
                     {
-                        "color": "#${Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)}"
+                        "color": "#${
+                Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)
+            }"
                     }
                 ]
             }
         ]
-    """.trimIndent())
+    """.trimIndent()
+        )
     } catch (e: Exception) {
         e.printStackTrace()
         null
@@ -340,8 +397,14 @@ fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
 
 
 fun checkLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 }
 
 fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int): BitmapDescriptor {

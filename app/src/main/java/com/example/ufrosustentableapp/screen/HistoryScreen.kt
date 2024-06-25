@@ -154,9 +154,8 @@ fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifie
 }
 
 
-
 @Preview
 @Composable
 fun HistoryScreenPreview() {
-    HistoryScreen( onCancel = {})
+    HistoryScreen(onCancel = {})
 }
