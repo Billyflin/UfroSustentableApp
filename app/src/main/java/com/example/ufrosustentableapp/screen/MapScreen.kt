@@ -13,6 +13,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -35,7 +38,25 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun MapScreen(recyclingPoints: List<RecyclingPoint>) {
+fun MapScreen() {
+    val recyclingPoints = remember { mutableStateListOf<RecyclingPoint>() }
+
+    Firebase.firestore.collection("recycling_points")
+        .get()
+        .addOnSuccessListener { result ->
+            for (document in result) {
+                val point = RecyclingPoint(
+                    latitude = document.getDouble("latitude") ?: 0.0,
+                    longitude = document.getDouble("longitude") ?: 0.0,
+                    description = document.getString("description") ?: ""
+                )
+                recyclingPoints.add(point)
+                Log.d("MainActivity", "${document.id} => ${document.data}")
+            }
+        }
+        .addOnFailureListener { exception ->
+            Log.w("MainActivity", "Error getting documents: ", exception)
+        }
     val context = LocalContext.current
     val leafIcon = remember { mutableStateOf<BitmapDescriptor?>(null) }
 

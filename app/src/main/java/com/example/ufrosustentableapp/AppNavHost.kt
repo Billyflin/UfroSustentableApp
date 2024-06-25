@@ -1,11 +1,6 @@
 package com.example.ufrosustentableapp
 
-import android.content.Context
-import android.content.Intent
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,7 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.ufrosustentableapp.screen.CameraScreen
 import com.example.ufrosustentableapp.screen.HistoryScreen
-import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
 import com.example.ufrosustentableapp.screen.RecycleFormScreen
@@ -34,27 +28,20 @@ fun NavBackStackEntry?.fromRoute(): String? {
 fun AppNavHost(
     navController: NavHostController,
     user: FirebaseUser?,
-    token: String,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    context: Context,
     isDarkMode: Boolean,
     onToggleDarkMode: () -> Unit,
     isDynamicColor: Boolean,
     onToggleDynamicColor: () -> Unit,
     contrastLevel: ContrastLevel,
-    onChangeContrastLevel: (ContrastLevel) -> Unit,
-    recyclingPoints: SnapshotStateList<RecyclingPoint>
+    onChangeContrastLevel: (ContrastLevel) -> Unit
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (user == null) ScreenLogin else ScreenMap
+        startDestination = ScreenMap
 //        startDestination = ScreenA
     ) {
-        composable<ScreenLogin> {
-            LoginScreen(token = token, launcher = launcher, context = context)
-        }
         composable<ScreenMap> {
-            MapScreen(recyclingPoints)
+            MapScreen()
         }
         composable<ScreenQrScanner> {
             CameraScreen(
@@ -109,9 +96,6 @@ fun AppNavHost(
                 isDynamicColor = isDynamicColor,
                 onLogout = {
                     Firebase.auth.signOut()
-                    navController.navigate("ScreenLogin") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
                 },
                 onChangeContrastLevel = onChangeContrastLevel,
                 contrastLevel = contrastLevel
