@@ -37,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ufrosustentableapp.R
+import com.example.ufrosustentableapp.model.RewardItem
 import com.example.ufrosustentableapp.presentation.RewardCard
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -51,7 +52,7 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
             value = rewardsList
         }
     }
- Log.d("RewardsScreen", "Antes del la corrutina for user $userId")
+    Log.d("RewardsScreen", "Antes del la corrutina for user $userId")
     LaunchedEffect(userId) {
         Log.d("RewardsScreen", "Fetching user points for user $userId")
         val db = FirebaseFirestore.getInstance()
@@ -147,23 +148,6 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
         }
     }
 }
-fun updateUserPoints(userId: String, pointsToAdd: Int, onComplete: (Boolean) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-    val userRef = db.collection("users").document(userId)
-
-    db.runTransaction { transaction ->
-        val snapshot = transaction.get(userRef)
-        val currentPoints = snapshot.getLong("points") ?: 0
-        val newPoints = currentPoints + pointsToAdd
-        transaction.update(userRef, "points", newPoints)
-    }.addOnSuccessListener {
-        onComplete(true)
-    }.addOnFailureListener { e ->
-        println("Error actualizando los puntos: ${e.message}")
-        onComplete(false)
-    }
-}
-
 
 
 fun fetchRewards(onResult: (List<RewardItem>) -> Unit) {
@@ -183,6 +167,4 @@ fun fetchRewards(onResult: (List<RewardItem>) -> Unit) {
             onResult(emptyList()) // En caso de error, devolver una lista vacía
         }
 }
-
-data class RewardItem(val title: String, val pointsRequired: Int)
 

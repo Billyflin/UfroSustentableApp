@@ -34,7 +34,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.testing.TestNavHostController
 import com.example.ufrosustentableapp.R
 import com.example.ufrosustentableapp.ScreenRewardConfimation
-import com.example.ufrosustentableapp.screen.RewardItem
+import com.example.ufrosustentableapp.model.RewardItem
 
 @Composable
 fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints: Int) {

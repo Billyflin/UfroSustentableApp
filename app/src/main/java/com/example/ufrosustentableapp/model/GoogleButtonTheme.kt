@@ -1,3 +1,3 @@
-package com.example.ufrosustentableapp.presentation
+package com.example.ufrosustentableapp.model
 
 enum class GoogleButtonTheme { Light, Dark, Neutral }

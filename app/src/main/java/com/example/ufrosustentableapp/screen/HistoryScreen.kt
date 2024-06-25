@@ -40,23 +40,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.testing.TestNavHostController
+import com.example.ufrosustentableapp.ScreenRequestDetail
+import com.example.ufrosustentableapp.model.RecyclingRequest
+import com.example.ufrosustentableapp.model.RequestStatus
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
 
-
-data class RecyclingRequest(
-    val id: String,
-    val userId: String,
-    val materialType: String,
-    val quantityKg: Double,
-    val photoUrl: String,
-    val status: RequestStatus,
-    val requestTime: String,
-    val updateTime: String
-)
 
 @Composable
 fun RequestHistoryScreen(navController: NavHostController, userId: String) {
-    val context = LocalContext.current
+    LocalContext.current
     var requests by remember { mutableStateOf(listOf<RecyclingRequest>()) }
 
     LaunchedEffect(userId) {
@@ -69,6 +63,7 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .padding(top = 74.dp, bottom = 110.dp),
     ) {
         Text(
             text = "Historial de Solicitudes",
@@ -82,7 +77,7 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp),
+                contentPadding = PaddingValues(bottom = 20.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(requests) { request ->
@@ -100,11 +95,13 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                navController.navigate("requestDetail/${request.id}")
+                navController.navigate(
+                    ScreenRequestDetail(request.id)
+                )
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface,
+            containerColor = colorScheme.surfaceContainerHigh,
             contentColor = colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -142,13 +139,20 @@ fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit
         .get()
         .addOnSuccessListener { result ->
             val requests = result.map { document ->
+                val status = try {
+                    RequestStatus.valueOf(
+                        document.getString("status")?.uppercase(Locale.ROOT) ?: "PROCESSING"
+                    )
+                } catch (e: IllegalArgumentException) {
+                    RequestStatus.PROCESSING // Valor predeterminado en caso de error
+                }
                 RecyclingRequest(
                     id = document.id,
                     userId = document.getString("userId") ?: "",
                     materialType = document.getString("materialType") ?: "",
                     quantityKg = document.getDouble("quantityKg") ?: 0.0,
                     photoUrl = document.getString("photoUrl") ?: "",
-                    status = RequestStatus.valueOf(document.getString("status") ?: "PROCESSING"),
+                    status = status,
                     requestTime = document.getTimestamp("timestamp")?.toDate()?.toString() ?: "",
                     updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: ""
                 )
@@ -160,30 +164,6 @@ fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit
         }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-enum class RequestStatus {
-    PROCESSING,
-    VALIDATING,
-    REWARD,
-}
 
 @Composable
 fun HistoryScreen(
@@ -212,6 +192,7 @@ fun HistoryScreen(
                 RequestStatus.PROCESSING -> "Estamos procesando tu solicitud"
                 RequestStatus.VALIDATING -> "Estamos validando tu información"
                 RequestStatus.REWARD -> "Recompensa disponible"
+                RequestStatus.UNKNOWN -> "Estado desconocido"
             },
             style = MaterialTheme.typography.bodyLarge,
         )
@@ -305,6 +286,32 @@ fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifie
     }
 }
 
+@Preview
+@Composable
+fun RequestItemPreview() {
+    RequestItem(
+        navController = TestNavHostController(LocalContext.current),
+        request = RecyclingRequest(
+            id = "1",
+            userId = "userId",
+            materialType = "Plástico",
+            quantityKg = 2.5,
+            photoUrl = "",
+            status = RequestStatus.PROCESSING,
+            requestTime = "12:00",
+            updateTime = "12:30"
+        )
+    )
+}
+
+@Preview
+@Composable
+fun RequestHistoryScreenPreview() {
+    RequestHistoryScreen(
+        navController = TestNavHostController(LocalContext.current),
+        userId = "userId"
+    )
+}
 
 @Preview
 @Composable

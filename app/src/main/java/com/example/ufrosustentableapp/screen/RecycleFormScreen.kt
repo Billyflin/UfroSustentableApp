@@ -123,155 +123,170 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
     ) {
         if (isUploading) {
 //            ciculo en el centro de la pantalla
-            CircularProgressIndicator(modifier = Modifier.size(50.dp).padding(top = 200.dp)
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(top = 200.dp)
             )
         } else {
-        Text(text = "Estás en el punto de reciclaje")
-        recyclingPoint.let {
-            it?.description?.let { it1 ->
-                Text(
-                    text = it1,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+            Text(text = "Estás en el punto de reciclaje")
+            recyclingPoint.let {
+                it?.description?.let { it1 ->
+                    Text(
+                        text = it1,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
             }
-        }
-        Text(
-            text = "Completa la siguiente información para ganar puntos",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            fontSize = 17.sp,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+            Text(
+                text = "Completa la siguiente información para ganar puntos",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-        Text(
-            text = "¿Qué material vas a reciclar?*",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+            Text(
+                text = "¿Qué material vas a reciclar?*",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
+            ) {
+                TextField(
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                    value = selectedMaterial,
+                    onValueChange = {},
+                    readOnly = true,
+                    singleLine = true,
+                    label = { Text("Material de Reciclaje") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    shape = MaterialTheme.shapes.large,
+                )
+                ExposedDropdownMenu(
+                    shape = MaterialTheme.shapes.large,
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    materials.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                            onClick = {
+                                selectedMaterial = option
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             TextField(
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                value = selectedMaterial,
-                onValueChange = {},
-                readOnly = true,
+                value = kilos,
+                onValueChange = { kilos = it },
+                label = { Text("Cantidad en kilos") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
                 singleLine = true,
-                label = { Text("Material de Reciclaje") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(
+                colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
                 shape = MaterialTheme.shapes.large,
             )
-            ExposedDropdownMenu(
-                shape = MaterialTheme.shapes.large,
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
-                materials.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
-                        onClick = {
-                            selectedMaterial = option
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
-                }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            capturedImage?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(bottom = 16.dp)
+                )
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = kilos,
-            onValueChange = { kilos = it },
-            label = { Text("Cantidad en kilos") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            shape = MaterialTheme.shapes.large,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        capturedImage?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(bottom = 16.dp)
-            )
-        }
-
-        Button(
-            onClick = {
-                if (capturedImage == null) {
-                    takePicture()
-                } else {
-                    capturedImage = null
-                }
-            },
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (capturedImage == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
-                contentColor = if (capturedImage == null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer,
-            )
-        ) {
-            Text(if (capturedImage == null) "Tomar Foto" else "Eliminar")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (capturedImage != null) {
             Button(
                 onClick = {
-                    isUploading = true
-                    capturedImage?.let { bitmap ->
-                        uploadImageToFirebaseStorage(bitmap) { photoUrl ->
-                            if (photoUrl != null) {
-                                user?.uid?.let { userId ->
-                                    val materialType = selectedMaterial
-                                    val quantityKg = kilos.toDoubleOrNull() ?: 0.0
-
-                                    createRecyclingRequest(
-                                        userId = userId,
-                                        materialType = materialType,
-                                        quantityKg = quantityKg,
-                                        photoUrl = photoUrl
-                                    ) { success ->
-                                        if (success) {
-                                            Toast.makeText(context, "Solicitud creada exitosamente", Toast.LENGTH_SHORT).show()
-                                            navController?.navigate(ScreenHistory)
-                                        } else {
-                                            Toast.makeText(context, "Error al crear la solicitud", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "Error al subir la imagen", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                    if (capturedImage == null) {
+                        takePicture()
+                    } else {
+                        capturedImage = null
                     }
                 },
-                shape = MaterialTheme.shapes.large
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (capturedImage == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
+                    contentColor = if (capturedImage == null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer,
+                )
             ) {
-                Text("Enviar")
+                Text(if (capturedImage == null) "Tomar Foto" else "Eliminar")
             }
-        }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (capturedImage != null) {
+                Button(
+                    onClick = {
+                        isUploading = true
+                        capturedImage?.let { bitmap ->
+                            uploadImageToFirebaseStorage(bitmap) { photoUrl ->
+                                if (photoUrl != null) {
+                                    user?.uid?.let { userId ->
+                                        val materialType = selectedMaterial
+                                        val quantityKg = kilos.toDoubleOrNull() ?: 0.0
+
+                                        createRecyclingRequest(
+                                            userId = userId,
+                                            materialType = materialType,
+                                            quantityKg = quantityKg,
+                                            photoUrl = photoUrl
+                                        ) { success ->
+                                            if (success) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Solicitud creada exitosamente",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                navController?.navigate(ScreenHistory)
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Error al crear la solicitud",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Error al subir la imagen",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    },
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    Text("Enviar")
+                }
+            }
         }
     }
 }
@@ -339,7 +354,6 @@ fun uploadImageToFirebaseStorage(bitmap: Bitmap, onComplete: (String?) -> Unit) 
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
