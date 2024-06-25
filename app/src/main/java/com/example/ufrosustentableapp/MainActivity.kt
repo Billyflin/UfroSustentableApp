@@ -32,7 +32,9 @@ import com.example.ufrosustentableapp.ui.theme.AppTheme
 import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+//        initializeRewards()
         setContent {
             val initColor = isSystemInDarkTheme()
             var isDarkMode by remember { mutableStateOf(initColor) }
@@ -114,6 +117,35 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+fun initializeRewards() {
+    val db = FirebaseFirestore.getInstance()
+    val rewardsCollection = db.collection("rewards")
+
+    val rewardTitles = listOf(
+        "Café Gratis", "Descuento en Tienda", "Entrada al Cine", "Tarjeta de Regalo", "Producto Ecológico"
+    )
+
+    val batch = db.batch()
+
+    rewardTitles.forEach { title ->
+        val pointsRequired = Random.nextInt(50, 2000) // Genera un número aleatorio entre 50 y 200
+        val reward = mapOf(
+            "title" to title,
+            "pointsRequired" to pointsRequired
+        )
+        val newRewardRef = rewardsCollection.document()
+        batch.set(newRewardRef, reward)
+    }
+
+    batch.commit()
+        .addOnSuccessListener {
+            println("Recompensas inicializadas correctamente")
+        }
+        .addOnFailureListener { e ->
+            println("Error al inicializar recompensas: ${e.message}")
+        }
 }
 
 

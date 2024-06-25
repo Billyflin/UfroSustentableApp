@@ -139,6 +139,7 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
+                Text(text = request.description, style = MaterialTheme.typography.titleSmall)
                 Text(
                     text = request.materialType,
                     style = MaterialTheme.typography.titleLarge,
