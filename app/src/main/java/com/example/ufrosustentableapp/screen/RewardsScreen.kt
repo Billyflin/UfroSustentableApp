@@ -1,5 +1,6 @@
 package com.example.ufrosustentableapp.screen
 
+import android.util.Log
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -24,7 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,11 +38,39 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.ufrosustentableapp.R
 import com.example.ufrosustentableapp.presentation.RewardCard
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
-fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: List<RewardItem>) {
+fun RewardsScreen(navController: NavHostController, userId: String) {
     val colorScheme = MaterialTheme.colorScheme
+    var userPoints by remember { mutableIntStateOf(0) }
+
+    val rewards by produceState(initialValue = emptyList<RewardItem>()) {
+        fetchRewards { rewardsList ->
+            value = rewardsList
+        }
+    }
+ Log.d("RewardsScreen", "Antes del la corrutina for user $userId")
+    LaunchedEffect(userId) {
+        Log.d("RewardsScreen", "Fetching user points for user $userId")
+        val db = FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(userId)
+        userRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e("RewardsScreen", "Error fetching user points: ${e.message}")
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                Log.d("RewardsScreen", "Current data: ${snapshot.data}")
+                userPoints = (snapshot.getLong("points") ?: 0).toInt()
+                Log.d("RewardsScreen", "User points: $userPoints")
+            } else {
+                Log.d("RewardsScreen", "No such document")
+            }
+        }
+    }
+
 
     val transition = rememberInfiniteTransition(label = "")
     val containerColor by transition.animateColor(
@@ -113,7 +147,42 @@ fun RewardsScreen(navController: NavHostController, userPoints: Int, rewards: Li
         }
     }
 }
+fun updateUserPoints(userId: String, pointsToAdd: Int, onComplete: (Boolean) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("users").document(userId)
 
+    db.runTransaction { transaction ->
+        val snapshot = transaction.get(userRef)
+        val currentPoints = snapshot.getLong("points") ?: 0
+        val newPoints = currentPoints + pointsToAdd
+        transaction.update(userRef, "points", newPoints)
+    }.addOnSuccessListener {
+        onComplete(true)
+    }.addOnFailureListener { e ->
+        println("Error actualizando los puntos: ${e.message}")
+        onComplete(false)
+    }
+}
+
+
+
+fun fetchRewards(onResult: (List<RewardItem>) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("rewards")
+        .get()
+        .addOnSuccessListener { result ->
+            val rewards = result.map { document ->
+                RewardItem(
+                    title = document.getString("title") ?: "",
+                    pointsRequired = document.getLong("pointsRequired")?.toInt() ?: 0
+                )
+            }
+            onResult(rewards)
+        }
+        .addOnFailureListener {
+            onResult(emptyList()) // En caso de error, devolver una lista vacía
+        }
+}
 
 data class RewardItem(val title: String, val pointsRequired: Int)
 

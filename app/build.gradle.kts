@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.benchmark.macro)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

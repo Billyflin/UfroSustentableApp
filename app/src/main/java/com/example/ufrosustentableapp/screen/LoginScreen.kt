@@ -2,6 +2,7 @@ package com.example.ufrosustentableapp.screen
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -106,33 +107,56 @@ private fun firebaseAuthWithGoogle(context: Context, idToken: String, onSignInSu
                 val userId = user?.uid
 
                 userId?.let {
-                    db.collection("users").document(it).get()
+                    val userDocRef = db.collection("users").document(it)
+                    userDocRef.get()
                         .addOnSuccessListener { document ->
                             if (!document.exists()) {
+                                // Crear un nuevo documento de usuario si no existe
                                 val userDoc = hashMapOf(
-                                    "name" to user.displayName,
-                                    "email" to user.email,
+                                    "name" to (user.displayName ?: ""),
+                                    "email" to (user.email ?: ""),
                                     "points" to 0,
                                     "recyclingHistory" to emptyList<String>()
                                 )
 
-                                db.collection("users").document(it).set(userDoc)
+                                userDocRef.set(userDoc)
                                     .addOnSuccessListener {
                                         onSignInSuccess()
                                     }
-                                    .addOnFailureListener {
-                                        // Handle the error
+                                    .addOnFailureListener { e ->
+                                        Log.e(
+                                            "Auth",
+                                            "Error al crear el documento de usuario: ${e.message}"
+                                        )
+                                        // Manejar el error
                                     }
                             } else {
-                                onSignInSuccess()
+                                // Asegurarse de que el documento existente tiene el campo "points"
+                                if (!document.contains("points")) {
+                                    userDocRef.update("points", 0)
+                                        .addOnSuccessListener {
+                                            onSignInSuccess()
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e(
+                                                "Auth",
+                                                "Error al actualizar el documento de usuario: ${e.message}"
+                                            )
+                                            // Manejar el error
+                                        }
+                                } else {
+                                    onSignInSuccess()
+                                }
                             }
                         }
-                        .addOnFailureListener {
-                            // Handle the error
+                        .addOnFailureListener { e ->
+                            Log.e("Auth", "Error al obtener el documento de usuario: ${e.message}")
+                            // Manejar el error
                         }
                 }
             } else {
-                // Handle authentication error
+                Log.e("Auth", "Error de autenticación: ${task.exception?.message}")
+                // Manejar el error de autenticación
             }
         }
 }

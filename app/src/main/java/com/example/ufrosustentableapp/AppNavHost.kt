@@ -1,5 +1,6 @@
 package com.example.ufrosustentableapp
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -7,13 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.ufrosustentableapp.screen.CameraScreen
-import com.example.ufrosustentableapp.screen.HistoryScreen
 import com.example.ufrosustentableapp.screen.MapScreen
 import com.example.ufrosustentableapp.screen.ProfileScreen
 import com.example.ufrosustentableapp.screen.RecycleFormScreen
+import com.example.ufrosustentableapp.screen.RequestHistoryScreen
 import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
-import com.example.ufrosustentableapp.screen.RewardItem
-import com.example.ufrosustentableapp.screen.RewardsScreen
 import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -60,20 +59,11 @@ fun AppNavHost(
             )
         }
         composable<ScreenRewards> {
-            RewardsScreen(
-                navController = navController,
-                userPoints = 1500,
-                rewards = listOf(
-                    RewardItem("Café Gratis", 500),
-                    RewardItem("Descuento en Tienda", 1000),
-                    RewardItem("Entrada al Cine", 1500),
-                    RewardItem("Descuento en Restaurante", 2000),
-                    RewardItem("Descuento en Librería", 2500),
-                    RewardItem("Descuento en Ropa", 3000),
-                    RewardItem("Descuento en Tecnología", 3500),
-                    RewardItem("Descuento en Viajes", 4000),
-                )
-            )
+            Log.d("AppNavHost", "user: ${user?.uid}")
+//            RewardsScreen(
+//                navController = navController,
+//                userId = user?.uid ?: ""
+//            )
         }
         composable<ScreenRewardConfimation> {
             val args = it.toRoute<ScreenRewardConfimation>()
@@ -85,7 +75,7 @@ fun AppNavHost(
             )
         }
         composable<ScreenHistory> {
-            HistoryScreen(onCancel = {})
+            RequestHistoryScreen(navController = navController, userId = user?.uid ?: "")
         }
         composable<ScreenProfile> {
             ProfileScreen(

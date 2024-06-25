@@ -34,6 +34,7 @@ playServicesMlkitTextRecognition = "19.0.0"
 benchmarkMacro = "1.2.4"
 navigationTesting = "2.7.7"
 firebaseFirestoreKtx = "25.0.0"
+firebaseStorageKtx = "21.0.0"
 
 [libraries]
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
@@ -80,6 +81,7 @@ play-services-mlkit-text-recognition = { group = "com.google.android.gms", name 
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro", version.ref = "benchmarkMacro" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

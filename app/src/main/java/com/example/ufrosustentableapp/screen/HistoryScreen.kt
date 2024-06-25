@@ -7,30 +7,182 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.google.firebase.firestore.FirebaseFirestore
+
+
+data class RecyclingRequest(
+    val id: String,
+    val userId: String,
+    val materialType: String,
+    val quantityKg: Double,
+    val photoUrl: String,
+    val status: RequestStatus,
+    val requestTime: String,
+    val updateTime: String
+)
+
+@Composable
+fun RequestHistoryScreen(navController: NavHostController, userId: String) {
+    val context = LocalContext.current
+    var requests by remember { mutableStateOf(listOf<RecyclingRequest>()) }
+
+    LaunchedEffect(userId) {
+        fetchUserRequests(userId) { requestsList ->
+            requests = requestsList
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Historial de Solicitudes",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        if (requests.isEmpty()) {
+            Text("No hay solicitudes de reciclaje.")
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(requests) { request ->
+                    RequestItem(navController, request)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
+    val colorScheme = MaterialTheme.colorScheme
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate("requestDetail/${request.id}")
+            },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorScheme.surface,
+            contentColor = colorScheme.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = request.materialType,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colorScheme.onSurface
+                )
+                Text(
+                    text = "Cantidad: ${request.quantityKg} kg",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorScheme.onSurface
+                )
+                Text(
+                    text = "Estado: ${request.status}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("recycling_requests")
+        .whereEqualTo("userId", userId)
+        .get()
+        .addOnSuccessListener { result ->
+            val requests = result.map { document ->
+                RecyclingRequest(
+                    id = document.id,
+                    userId = document.getString("userId") ?: "",
+                    materialType = document.getString("materialType") ?: "",
+                    quantityKg = document.getDouble("quantityKg") ?: 0.0,
+                    photoUrl = document.getString("photoUrl") ?: "",
+                    status = RequestStatus.valueOf(document.getString("status") ?: "PROCESSING"),
+                    requestTime = document.getTimestamp("timestamp")?.toDate()?.toString() ?: "",
+                    updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: ""
+                )
+            }
+            onResult(requests)
+        }
+        .addOnFailureListener {
+            onResult(emptyList()) // En caso de error, devolver una lista vacía
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 enum class RequestStatus {
     PROCESSING,
     VALIDATING,
-    REWARD
+    REWARD,
 }
 
 @Composable
@@ -158,4 +310,30 @@ fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifie
 @Composable
 fun HistoryScreenPreview() {
     HistoryScreen(onCancel = {})
+}
+
+@Preview
+@Composable
+fun HistoryScreenProcessingPreview() {
+    HistoryScreen(
+        title = "Historial de Solicitudes",
+        activeProgressBar = 0,
+        requestTime = "12:00",
+        updateTime = "12:30",
+        status = RequestStatus.PROCESSING,
+        onCancel = {}
+    )
+}
+
+@Preview
+@Composable
+fun HistoryScreenValidatingPreview() {
+    HistoryScreen(
+        title = "Historial de Solicitudes",
+        activeProgressBar = 1,
+        requestTime = "12:00",
+        updateTime = "12:30",
+        status = RequestStatus.VALIDATING,
+        onCancel = {}
+    )
 }
