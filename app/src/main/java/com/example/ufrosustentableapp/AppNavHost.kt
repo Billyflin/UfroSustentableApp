@@ -29,6 +29,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.serialization.Serializable
+import java.util.Date
 import java.util.Locale
 
 fun NavBackStackEntry?.fromRoute(): String? {
@@ -110,6 +111,7 @@ fun AppNavHost(
 
             request?.let { it2 ->
                 HistoryScreen(
+                    navController = navController,
                     activeProgressBar = when (it2.status) {
                         RequestStatus.PROCESSING -> 0
                         RequestStatus.VALIDATING -> 1
@@ -159,8 +161,8 @@ fun getRequestById(requestId: String): State<RecyclingRequest?> {
                         quantityKg = document.getDouble("quantityKg") ?: 0.0,
                         photoUrl = document.getString("photoUrl") ?: "",
                         status = status,
-                        requestTime = document.getTimestamp("timestamp")?.toDate()?.toString() ?: "",
-                        updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: "",
+                        requestTime = document.getTimestamp("timestamp")?.toDate()!!,
+                        updateTime = document.getTimestamp("updateTime")?.toDate() ?: Date(),
                         description = document.getString("description") ?: "",
                         reward = document.getLong("reward")?.toInt() ?: 0
                     )

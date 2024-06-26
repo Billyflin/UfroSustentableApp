@@ -1,7 +1,5 @@
 package com.example.ufrosustentableapp.screen
 
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +27,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,16 +43,24 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.testing.TestNavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.ufrosustentableapp.R
 import com.example.ufrosustentableapp.ScreenRequestDetail
 import com.example.ufrosustentableapp.model.RecyclingRequest
 import com.example.ufrosustentableapp.model.RequestStatus
+import com.example.ufrosustentableapp.presentation.infiniteColorTransition
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 
@@ -69,8 +78,7 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 74.dp, bottom = 110.dp),
+            .padding(top = 90.dp, bottom = 110.dp, start = 4.dp, end = 4.dp),
     ) {
         Text(
             text = "Historial de Solicitudes",
@@ -82,12 +90,13 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
         if (requests.isEmpty()) {
             Text("No hay solicitudes de reciclaje.")
         } else {
+            val sortedRequests = requests.sortedBy { it.status == RequestStatus.REEDEMED }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 20.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(requests) { request ->
+                items(sortedRequests) { request ->
                     RequestItem(navController, request)
                 }
             }
@@ -98,38 +107,43 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
 @Composable
 fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
     val colorScheme = MaterialTheme.colorScheme
-    val transition = rememberInfiniteTransition(label = "")
-    val containerColor by transition.animateColor(
+
+    val containerColor by infiniteColorTransition(
         initialValue = colorScheme.primary,
-        targetValue = colorScheme.primaryContainer,
-        label = "containerColor",
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = colorScheme.inversePrimary,
+        label = "containerColor"
     )
-    val transitionIcon = rememberInfiniteTransition(label = "")
-    val containerColorIcon by transitionIcon.animateColor(
+    val containerColorIcon by infiniteColorTransition(
         initialValue = colorScheme.onPrimary,
-        targetValue = colorScheme.onPrimaryContainer,
-        label = "containerColorIcon",
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = colorScheme.onSurfaceVariant,
+        label = "containerColorIcon"
     )
+    val containerColorIcon2 by infiniteColorTransition(
+        initialValue = colorScheme.tertiaryContainer,
+        targetValue = colorScheme.tertiary,
+        label = "containerColorIcon2"
+    )
+    val containerColorIcon3 by infiniteColorTransition(
+        initialValue = colorScheme.primaryContainer,
+        targetValue = colorScheme.primary,
+        label = "containerColorIcon3"
+    )
+    val dateFormat = SimpleDateFormat("dd/MM/yy", Locale("es", "ES"))
+    val timeFormat = SimpleDateFormat("h:mm", Locale("es", "ES"))
+    val formattedDate = dateFormat.format(request.requestTime)
+    val formattedTime = timeFormat.format(request.requestTime)
+    val isRedeemed = request.status == RequestStatus.REEDEMED
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                navController.navigate(
-                    ScreenRequestDetail(request.id)
-                )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clickable(enabled = !isRedeemed) {
+                navController.navigate(ScreenRequestDetail(request.id))
             },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor =if (request.status == RequestStatus.REWARD) containerColor else colorScheme.surfaceContainerHigh,
-            contentColor = if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
+            containerColor = if (isRedeemed) colorScheme.outline else if (request.status == RequestStatus.REWARD) containerColor else colorScheme.surfaceContainerHigh,
+            contentColor = if (isRedeemed) colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -138,27 +152,59 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text(text = request.description, style = MaterialTheme.typography.titleSmall)
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(0.83f),
+            ) {
+                Text(
+                    text = request.description,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon2 else colorScheme.tertiary
+                )
                 Text(
                     text = request.materialType,
                     style = MaterialTheme.typography.titleLarge,
-                    color = if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
+                    color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon3 else colorScheme.primary
                 )
                 Text(
-                    text = "Cantidad: ${request.quantityKg} kg",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface)) {
+                            append("Cantidad: ")
+                        }
+                        withStyle(style = SpanStyle(color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon3 else colorScheme.primary)) {
+                            append("${request.quantityKg} kg")
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Column(
+                modifier = Modifier.weight(0.17f),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
                 )
                 Text(
-                    text = "Estado: ${request.status}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (request.status == RequestStatus.REWARD) containerColorIcon else colorScheme.onSurface
+                    text = formattedTime,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (isRedeemed)  colorScheme.onSurfaceVariant else if (request.status == RequestStatus.REWARD) containerColorIcon3 else colorScheme.primary
                 )
+                if(isRedeemed){
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_workspace_premium_20),
+                        contentDescription = "Medalla",
+                        tint = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
             }
         }
     }
 }
+
 
 fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
@@ -181,8 +227,8 @@ fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit
                     quantityKg = document.getDouble("quantityKg") ?: 0.0,
                     photoUrl = document.getString("photoUrl") ?: "",
                     status = status,
-                    requestTime = document.getTimestamp("timestamp")?.toDate()?.toString() ?: "",
-                    updateTime = document.getTimestamp("updateTime")?.toDate()?.toString() ?: "",
+                    requestTime = document.getTimestamp("timestamp")?.toDate()!!,
+                    updateTime = document.getTimestamp("updateTime")?.toDate(),
                     description = document.getString("description") ?: "",
                     reward = document.getLong("reward")?.toInt() ?: 0
                 )
@@ -198,16 +244,20 @@ fun fetchUserRequests(userId: String, onResult: (List<RecyclingRequest>) -> Unit
 @Composable
 fun HistoryScreen(
     activeProgressBar: Int = 0,
-    requestTime: String = "12:00",
-    updateTime: String = "12:30",
+    requestTime: Date?,
+    updateTime: Date?,
     imageUrl: String = "",
     reward: Int = 0,
     description: String = "Hola",
     requestId: String = "",
     userId: String = "",
     status: RequestStatus = RequestStatus.PROCESSING,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    navController: NavHostController
 ) {
+    var activeProgressBar2 by remember { mutableStateOf(activeProgressBar) }
+    var requests by remember { mutableStateOf(true) }
+    var claimReady by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -254,8 +304,8 @@ fun HistoryScreen(
         ) {
             for (i in 0..2) {
                 AnimatedProgressBar(
-                    progress = if (i < activeProgressBar) 1f else 0f, // Completar las fases anteriores
-                    isAnimating = i == activeProgressBar, // Animar la fase actual
+                    progress = if (i < activeProgressBar2) 1f else 0f, // Completar las fases anteriores
+                    isAnimating = i == activeProgressBar2, // Animar la fase actual
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -277,21 +327,54 @@ fun HistoryScreen(
         }
         if (status == RequestStatus.REWARD) {
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    redeemReward(requestId, userId, reward) { success ->
-                        if (success) {
-
-                        } else {
-                            // Manejar error
+            if (requests){
+                Button(
+                    onClick = {
+                        requests = false
+                        redeemReward(requestId, userId, reward) { success ->
+                            if (success) {
+                                claimReady = true
+                            } else {
+                                // Manejar error
+                            }
                         }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Reclamar Recompensa")
+                }
+            }
+            if (!requests){
+                if (!claimReady){
+                    CircularProgressIndicator()
+                }
+                Text(text="Recompensa reclamada",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary)
+                Text(text = "Gracias por reciclar",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (claimReady){
+                    Text(text = "Tu recompensa ha sido añadida a tu cuenta",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary)
+                    activeProgressBar2 = 3
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text("Volver")
                     }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Reclamar Recompensa")
+                }
             }
         }
     }
@@ -385,8 +468,8 @@ fun RequestItemPreview() {
             quantityKg = 2.5,
             photoUrl = "",
             status = RequestStatus.PROCESSING,
-            requestTime = "12:00",
-            updateTime = "12:30",
+            requestTime = Date(),
+            updateTime = Date(),
             description = "Descripción de la solicitud",
             reward = 0
         )
@@ -402,32 +485,3 @@ fun RequestHistoryScreenPreview() {
     )
 }
 
-@Preview
-@Composable
-fun HistoryScreenPreview() {
-    HistoryScreen(onCancel = {})
-}
-
-@Preview
-@Composable
-fun HistoryScreenProcessingPreview() {
-    HistoryScreen(
-        activeProgressBar = 0,
-        requestTime = "12:00",
-        updateTime = "12:30",
-        status = RequestStatus.PROCESSING,
-        onCancel = {}
-    )
-}
-
-@Preview
-@Composable
-fun HistoryScreenValidatingPreview() {
-    HistoryScreen(
-        activeProgressBar = 1,
-        requestTime = "12:00",
-        updateTime = "12:30",
-        status = RequestStatus.VALIDATING,
-        onCancel = {}
-    )
-}

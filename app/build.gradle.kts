@@ -94,6 +94,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation (libs.core)
     implementation (libs.zxing.android.embedded)
+    implementation (libs.androidx.datastore.preferences)
+
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)

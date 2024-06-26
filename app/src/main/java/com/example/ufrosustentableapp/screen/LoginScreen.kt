@@ -37,7 +37,7 @@ fun LoginScreen(
     onSignInSuccess: () -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val gradientColors = listOf(colorScheme.primary, colorScheme.primaryContainer)
+    val gradientColors = listOf(colorScheme.primary, colorScheme.secondary)
 
     // Remember a launcher to handle the result of the Google Sign-In intent
     val launcher = rememberLauncherForActivityResult(
@@ -74,7 +74,7 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.ufro_sustentable_app_logo),
                 contentDescription = "Logo",
-                colorFilter = ColorFilter.tint(colorScheme.onPrimaryContainer),
+                colorFilter = ColorFilter.tint(colorScheme.onPrimary),
                 modifier = Modifier
                     .size(320.dp)
                     .padding(bottom = 26.dp)

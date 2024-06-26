@@ -1,8 +1,8 @@
 package com.example.ufrosustentableapp.screen
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,12 +51,11 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background),
-        contentAlignment = Alignment.Center
+            .padding(top = 80.dp, bottom = 140.dp)
+            .background(colorScheme.background)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(16.dp)
         ) {
             AsyncImage(
@@ -88,10 +87,10 @@ fun ProfileScreen(
             ) {
                 Text("Cerrar sesión")
             }
+            Spacer(Modifier.height(16.dp))
             if (!isDynamicColor) {
-                Spacer(Modifier.height(24.dp))
                 Text(text = "Contraste", color = colorScheme.onBackground)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(4.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(16.dp)
@@ -124,14 +123,15 @@ fun ProfileScreen(
                 onCheckedChange = onToggleDarkMode,
                 colorScheme = colorScheme
             )
-            SwitchSetting(
-                title = "Colores dinámicos",
-                isChecked = isDynamicColor,
-                onCheckedChange = onToggleDynamicColor,
-                colorScheme = colorScheme
-            )
-            Spacer(modifier = Modifier.width(30.dp))
-
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Spacer(modifier = Modifier.height(8.dp))
+                SwitchSetting(
+                    title = "Colores dinámicos",
+                    isChecked = isDynamicColor,
+                    onCheckedChange = onToggleDynamicColor,
+                    colorScheme = colorScheme
+                )
+            }
         }
     }
 }
@@ -147,9 +147,8 @@ fun SwitchSetting(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(top = 16.dp)
             .background(colorScheme.surface, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp)
     ) {
         Text(
             text = title,

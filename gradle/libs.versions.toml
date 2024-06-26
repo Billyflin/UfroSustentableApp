@@ -3,6 +3,7 @@ agp = "8.4.2"
 animation = "1.6.8"
 cameraCamera2 = "1.3.4"
 core = "3.4.1"
+datastorePreferences = "1.1.1"
 firebaseBom = "33.1.1"
 gson = "2.11.0"
 guava = "32.0.1-android"
@@ -41,6 +42,7 @@ runtimeLivedata = "1.6.8"
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 #androidx-material-symbols-core = { module = "androidx.compose.material:material-symbols-core", version.ref = "materialSymbolsCore" }
 coil-compose = { module = "io.coil-kt:coil-compose", version = "2.6.0" }

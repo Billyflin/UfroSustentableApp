@@ -1,11 +1,5 @@
 package com.example.ufrosustentableapp.presentation
 
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -40,26 +34,16 @@ import com.example.ufrosustentableapp.model.RewardItem
 fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints: Int) {
     val colorScheme = MaterialTheme.colorScheme
     val isRedeemable = userPoints >= reward.pointsRequired
-    if (isRedeemable) colorScheme.primary else colorScheme.surface
-    val transition = rememberInfiniteTransition(label = "")
-    val containerColor by transition.animateColor(
+
+    val containerColor by infiniteColorTransition(
         initialValue = colorScheme.primary,
-        targetValue = colorScheme.primaryContainer,
-        label = "containerColor",
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = colorScheme.inversePrimary,
+        label = "containerColor"
     )
-    val transitionIcon = rememberInfiniteTransition(label = "")
-    val containerColorIcon by transitionIcon.animateColor(
+    val containerColorIcon by infiniteColorTransition(
         initialValue = colorScheme.onPrimary,
-        targetValue = colorScheme.onPrimaryContainer,
-        label = "containerColorIcon",
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = colorScheme.onSurfaceVariant,
+        label = "containerColorIcon"
     )
 
     Card(
@@ -112,7 +96,6 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
         }
     }
 }
-
 @Preview
 @Composable
 fun RewardCardPreview() {

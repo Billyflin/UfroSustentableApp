@@ -1,12 +1,6 @@
 package com.example.ufrosustentableapp.screen
 
 import android.util.Log
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +33,7 @@ import androidx.navigation.NavHostController
 import com.example.ufrosustentableapp.R
 import com.example.ufrosustentableapp.model.RewardItem
 import com.example.ufrosustentableapp.presentation.RewardCard
+import com.example.ufrosustentableapp.presentation.infiniteColorTransition
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -72,18 +67,14 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
         }
     }
 
+    // Ordena las recompensas basadas en los puntos del usuario
+    val sortedRewards = rewards.sortedBy { it.pointsRequired > userPoints }
 
-    val transition = rememberInfiniteTransition(label = "")
-    val containerColor by transition.animateColor(
+    val containerColor by infiniteColorTransition(
         initialValue = colorScheme.primary,
-        targetValue = colorScheme.primaryContainer,
-        label = "containerColor",
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+        targetValue = colorScheme.inversePrimary,
+        label = "containerColor"
     )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -142,7 +133,7 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
                 .padding(bottom = 16.dp)
                 .fillMaxSize()
         ) {
-            items(rewards) { reward ->
+            items(sortedRewards) { reward ->
                 RewardCard(navController, reward, userPoints)
             }
         }
