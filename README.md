@@ -1,7 +1,3 @@
-Here is a draft README file for the UFRO Sustentable App repository:
-
----
-
 # UFRO Sustentable App
 
 UFRO Sustentable App is a mobile application designed to promote recycling among students at the Universidad de La Frontera. The app incentivizes recycling by awarding points for recycling activities, which can be exchanged for rewards.
@@ -91,7 +87,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Special thanks to the development team: Victor Leñam, Claudio Sáez, and Billy Martinez.
 
 For more details, refer to the [Software Requirements Specification](path_to_SRS_document).
-
----
-
-Feel free to adjust any sections as needed, especially the paths to the screenshots and the link to the SRS document.
