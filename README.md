@@ -68,6 +68,13 @@ UFRO Sustentable App is a mobile application designed to promote recycling among
 6. **Managing Profile**:
    - Visit your profile to update your information and customize the app’s appearance.
 
+## Video
+
+<video width="320" height="240" controls>
+    <source src="media/video_demo.mp4" type="video/mp4">
+    Tu navegador no soporta la etiqueta de video.
+</video>
+
 ## Screenshots
 
 - **Login Screen**:
@@ -168,6 +175,14 @@ UFRO Sustentable App es una aplicación móvil diseñada para promover el recicl
 
 6. **Gestionar perfil**:
    - Visita tu perfil para actualizar tu información y personalizar la apariencia de la app.
+
+## Video de Muestra
+  Aquí hay un video de muestra de la aplicación en funcionamiento:
+
+<video width="320" height="240" controls>
+    <source src="media/video_demo.mp4" type="video/mp4">
+    Tu navegador no soporta la etiqueta de video.
+</video>
 
 ## Capturas de Pantalla
 
