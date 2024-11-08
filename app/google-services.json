@@ -14,11 +14,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "1057480747790-bn4qden9iuqdtn71sbrqfrfaalg24pia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ufrosustentableapp",
+            "certificate_hash": "e3fa02d136248c27cf66ea2cfb81c5380762e8b1"
+          }
+        },
+        {
           "client_id": "1057480747790-nvpojjphk3mbi5qf6d4odumlpq7gjhhe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.ufrosustentableapp",
             "certificate_hash": "013ec347ab6762749db58cc480c9e27cc4ab6a5d"
+          }
+        },
+        {
+          "client_id": "1057480747790-qmf61nolim5c6bq7mbvm42l1epkur2fb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ufrosustentableapp",
+            "certificate_hash": "cfd78c25e9c7f210f04e1df91a533377ef77fd4c"
           }
         },
         {
@@ -29,6 +45,49 @@
       "api_key": [
         {
           "current_key": "AIzaSyDlq-iF_MaXJdq8qCVSvKQsLzVjQDt40Lw"
+        },
+        {
+          "current_key": "AIzaSyAmdVE6myy3KrsrHjx-ySGfjDVIlSe5rCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057480747790-l7i4196tk6bur4vc0734l1mu43cge75d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057480747790:android:afd9895468b7e0cc64855f",
+        "android_client_info": {
+          "package_name": "com.ufrosustentableapp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057480747790-8b2pa7pcb28c28kbkna2d6v6ga5vradp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ufrosustentableapp.app",
+            "certificate_hash": "cfd78c25e9c7f210f04e1df91a533377ef77fd4c"
+          }
+        },
+        {
+          "client_id": "1057480747790-l7i4196tk6bur4vc0734l1mu43cge75d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlq-iF_MaXJdq8qCVSvKQsLzVjQDt40Lw"
+        },
+        {
+          "current_key": "AIzaSyAmdVE6myy3KrsrHjx-ySGfjDVIlSe5rCI"
         }
       ],
       "services": {

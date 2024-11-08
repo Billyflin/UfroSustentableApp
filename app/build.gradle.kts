@@ -13,7 +13,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.ufrosustentableapp"
+        applicationId = "com.ufrosustentableapp.app"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
