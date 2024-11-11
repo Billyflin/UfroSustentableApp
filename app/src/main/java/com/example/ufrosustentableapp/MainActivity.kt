@@ -116,10 +116,11 @@ class MainActivity : ComponentActivity() {
                             BottomNavigationBar(navController, user)
                         }
                     }
-                ) {
+                ) { innerPadding ->
                     if (user != null) {
                         Log.d("MainActivity", "User is logged in, displaying AppNavHost")
                         AppNavHost(
+                            Modifier.padding(innerPadding),
                             navController = navController,
                             user = user,
                             isDarkMode = isDarkMode,

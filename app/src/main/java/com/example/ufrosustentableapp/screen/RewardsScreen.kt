@@ -78,9 +78,7 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
-            .padding(top = 70.dp, bottom = 110.dp)
-            .padding(16.dp)
+            .background(colorScheme.background).padding(16.dp)
     ) {
         Text(
             text = "Tus Puntos",

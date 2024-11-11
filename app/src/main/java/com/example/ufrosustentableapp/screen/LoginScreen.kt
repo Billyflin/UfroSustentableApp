@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,9 +95,68 @@ fun LoginScreen(
                     launcher.launch(signInIntent)
                 }
             })
+            Spacer(modifier = Modifier.height(16.dp))
+            // Botón de invitado
+            Button(onClick = {
+                firebaseAnonymousAuth(context, onSignInSuccess)
+            }) {
+                Text(text = "Ingresar como Invitado")
+            }
         }
     }
 }
+
+
+private fun firebaseAnonymousAuth(context: Context, onSignInSuccess: () -> Unit) {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+
+    auth.signInAnonymously()
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = auth.currentUser
+                val userId = user?.uid
+
+                userId?.let {
+                    val userDocRef = db.collection("users").document(it)
+                    userDocRef.get()
+                        .addOnSuccessListener { document ->
+                            if (!document.exists()) {
+                                // Crear un nuevo documento de usuario si no existe
+                                val userDoc = hashMapOf(
+                                    "name" to "Invitado",
+                                    "email" to "",
+                                    "points" to 0,
+                                    "recyclingHistory" to emptyList<String>()
+                                )
+
+                                userDocRef.set(userDoc)
+                                    .addOnSuccessListener {
+                                        onSignInSuccess()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e(
+                                            "Auth",
+                                            "Error al crear el documento de usuario: ${e.message}"
+                                        )
+                                        // Manejar el error
+                                    }
+                            } else {
+                                onSignInSuccess()
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Auth", "Error al obtener el documento de usuario: ${e.message}")
+                            // Manejar el error
+                        }
+                }
+            } else {
+                Log.e("Auth", "Error de autenticación anónima: ${task.exception?.message}")
+                // Manejar el error de autenticación
+            }
+        }
+}
+
 
 private fun firebaseAuthWithGoogle(context: Context, idToken: String, onSignInSuccess: () -> Unit) {
     val auth = FirebaseAuth.getInstance()

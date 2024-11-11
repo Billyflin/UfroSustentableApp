@@ -78,7 +78,6 @@ fun RequestHistoryScreen(navController: NavHostController, userId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 90.dp, bottom = 110.dp, start = 4.dp, end = 4.dp),
     ) {
         Text(
             text = "Historial de Solicitudes",
@@ -260,8 +259,8 @@ fun HistoryScreen(
     var claimReady by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 90.dp, bottom = 130.dp),
+            .fillMaxSize().padding(16.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Punto de reciclaje", style = MaterialTheme.typography.headlineSmall)

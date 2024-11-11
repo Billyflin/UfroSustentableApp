@@ -8,6 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,6 +39,7 @@ fun NavBackStackEntry?.fromRoute(): String? {
 
 @Composable
 fun AppNavHost(
+    navController1: Modifier,
     navController: NavHostController,
     user: FirebaseUser?,
     isDarkMode: Boolean,
@@ -48,6 +50,7 @@ fun AppNavHost(
     onChangeContrastLevel: (ContrastLevel) -> Unit
 ) {
     NavHost(
+        modifier = navController1,
         navController = navController,
         startDestination = ScreenHistory
 //        startDestination = ScreenA

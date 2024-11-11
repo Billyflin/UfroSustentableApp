@@ -29,8 +29,8 @@ fun RewardConfirmationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
-            .padding(16.dp),
+            .padding(16.dp)
+            .background(colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
