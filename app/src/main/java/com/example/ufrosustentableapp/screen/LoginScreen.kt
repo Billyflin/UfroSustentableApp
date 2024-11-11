@@ -19,6 +19,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,11 +99,18 @@ fun LoginScreen(
             })
             Spacer(modifier = Modifier.height(16.dp))
             // Botón de invitado
-            Button(onClick = {
-                firebaseAnonymousAuth(context, onSignInSuccess)
-            }) {
+            Button(
+                onClick = {
+                    firebaseAnonymousAuth(context, onSignInSuccess)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(text = "Ingresar como Invitado")
             }
+
         }
     }
 }
