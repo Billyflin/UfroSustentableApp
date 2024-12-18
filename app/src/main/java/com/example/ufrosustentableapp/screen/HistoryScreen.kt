@@ -60,6 +60,8 @@ import com.example.ufrosustentableapp.model.RequestStatus
 import com.example.ufrosustentableapp.presentation.infiniteColorTransition
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -254,6 +256,21 @@ fun HistoryScreen(
     onCancel: () -> Unit,
     navController: NavHostController
 ) {
+    // Configurar el formato de la fecha basado en la configuración local
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+    // Convertir las fechas de `Date` a `LocalDateTime` y luego formatearlas
+    val formattedRequestTime = requestTime?.toInstant()
+        ?.atZone(ZoneId.systemDefault())
+        ?.toLocalDateTime()
+        ?.format(formatter) ?: "Desconocido"
+
+    val formattedUpdateTime = updateTime?.toInstant()
+        ?.atZone(ZoneId.systemDefault())
+        ?.toLocalDateTime()
+        ?.format(formatter) ?: "Desconocido"
+
+
     var activeProgressBar2 by remember { mutableStateOf(activeProgressBar) }
     var requests by remember { mutableStateOf(true) }
     var claimReady by remember { mutableStateOf(false) }
@@ -284,12 +301,12 @@ fun HistoryScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Hora Solicitud: $requestTime",
+            text = "Hora Solicitud: $formattedRequestTime",
             style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Hora Actualización: $updateTime",
+            text = "Hora Actualización: $formattedUpdateTime",
             style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(modifier = Modifier.height(24.dp))

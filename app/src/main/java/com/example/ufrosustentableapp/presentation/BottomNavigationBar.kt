@@ -3,6 +3,7 @@ package com.example.ufrosustentableapp.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,80 +73,95 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxSize()
             ) {
-                IconButton(onClick = {
-                    navController.navigate(ScreenMap) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Map,
-                        contentDescription = "Inicio",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenHistory) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(
-                        Icons.Default.DateRange,
-                        contentDescription = "Historial",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(56.dp))
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenRewards) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Recompensas",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-
-                IconButton(onClick = {
-                    navController.navigate(ScreenProfile) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }) {
-                    if (user?.photoUrl != null) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(user.photoUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "Foto de perfil",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        )
-                    } else {
+                // Botón 1
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = {
+                        navController.navigate(ScreenMap) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }) {
                         Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
+                            imageVector = Icons.Rounded.Map,
+                            contentDescription = "Inicio",
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(30.dp)
                         )
                     }
+                    Text("Inicio", style = MaterialTheme.typography.bodySmall)
+                }
+
+                // Botón 2
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = {
+                        navController.navigate(ScreenHistory) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }) {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Historial",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Text("Historial", style = MaterialTheme.typography.bodySmall)
+                }
+
+                Spacer(modifier = Modifier.width(30.dp))
+
+                // Botón 3
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = {
+                        navController.navigate(ScreenRewards) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "Recompensas",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Text("Recompensas", style = MaterialTheme.typography.bodySmall)
+                }
+
+                // Botón 4
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = {
+                        navController.navigate(ScreenProfile) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }) {
+                        if (user?.photoUrl != null) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "Foto de perfil",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Perfil",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                    }
+                    Text("Perfil", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
-
 
         FloatingActionButton(
             onClick = {
@@ -156,7 +173,6 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                 .align(Alignment.TopCenter)
                 .offset(y = (-18).dp)
         ) {
-
             Icon(
                 painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
                 contentDescription = "QR Scanner",
@@ -165,6 +181,7 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
         }
     }
 }
+
 
 
 @Preview

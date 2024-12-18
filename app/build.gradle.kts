@@ -95,6 +95,8 @@ dependencies {
     implementation (libs.core)
     implementation (libs.zxing.android.embedded)
     implementation (libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.datetime) // Usa la versión más reciente
+
 
 
     implementation(platform(libs.firebase.bom))
