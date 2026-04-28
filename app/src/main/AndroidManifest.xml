@@ -36,7 +36,7 @@
         <meta-data
             android:name="androidx.camera.cameraX.CameraXConfigProvider"
             android:value="androidx.camera.camera2.Camera2Config" />
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDlq-iF_MaXJdq8qCVSvKQsLzVjQDt40Lw"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/google_api_key"/>
     </application>
 
 </manifest>

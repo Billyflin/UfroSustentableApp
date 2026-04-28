@@ -47,8 +47,6 @@ import java.security.SecureRandom
 import java.util.Base64
 
 private const val TAG = "LoginScreen"
-// TODO: Replace with your actual Web Client ID from Firebase Console
-private const val WEB_CLIENT_ID = "34543623932-sdajtc9dreognifuqu9d6kd97n4rda4u.apps.googleusercontent.com"
 
 @Composable
 fun LoginScreen(
@@ -77,7 +75,7 @@ fun LoginScreen(
     suspend fun signInWithGoogle() {
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(WEB_CLIENT_ID)
+            .setServerClientId(context.getString(R.string.default_web_client_id))
             .setAutoSelectEnabled(false)
             .setNonce(generateNonce())
             .build()
