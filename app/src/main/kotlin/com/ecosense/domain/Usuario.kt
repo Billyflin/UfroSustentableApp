@@ -8,3 +8,4 @@ data class Usuario(
     val recompensasReclamadas: MutableList<String> = mutableListOf()
 )
 
+

@@ -14,3 +14,4 @@ data class RecyclingRequest(
     val description: String,
     val reward: Int
 )
+

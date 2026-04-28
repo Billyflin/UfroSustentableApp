@@ -1,9 +1,7 @@
 package com.ecosense.screen
 
-import android.app.Activity
 import android.content.Context
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,21 +21,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ecosense.R
 import com.ecosense.presentation.GoogleSignInButton
 import com.ecosense.viewmodel.LoginUiState
 import com.ecosense.viewmodel.LoginViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.launch
+
+private const val TAG = "LoginScreen"
+// TODO: Replace with your actual Web Client ID from Firebase Console
+private const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID_HERE"
 
 @Composable
 fun LoginScreen(
@@ -47,6 +56,8 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colorScheme = MaterialTheme.colorScheme
+    val scope = rememberCoroutineScope()
+    val credentialManager = CredentialManager.create(context)
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.Success) {
@@ -55,15 +66,33 @@ fun LoginScreen(
         }
     }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                viewModel.signInWithGoogle(account.idToken!!)
-            } catch (_: ApiException) { }
+    suspend fun signInWithGoogle() {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(WEB_CLIENT_ID)
+            .setAutoSelectEnabled(false)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        try {
+            val result = credentialManager.getCredential(
+                context = context,
+                request = request
+            )
+            val credential = result.credential
+            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                viewModel.signInWithGoogle(googleIdTokenCredential.idToken)
+            }
+        } catch (e: NoCredentialException) {
+            Log.e(TAG, "NoCredentialException: Error de autenticación", e)
+            viewModel.setError("No se encontraron credenciales. Verifica tener una cuenta Google y el WEB_CLIENT_ID configurado.")
+        } catch (e: GetCredentialException) {
+            Log.e(TAG, "GetCredentialException: Error de autenticación", e)
+            viewModel.setError("Error al iniciar sesión: ${e.localizedMessage}")
         }
     }
 
@@ -106,14 +135,10 @@ fun LoginScreen(
                         )
                     }
                     GoogleSignInButton(onClick = {
-                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestIdToken(context.getString(R.string.default_web_client_id))
-                            .requestEmail()
-                            .requestProfile()
-                            .build()
-                        val signInClient = GoogleSignIn.getClient(context, gso)
-                        signInClient.signOut().addOnCompleteListener {
-                            launcher.launch(signInClient.signInIntent)
+                        scope.launch {
+                            // Clear state before sign in to allow choosing account
+                            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                            signInWithGoogle()
                         }
                     })
                     Spacer(modifier = Modifier.height(16.dp))
@@ -131,4 +156,3 @@ fun LoginScreen(
         }
     }
 }
-

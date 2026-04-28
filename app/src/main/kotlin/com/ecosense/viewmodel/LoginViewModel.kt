@@ -42,5 +42,8 @@ class LoginViewModel(
     fun resetState() {
         _uiState.value = LoginUiState.Idle
     }
-}
 
+    fun setError(message: String) {
+        _uiState.value = LoginUiState.Error(message)
+    }
+}

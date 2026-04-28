@@ -12,3 +12,4 @@ data class Grupo(
     val recompensasDisponibles: MutableList<String> = mutableListOf()
 )
 
+

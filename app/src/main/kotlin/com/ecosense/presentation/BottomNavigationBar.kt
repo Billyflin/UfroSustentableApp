@@ -190,3 +190,4 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
 fun NavBarPreview() {
     BottomNavigationBar(rememberNavController(), null)
 }
+

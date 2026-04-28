@@ -52,3 +52,4 @@ data class UserPreferences(
     val contrastLevel: ContrastLevel
 )
 
+

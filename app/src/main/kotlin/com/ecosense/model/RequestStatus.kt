@@ -8,3 +8,4 @@ enum class RequestStatus {
     REJECTED,
     UNKNOWN // Valor predeterminado
 }
+

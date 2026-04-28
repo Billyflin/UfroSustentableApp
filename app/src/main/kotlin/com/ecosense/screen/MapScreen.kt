@@ -192,3 +192,4 @@ fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int):
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
+

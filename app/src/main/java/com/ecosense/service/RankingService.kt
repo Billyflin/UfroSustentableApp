@@ -54,3 +54,4 @@ class RankingService {
         obtenerRankingGrupal(grupos).find { it.grupo.id == grupoId }?.posicion
 }
 
+

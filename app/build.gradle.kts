@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ecosense.app"
+        applicationId = "com.ecosense"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -125,4 +125,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.credentials:credentials:1.6.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
 }

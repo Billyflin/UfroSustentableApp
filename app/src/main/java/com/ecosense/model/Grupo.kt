@@ -18,3 +18,4 @@ data class Grupo(
     val metaPuntaje: Int = 1000
 )
 
+

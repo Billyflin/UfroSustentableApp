@@ -41,6 +41,8 @@ runtimeLivedata = "1.8.0"
 junitJupiter       = "5.11.0"
 junitPlatformSuite = "1.11.0"
 activityCompose = "1.13.0"
+credentials = "1.5.0-rc01"
+googleid = "1.1.1"
 coilCompose = "3.4.0"
 firebaseAuth = "23.3.0"
 kotlinxSerialization = "1.11.0"
@@ -81,6 +83,9 @@ maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = 
 maps-ktx = { module = "com.google.maps.android:maps-ktx", version.ref = "mapsKtx" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 onetapcompose = { module = "com.github.stevdza-san:OneTapCompose", version.ref = "onetapcompose" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
