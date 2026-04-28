@@ -3,17 +3,38 @@ package com.ecosense.screen
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ColorScheme
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ElevatedSuggestionChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,6 +63,9 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.key
 
 @Composable
 fun MapScreen(viewModel: MapViewModel = viewModel()) {
@@ -87,31 +112,35 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
         position = CameraPosition.fromLatLngZoom(universidadDeLaFrontera, 16.4f)
     }
 
-    val mapProperties = remember(locationPermissionGranted.value, colorScheme) {
+    // Separated so permission changes don't trigger expensive JSON rebuild
+    val mapStyleOptions = remember(colorScheme) { createFromScheme(colorScheme) }
+    val mapProperties = remember(locationPermissionGranted.value, mapStyleOptions) {
         MapProperties(
             isBuildingEnabled = true,
             isIndoorEnabled = true,
             isMyLocationEnabled = locationPermissionGranted.value,
-            mapStyleOptions = createFromScheme(colorScheme)
+            mapStyleOptions = mapStyleOptions
         )
     }
 
     if (locationPermissionGranted.value) {
-        Box {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    properties = mapProperties,
-                    uiSettings = MapUiSettings(zoomControlsEnabled = false)
-                ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = mapProperties,
+                uiSettings = MapUiSettings(zoomControlsEnabled = false)
+            ) {
+                key("ufro") {
                     Marker(
                         state = MarkerState(position = universidadDeLaFrontera),
                         title = "Universidad de La Frontera",
                         snippet = "Temuco, Chile",
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
                     )
-                    uiState.recyclingPoints.forEach { point ->
+                }
+                uiState.recyclingPoints.forEach { point ->
+                    key(point.latitude, point.longitude) {
                         Marker(
                             state = MarkerState(position = LatLng(point.latitude, point.longitude)),
                             title = point.description,
@@ -121,16 +150,115 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                     }
                 }
             }
+
+            // Loading overlay
+            AnimatedVisibility(
+                visible = uiState.isLoading,
+                enter = fadeIn(spring(stiffness = Spring.StiffnessMedium)),
+                exit = fadeOut(spring(stiffness = Spring.StiffnessMedium)),
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
+            ) {
+                ElevatedCard(shape = MaterialTheme.shapes.extraLarge) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(12.dp).size(24.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 2.5.dp
+                    )
+                }
+            }
+
+            // Points count chip
+            AnimatedVisibility(
+                visible = !uiState.isLoading && uiState.recyclingPoints.isNotEmpty(),
+                enter = fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) +
+                        scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow)) +
+                        slideInVertically(spring(stiffness = Spring.StiffnessMediumLow)) { -it },
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
+            ) {
+                ElevatedSuggestionChip(
+                    onClick = {},
+                    label = { Text("${uiState.recyclingPoints.size} puntos de reciclaje") },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                        )
+                    },
+                    colors = SuggestionChipDefaults.elevatedSuggestionChipColors(
+                        containerColor = colorScheme.primaryContainer,
+                        labelColor = colorScheme.onPrimaryContainer,
+                        iconContentColor = colorScheme.primary
+                    )
+                )
+            }
+
+            // Error chip
+            AnimatedVisibility(
+                visible = uiState.error != null,
+                enter = fadeIn() + slideInVertically { -it },
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
+            ) {
+                ElevatedCard(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Button(
+                        onClick = { viewModel.retry() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.errorContainer,
+                            contentColor = colorScheme.onErrorContainer
+                        ),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.size(6.dp))
+                        Text("Reintentar")
+                    }
+                }
+            }
         }
     } else {
-        Box(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Se requieren permisos de ubicación para mostrar el mapa.",
-                style = MaterialTheme.typography.bodyLarge
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = colorScheme.primary
             )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Permisos de ubicación requeridos",
+                style = MaterialTheme.typography.titleLarge,
+                color = colorScheme.onBackground
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Para ver los puntos de reciclaje cercanos necesitamos acceso a tu ubicación.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 32.dp)
+            )
+            Spacer(Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
+                }
+            ) {
+                Text("Permitir ubicación")
+            }
         }
     }
 }
@@ -180,7 +308,7 @@ fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int):
     val vectorDrawable = ContextCompat.getDrawable(context, vectorResId)
         ?: run {
             Log.e("MapScreen", "El recurso vectorial no se pudo cargar.")
-            throw Resources.NotFoundException("El recurso vectorial no se pudo cargar.")
+            throw android.content.res.Resources.NotFoundException("El recurso vectorial no se pudo cargar.")
         }
     vectorDrawable.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
     val bitmap = Bitmap.createBitmap(
@@ -191,5 +319,3 @@ fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int):
     vectorDrawable.draw(android.graphics.Canvas(bitmap))
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
-
-

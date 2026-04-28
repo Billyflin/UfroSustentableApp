@@ -1,11 +1,19 @@
 package com.ecosense.screen
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,12 +30,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,38 +92,126 @@ fun RequestHistoryScreen(
         viewModel.loadRequests(userId)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = "Historial de Solicitudes",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        when (val state = uiState) {
-            is HistoryUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            is HistoryUiState.Error -> {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(
+                text = "Mis solicitudes",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            if (uiState is HistoryUiState.Success) {
+                val count = (uiState as HistoryUiState.Success).requests.size
+                Spacer(Modifier.weight(1f))
                 Text(
-                    text = "Error al cargar solicitudes: ${state.message}",
-                    color = MaterialTheme.colorScheme.error
+                    text = "$count",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.shapes.extraLarge
+                        )
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
-            is HistoryUiState.Success -> {
-                if (state.requests.isEmpty()) {
-                    Text("No hay solicitudes de reciclaje.")
-                } else {
-                    val sortedRequests = state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(bottom = 20.dp),
-                        modifier = Modifier.fillMaxSize()
+        }
+
+        AnimatedContent(
+            targetState = uiState,
+            transitionSpec = {
+                fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) +
+                        slideInVertically(spring(stiffness = Spring.StiffnessMediumLow)) { it / 4 } togetherWith
+                        fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
+            },
+            label = "historyState"
+        ) { state ->
+            when (state) {
+                is HistoryUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                is HistoryUiState.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        items(sortedRequests) { request ->
-                            RequestItem(navController, request)
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = "Error al cargar solicitudes",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            text = state.message,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Button(onClick = { viewModel.loadRequests(userId) }) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+                is HistoryUiState.Success -> {
+                    if (state.requests.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = "Aún no tienes solicitudes",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Escanea un código QR en un punto de reciclaje para comenzar",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                            )
+                        }
+                    } else {
+                        val sortedRequests = state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 20.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(sortedRequests, key = { it.id }) { request ->
+                                RequestItem(navController, request)
+                            }
                         }
                     }
                 }
@@ -152,23 +250,21 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
     val formattedTime = timeFormat.format(request.requestTime)
     val isRedeemed = request.status == RequestStatus.REEDEMED
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
             .clickable(enabled = !isRedeemed) {
                 navController.navigate(ScreenRequestDetail(request.id))
             },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isRedeemed) colorScheme.outline
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = if (isRedeemed) colorScheme.surfaceContainerLow
             else if (request.status == RequestStatus.REWARD) containerColor
             else colorScheme.surfaceContainerHigh,
             contentColor = if (isRedeemed) colorScheme.onSurfaceVariant
             else if (request.status == RequestStatus.REWARD) containerColorIcon
             else colorScheme.onSurface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -181,27 +277,23 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
             ) {
                 Text(
                     text = request.description,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = if (isRedeemed) colorScheme.onSurfaceVariant
                     else if (request.status == RequestStatus.REWARD) containerColorIcon2
                     else colorScheme.tertiary
                 )
                 Text(
                     text = request.materialType,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = if (isRedeemed) colorScheme.onSurfaceVariant
                     else if (request.status == RequestStatus.REWARD) containerColorIcon3
                     else colorScheme.primary
                 )
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                color = if (isRedeemed) colorScheme.onSurfaceVariant
-                                else if (request.status == RequestStatus.REWARD) containerColorIcon
-                                else colorScheme.onSurface
-                            )
-                        ) { append("Cantidad: ") }
+                        withStyle(style = SpanStyle(color = if (isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onSurface)) {
+                            append("Cantidad: ")
+                        }
                         withStyle(
                             style = SpanStyle(
                                 color = if (isRedeemed) colorScheme.onSurfaceVariant
@@ -210,7 +302,7 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
                             )
                         ) { append("${request.quantityKg} kg") }
                     },
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
             Column(
@@ -219,14 +311,12 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
             ) {
                 Text(
                     text = formattedDate,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (isRedeemed) colorScheme.onSurfaceVariant
-                    else if (request.status == RequestStatus.REWARD) containerColorIcon
-                    else colorScheme.onSurface
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onSurface
                 )
                 Text(
                     text = formattedTime,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     color = if (isRedeemed) colorScheme.onSurfaceVariant
                     else if (request.status == RequestStatus.REWARD) containerColorIcon3
                     else colorScheme.primary
@@ -234,9 +324,9 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
                 if (isRedeemed) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_workspace_premium_20),
-                        contentDescription = "Medalla",
+                        contentDescription = "Canjeado",
                         tint = colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(40.dp)
                     )
                 }
             }
@@ -283,35 +373,47 @@ fun HistoryScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Punto de reciclaje", style = MaterialTheme.typography.headlineSmall)
+        Text("Punto de reciclaje", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(
             text = description,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary,
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ElevatedCard(
+            shape = MaterialTheme.shapes.large,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = when (status) {
+                        RequestStatus.PROCESSING -> "Procesando solicitud"
+                        RequestStatus.VALIDATING -> "Validando información"
+                        RequestStatus.REWARD -> "Recompensa disponible"
+                        RequestStatus.UNKNOWN -> "Estado desconocido"
+                        RequestStatus.REEDEMED -> "Recompensa canjeada"
+                        RequestStatus.REJECTED -> "Solicitud rechazada"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Solicitud: $formattedRequestTime", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Actualizado: $formattedUpdateTime", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = when (status) {
-                RequestStatus.PROCESSING -> "Estamos procesando tu solicitud"
-                RequestStatus.VALIDATING -> "Estamos validando tu información"
-                RequestStatus.REWARD -> "Recompensa disponible"
-                RequestStatus.UNKNOWN -> "Estado desconocido"
-                RequestStatus.REEDEMED -> "Recompensa canjeada"
-                RequestStatus.REJECTED -> "Solicitud rechazada"
-            },
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Hora Solicitud: $formattedRequestTime", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Hora Actualización: $formattedUpdateTime", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(24.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         ) {
             for (i in 0..2) {
                 AnimatedProgressBar(
@@ -323,74 +425,91 @@ fun HistoryScreen(
         }
 
         if (imageUrl.isNotEmpty() && status != RequestStatus.REWARD) {
-            Box(
-                modifier = Modifier.fillMaxWidth().height(250.dp).padding(16.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+            ElevatedCard(
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth().height(220.dp)
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(model = imageUrl),
                     contentDescription = null,
-                    contentScale = ContentScale.FillHeight,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             }
         }
 
         if (status == RequestStatus.REWARD) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            when (redeemState) {
-                is RedeemState.Idle -> {
-                    if (!claimInitiated) {
-                        Button(
-                            onClick = {
-                                claimInitiated = true
-                                viewModel.redeemReward(requestId, userId, reward)
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text("Reclamar Recompensa")
+            Spacer(modifier = Modifier.height(24.dp))
+            AnimatedContent(
+                targetState = redeemState,
+                transitionSpec = {
+                    fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) togetherWith
+                            fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
+                },
+                label = "redeemState"
+            ) { state ->
+                when (state) {
+                    is RedeemState.Idle -> {
+                        if (!claimInitiated) {
+                            Button(
+                                onClick = {
+                                    claimInitiated = true
+                                    viewModel.redeemReward(requestId, userId, reward)
+                                },
+                                shape = MaterialTheme.shapes.large,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Reclamar Recompensa")
+                            }
                         }
                     }
-                }
-                is RedeemState.Loading -> CircularProgressIndicator()
-                is RedeemState.Success -> {
-                    Text(
-                        text = "Recompensa reclamada",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "Gracias por reciclar",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Tu recompensa ha sido añadida a tu cuenta",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Volver")
+                    is RedeemState.Loading -> {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
-                }
-                is RedeemState.Error -> {
-                    Text(
-                        text = "Error: ${(redeemState as RedeemState.Error).message}",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Button(
-                        onClick = {
-                            viewModel.resetRedeemState()
-                            claimInitiated = false
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Reintentar")
+                    is RedeemState.Success -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Recompensa reclamada",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Gracias por reciclar. Tu recompensa ha sido añadida a tu cuenta.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { navController.popBackStack() },
+                                shape = MaterialTheme.shapes.large,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Volver")
+                            }
+                        }
+                    }
+                    is RedeemState.Error -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Error: ${state.message}",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    viewModel.resetRedeemState()
+                                    claimInitiated = false
+                                },
+                                shape = MaterialTheme.shapes.large
+                            ) {
+                                Text("Reintentar")
+                            }
+                        }
                     }
                 }
             }
@@ -415,14 +534,14 @@ fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifie
         progress
     }
 
-    Canvas(modifier.height(4.dp)) {
+    Canvas(modifier.height(6.dp)) {
         val barWidth = size.width
         val barHeight = size.height
-        val cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
+        val cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
         val dotRadius = barHeight / 2
 
         drawRoundRect(
-            color = colorScheme.surfaceContainerHigh,
+            color = colorScheme.surfaceContainerHighest,
             size = size,
             cornerRadius = cornerRadius
         )
@@ -469,5 +588,3 @@ fun RequestHistoryScreenPreview() {
         userId = "userId"
     )
 }
-
-

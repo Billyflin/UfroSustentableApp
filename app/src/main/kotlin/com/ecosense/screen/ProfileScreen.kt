@@ -2,7 +2,7 @@ package com.ecosense.screen
 
 import android.os.Build
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,18 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +37,6 @@ import coil3.request.crossfade
 import com.ecosense.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseUser
 
-
 @Composable
 fun ProfileScreen(
     user: FirebaseUser?,
@@ -52,14 +50,23 @@ fun ProfileScreen(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorScheme.background)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
+        Spacer(Modifier.height(8.dp))
+
+        // Avatar
+        Box(
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
         ) {
             if (user?.photoUrl != null) {
                 AsyncImage(
@@ -69,115 +76,155 @@ fun ProfileScreen(
                         .build(),
                     contentScale = ContentScale.Crop,
                     contentDescription = "Foto de perfil",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
+                    modifier = Modifier.fillMaxSize()
                 )
             } else {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Perfil",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(60.dp)
-                )
-            }
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = user?.displayName ?: "Usuario",
-                color = colorScheme.onBackground,
-                style = MaterialTheme.typography.headlineLarge
-            )
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = { onLogout() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.primary,
-                    contentColor = colorScheme.onPrimary
-                )
-            ) {
-                Text("Cerrar sesión")
-            }
-            Spacer(Modifier.height(16.dp))
-            if (!isDynamicColor) {
-                Text(text = "Contraste", color = colorScheme.onBackground)
-                Spacer(Modifier.height(4.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Button(
-                        onClick = { onChangeContrastLevel(ContrastLevel.NORMAL) },
-                        enabled = contrastLevel != ContrastLevel.NORMAL
-                    ) {
-                        Text(text = "Normal")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { onChangeContrastLevel(ContrastLevel.MEDIUM) },
-                        enabled = contrastLevel != ContrastLevel.MEDIUM
-                    ) {
-                        Text(text = "Medio")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { onChangeContrastLevel(ContrastLevel.HIGH) },
-                        enabled = contrastLevel != ContrastLevel.HIGH
-                    ) {
-                        Text(text = "Alto")
-                    }
-                }
-            }
-            SwitchSetting(
-                title = "Modo oscuro",
-                isChecked = isDarkMode,
-                onCheckedChange = onToggleDarkMode,
-                colorScheme = colorScheme
-            )
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                Spacer(modifier = Modifier.height(8.dp))
-                SwitchSetting(
-                    title = "Colores dinámicos",
-                    isChecked = isDynamicColor,
-                    onCheckedChange = onToggleDynamicColor,
-                    colorScheme = colorScheme
+                    contentDescription = null,
+                    tint = colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(52.dp)
                 )
             }
         }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = user?.displayName ?: "Usuario",
+            style = MaterialTheme.typography.headlineMedium,
+            color = colorScheme.onBackground
+        )
+        if (!user?.email.isNullOrEmpty()) {
+            Text(
+                text = user!!.email!!,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = onLogout,
+            shape = MaterialTheme.shapes.large,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorScheme.errorContainer,
+                contentColor = colorScheme.onErrorContainer
+            ),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Cerrar sesión")
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // Settings card
+        ElevatedCard(
+            shape = MaterialTheme.shapes.extraLarge,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Apariencia",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                SettingRow(
+                    title = "Modo oscuro",
+                    isChecked = isDarkMode,
+                    onCheckedChange = onToggleDarkMode
+                )
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    SettingRow(
+                        title = "Colores dinámicos",
+                        isChecked = isDynamicColor,
+                        onCheckedChange = onToggleDynamicColor
+                    )
+                }
+            }
+        }
+
+        if (!isDynamicColor) {
+            Spacer(Modifier.height(16.dp))
+            ElevatedCard(
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "Nivel de contraste",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = { onChangeContrastLevel(ContrastLevel.NORMAL) },
+                            enabled = contrastLevel != ContrastLevel.NORMAL,
+                            shape = MaterialTheme.shapes.large,
+                            modifier = Modifier.weight(1f)
+                        ) { Text("Normal") }
+                        Button(
+                            onClick = { onChangeContrastLevel(ContrastLevel.MEDIUM) },
+                            enabled = contrastLevel != ContrastLevel.MEDIUM,
+                            shape = MaterialTheme.shapes.large,
+                            modifier = Modifier.weight(1f)
+                        ) { Text("Medio") }
+                        Button(
+                            onClick = { onChangeContrastLevel(ContrastLevel.HIGH) },
+                            enabled = contrastLevel != ContrastLevel.HIGH,
+                            shape = MaterialTheme.shapes.large,
+                            modifier = Modifier.weight(1f)
+                        ) { Text("Alto") }
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
     }
 }
 
+@Composable
+fun SettingRow(
+    title: String,
+    isChecked: Boolean,
+    onCheckedChange: () -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            color = colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Switch(
+            checked = isChecked,
+            onCheckedChange = { onCheckedChange() }
+        )
+    }
+}
+
+@Suppress("UNUSED")
 @Composable
 fun SwitchSetting(
     title: String,
     isChecked: Boolean,
     onCheckedChange: () -> Unit,
-    colorScheme: ColorScheme
+    colorScheme: androidx.compose.material3.ColorScheme
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .background(colorScheme.surface, shape = RoundedCornerShape(8.dp))
-    ) {
-        Text(
-            text = title,
-            color = colorScheme.onSurface,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f)
-        )
-        Switch(
-            checked = isChecked,
-            onCheckedChange = { onCheckedChange() },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = colorScheme.primary,
-                uncheckedThumbColor = colorScheme.onSurface,
-                checkedTrackColor = colorScheme.primary.copy(alpha = 0.5f),
-                uncheckedTrackColor = colorScheme.onSurface.copy(alpha = 0.5f)
-            )
-        )
-    }
+    SettingRow(title = title, isChecked = isChecked, onCheckedChange = onCheckedChange)
 }
-
-

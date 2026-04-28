@@ -1,20 +1,27 @@
 package com.ecosense.screen
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,81 +55,107 @@ fun RewardsScreen(
 
     val sortedRewards = uiState.rewards.sortedBy { it.pointsRequired > uiState.userPoints }
 
-    val containerColor by infiniteColorTransition(
+    val medalColor by infiniteColorTransition(
         initialValue = colorScheme.primary,
-        targetValue = colorScheme.inversePrimary,
-        label = "containerColor"
+        targetValue = colorScheme.tertiary,
+        label = "medalColor"
     )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        Text(
-            text = "Tus Puntos",
-            style = MaterialTheme.typography.headlineMedium,
-            color = colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = null,
+                tint = colorScheme.primary,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(Modifier.size(8.dp))
+            Text(
+                text = "Recompensas",
+                style = MaterialTheme.typography.headlineSmall,
+                color = colorScheme.onBackground
+            )
+        }
 
-        Card(
+        // Points hero card
+        ElevatedCard(
+            shape = MaterialTheme.shapes.extraLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = colorScheme.surfaceContainerHigh,
-                contentColor = colorScheme.onSurface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .padding(bottom = 20.dp)
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                Column {
+                    Text(
+                        text = "Tus puntos",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "${uiState.userPoints}",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = colorScheme.primary
+                    )
+                }
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_workspace_premium_20),
-                    contentDescription = "Medalla",
-                    tint = containerColor,
-                    modifier = Modifier.size(48.dp)
-                )
-                Text(
-                    text = "${uiState.userPoints} puntos",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = colorScheme.onSurface
+                    contentDescription = null,
+                    tint = medalColor,
+                    modifier = Modifier.size(56.dp)
                 )
             }
         }
 
         Text(
-            text = "Premios Disponibles",
-            style = MaterialTheme.typography.headlineMedium,
-            color = colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp)
+            text = "Premios disponibles",
+            style = MaterialTheme.typography.titleMedium,
+            color = colorScheme.onBackground,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        when {
-            uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            uiState.error != null -> Text(
-                text = "Error: ${uiState.error}",
-                color = colorScheme.error
-            )
-            else -> LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp),
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .fillMaxSize()
-            ) {
-                items(sortedRewards) { reward ->
-                    RewardCard(navController, reward, uiState.userPoints)
+        AnimatedContent(
+            targetState = Triple(uiState.isLoading, uiState.error, sortedRewards),
+            transitionSpec = {
+                fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) +
+                        scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow), initialScale = 0.95f) togetherWith
+                        fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
+            },
+            label = "rewardsState"
+        ) { (isLoading, error, rewards) ->
+            when {
+                isLoading -> Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(color = colorScheme.primary)
+                }
+                error != null -> Text(
+                    text = "Error: $error",
+                    color = colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                else -> LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(rewards, key = { it.title }) { reward ->
+                        RewardCard(navController, reward, uiState.userPoints)
+                    }
                 }
             }
         }
     }
 }
-
-

@@ -1,6 +1,5 @@
 package com.ecosense.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,13 +37,13 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
         targetValue = colorScheme.inversePrimary,
         label = "containerColor"
     )
-    val containerColorIcon by infiniteColorTransition(
+    val iconColor by infiniteColorTransition(
         initialValue = colorScheme.onPrimary,
         targetValue = colorScheme.onSurfaceVariant,
-        label = "containerColorIcon"
+        label = "iconColor"
     )
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = isRedeemable) {
@@ -57,45 +54,47 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
                         userPoints = userPoints
                     )
                 )
-            }
-            .background(Color.Transparent),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(16.dp)
-                .background(Color.Transparent)
+            modifier = Modifier.padding(16.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_emoji_events_20), // Reemplaza con tu icono de recompensa
+                painter = painterResource(id = R.drawable.baseline_emoji_events_20),
                 contentDescription = reward.title,
-                tint = if (isRedeemable) containerColorIcon else colorScheme.primary,
+                tint = if (isRedeemable) iconColor else colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
-            Spacer(
-                Modifier
-                    .width(16.dp)
-                    .background(Color.Transparent))
-            Column {
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = reward.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (isRedeemable) containerColorIcon else colorScheme.onSurface
+                    color = if (isRedeemable) iconColor else colorScheme.onSurface
                 )
                 Text(
                     text = "${reward.pointsRequired} puntos",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (isRedeemable) containerColorIcon.copy(alpha = 0.6f) else colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isRedeemable) iconColor.copy(alpha = 0.75f) else colorScheme.onSurfaceVariant
+                )
+            }
+            if (!isRedeemable) {
+                val needed = reward.pointsRequired - userPoints
+                Text(
+                    text = "Faltan $needed",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
+
 @Preview
 @Composable
 fun RewardCardPreview() {
@@ -105,5 +104,3 @@ fun RewardCardPreview() {
         userPoints = 1000
     )
 }
-
-

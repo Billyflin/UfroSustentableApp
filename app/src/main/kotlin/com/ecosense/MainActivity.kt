@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ecosense.presentation.BottomNavigationBar
@@ -78,27 +79,28 @@ class MainActivity : ComponentActivity() {
                     onDispose { Firebase.auth.removeAuthStateListener(listener) }
                 }
 
-                val backstackEntry = navController.currentBackStackEntryAsState()
-                val currentScreen = backstackEntry.value?.destination?.route
+                val backstackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = backstackEntry?.destination
+                val isOnQrScanner = currentDestination?.hasRoute(ScreenQrScanner::class) == true
 
                 Scaffold(
                     topBar = {
-                        if (user != null) {
+                        if (user != null && !isOnQrScanner) {
                             TopAppBar(
-                                title = { Text("Ecosense") },
+                                title = {},
                                 navigationIcon = {
                                     Image(
                                         painter = painterResource(id = R.drawable.ecosenselogo),
-                                        contentDescription = "Logo",
+                                        contentDescription = "EcoSense",
                                         colorFilter = ColorFilter.tint(colorScheme.primary),
-                                        modifier = Modifier.size(150.dp).padding(8.dp)
+                                        modifier = Modifier.size(140.dp).padding(horizontal = 8.dp)
                                     )
                                 }
                             )
                         }
                     },
                     bottomBar = {
-                        if (user != null && currentScreen != "ScreenQrScanner") {
+                        if (user != null && !isOnQrScanner) {
                             BottomNavigationBar(navController, user)
                         }
                     }
