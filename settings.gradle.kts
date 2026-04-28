@@ -21,5 +21,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UfroSustentableApp"
+rootProject.name = "EcoSense"
 include(":app")

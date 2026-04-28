@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ufrosustentableapp"
+    namespace = "com.ecosense"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ufrosustentableapp.app"
+        applicationId = "com.ecosense.app"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
