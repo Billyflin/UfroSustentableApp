@@ -38,7 +38,7 @@ navigationTesting = "2.7.7"
 firebaseFirestoreKtx = "25.0.0"
 firebaseStorageKtx = "21.0.0"
 runtimeLivedata = "1.6.8"
-cucumberJvm        = "7.18.1"
+cucumberJvm        = "7.34.3"
 junitJupiter       = "5.10.3"
 junitPlatformSuite = "1.10.3"
 
