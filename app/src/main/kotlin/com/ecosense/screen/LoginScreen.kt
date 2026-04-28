@@ -48,7 +48,7 @@ import java.util.Base64
 
 private const val TAG = "LoginScreen"
 // TODO: Replace with your actual Web Client ID from Firebase Console
-private const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID_HERE"
+private const val WEB_CLIENT_ID = "34543623932-sdajtc9dreognifuqu9d6kd97n4rda4u.apps.googleusercontent.com"
 
 @Composable
 fun LoginScreen(
