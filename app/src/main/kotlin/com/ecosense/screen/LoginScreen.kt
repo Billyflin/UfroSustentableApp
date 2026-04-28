@@ -128,7 +128,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ecosense_logo),
+                        painter = painterResource(id = R.drawable.logoecocuadrado),
                         contentDescription = "Logo",
                         colorFilter = ColorFilter.tint(colorScheme.onPrimary),
                         modifier = Modifier

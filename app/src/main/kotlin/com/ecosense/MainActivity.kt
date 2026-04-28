@@ -85,10 +85,10 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         if (user != null) {
                             TopAppBar(
-                                title = { Text("Sustentable") },
+                                title = { Text("Ecosense") },
                                 navigationIcon = {
                                     Image(
-                                        painter = painterResource(id = R.drawable.ecosense_logo),
+                                        painter = painterResource(id = R.drawable.ecosenselogo),
                                         contentDescription = "Logo",
                                         colorFilter = ColorFilter.tint(colorScheme.primary),
                                         modifier = Modifier.size(150.dp).padding(8.dp)
