@@ -43,6 +43,8 @@ import com.ecosense.viewmodel.LoginViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
+import java.security.SecureRandom
+import java.util.Base64
 
 private const val TAG = "LoginScreen"
 // TODO: Replace with your actual Web Client ID from Firebase Console
@@ -66,11 +68,18 @@ fun LoginScreen(
         }
     }
 
+    fun generateNonce(): String {
+        val bytes = ByteArray(32)
+        SecureRandom().nextBytes(bytes)
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+    }
+
     suspend fun signInWithGoogle() {
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(WEB_CLIENT_ID)
             .setAutoSelectEnabled(false)
+            .setNonce(generateNonce())
             .build()
 
         val request = GetCredentialRequest.Builder()
