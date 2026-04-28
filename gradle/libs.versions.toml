@@ -38,7 +38,6 @@ navigationTesting = "2.7.7"
 firebaseFirestoreKtx = "25.0.0"
 firebaseStorageKtx = "21.0.0"
 runtimeLivedata = "1.6.8"
-cucumberJvm        = "7.34.3"
 junitJupiter       = "5.10.3"
 junitPlatformSuite = "1.10.3"
 
@@ -91,9 +90,8 @@ androidx-navigation-testing = { group = "androidx.navigation", name = "navigatio
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
-cucumber-java                  = { group = "io.cucumber",        name = "cucumber-java",                  version.ref = "cucumberJvm" }
-cucumber-junit-platform-engine = { group = "io.cucumber",        name = "cucumber-junit-platform-engine", version.ref = "cucumberJvm" }
-junit-platform-suite           = { group = "org.junit.platform", name = "junit-platform-suite",           version.ref = "junitPlatformSuite" }
+kotest-runner-junit5           = { group = "io.kotest",          name = "kotest-runner-junit5",           version = "5.9.1" }
+kotest-assertions-core         = { group = "io.kotest",          name = "kotest-assertions-core",         version = "5.9.1" }
 junit-platform-launcher        = { group = "org.junit.platform", name = "junit-platform-launcher",        version.ref = "junitPlatformSuite" }
 junit-jupiter                  = { group = "org.junit.jupiter",  name = "junit-jupiter",                  version.ref = "junitJupiter" }
 junit-vintage-engine           = { group = "org.junit.vintage",  name = "junit-vintage-engine",           version.ref = "junitJupiter" }

@@ -1,29 +1,5 @@
 package com.example.ufrosustentableapp.domain
 
-enum class TipoGrupo { PUBLICO, PRIVADO }
-
-enum class ResultadoAccion { EXITOSO, PENDIENTE, ERROR }
-
-data class Usuario(
-    val id: String,
-    val email: String,
-    var grupoId: String? = null,
-    var puntos: Int = 0,
-    val recompensasReclamadas: MutableList<String> = mutableListOf()
-)
-
-data class Grupo(
-    val id: String,
-    val nombre: String,
-    val tipo: TipoGrupo,
-    val descripcion: String = "",
-    var puntajeTotal: Int = 0,
-    val capacidad: Int = 100,
-    val miembros: MutableList<String> = mutableListOf(),
-    val admins: MutableList<String> = mutableListOf(),
-    val recompensasDisponibles: MutableList<String> = mutableListOf()
-)
-
 class CrearGrupoUseCase(
     private val gruposRepository: MutableList<Grupo>,
     private val usuariosRepository: MutableList<Usuario>

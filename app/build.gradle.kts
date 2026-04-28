@@ -64,6 +64,11 @@ android {
             isReturnDefaultValues = true
             all {
                 it.useJUnitPlatform()
+                it.testLogging {
+                    events("passed", "skipped", "failed")
+                    showStandardStreams = true
+                    exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                }
             }
         }
     }
@@ -95,9 +100,8 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
-    testImplementation(libs.cucumber.java)
-    testImplementation(libs.cucumber.junit.platform.engine)
-    testImplementation(libs.junit.platform.suite)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.junit.platform.launcher)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.vintage.engine)

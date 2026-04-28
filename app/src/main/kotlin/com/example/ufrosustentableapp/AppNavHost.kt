@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,10 +31,6 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.serialization.Serializable
 import java.util.Date
 import java.util.Locale
-
-fun NavBackStackEntry?.fromRoute(): String? {
-    return this?.destination?.route?.substringAfterLast(".")
-}
 
 @Composable
 fun AppNavHost(
