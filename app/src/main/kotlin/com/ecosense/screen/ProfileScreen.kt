@@ -95,9 +95,10 @@ fun ProfileScreen(
             style = MaterialTheme.typography.headlineMedium,
             color = colorScheme.onBackground
         )
-        if (!user?.email.isNullOrEmpty()) {
+        val email = user?.email
+        if (!email.isNullOrEmpty()) {
             Text(
-                text = user!!.email!!,
+                text = email,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colorScheme.onSurfaceVariant
             )
