@@ -1,97 +1,102 @@
 [versions]
-agp = "8.7.2"
-animation = "1.6.8"
-cameraCamera2 = "1.3.4"
-core = "3.4.1"
-datastorePreferences = "1.1.1"
-firebaseBom = "33.1.1"
-gson = "2.11.0"
-guava = "32.0.1-android"
-kotlin = "2.0.0"
-coreKtx = "1.13.1"
+agp = "9.2.0"
+animation = "1.8.0"
+cameraCamera2 = "1.5.0"
+core = "3.5.4"
+coroutines = "1.10.2"
+datastorePreferences = "1.2.0"
+firebaseBom = "34.12.0"
+gson = "2.12.0"
+guava = "33.0.0-android"
+kotlin = "2.3.21"
+coreKtx = "1.18.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-kotlinxDatetime = "0.4.0"
-lifecycleRuntimeKtx = "2.8.2"
-composeBom = "2024.06.00"
-composeNavigation = "2.8.0-beta03"
-mapsCompose = "5.0.3"
-mapsKtx = "5.0.0"
-materialIconsExtended = "1.6.8"
-#materialSymbolsCore = "1.0.0-alpha03"
-onetapcompose = "1.0.12"
-playServicesAuth = "21.2.0"
-firebaseCrashlytics = "19.0.2"
-googleGmsGoogleServices = "4.4.2"
-googleFirebaseCrashlytics = "3.0.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+kotlinxDatetime = "0.7.0"
+lifecycleRuntimeKtx = "2.10.0"
+composeBom = "2026.04.01"
+composeNavigation = "2.9.8"
+mapsCompose = "8.3.0"
+mapsKtx = "6.0.1"
+materialIconsExtended = "1.11.0"
+onetapcompose = "1.0.13"
+playServicesAuth = "21.3.0"
+firebaseCrashlytics = "19.4.0"
+googleGmsGoogleServices = "4.4.4"
+googleFirebaseCrashlytics = "3.0.7"
 zxingAndroidEmbedded = "4.3.0"
-cameraView = "1.3.4"
-cameraLifecycle = "1.3.4"
-uiTextGoogleFonts = "1.6.8"
+cameraView = "1.5.0"
+cameraLifecycle = "1.5.0"
+uiTextGoogleFonts = "1.8.0"
 visionCommon = "17.3.0"
-barcodeScanningCommon = "17.0.0"
-playServicesMlkitBarcodeScanning = "18.3.0"
-playServicesMlkitTextRecognition = "19.0.0"
-benchmarkMacro = "1.2.4"
-navigationTesting = "2.7.7"
-firebaseFirestoreKtx = "25.0.0"
-firebaseStorageKtx = "21.0.0"
-runtimeLivedata = "1.6.8"
-junitJupiter       = "5.10.3"
-junitPlatformSuite = "1.10.3"
+barcodeScanningCommon = "17.3.0"
+playServicesMlkitBarcodeScanning = "18.3.1"
+playServicesMlkitTextRecognition = "19.0.1"
+benchmarkMacro = "1.4.0"
+navigationTesting = "2.9.8"
+firebaseFirestoreKtx = "25.2.0"
+firebaseStorageKtx = "21.1.0"
+runtimeLivedata = "1.8.0"
+junitJupiter       = "5.11.0"
+junitPlatformSuite = "1.11.0"
+activityCompose = "1.13.0"
+coilCompose = "3.4.0"
+firebaseAuth = "23.3.0"
+kotlinxSerialization = "1.11.0"
 
 [libraries]
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
-#androidx-material-symbols-core = { module = "androidx.compose.material:material-symbols-core", version.ref = "materialSymbolsCore" }
-coil-compose = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version = "23.0.0" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database = { module = "com.google.firebase:firebase-database" }
-firebase-storage = { module = "com.google.firebase:firebase-storage" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.9.0" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version = "1.7.0-beta03" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.3.0-beta03" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-ktx = { module = "com.google.maps.android:maps-ktx", version.ref = "mapsKtx" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.0" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 onetapcompose = { module = "com.github.stevdza-san:OneTapCompose", version.ref = "onetapcompose" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
-androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
-vision-common = { group = "com.google.mlkit", name = "vision-common", version.ref = "visionCommon" }
-barcode-scanning-common = { group = "com.google.mlkit", name = "barcode-scanning-common", version.ref = "barcodeScanningCommon" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
 play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
 play-services-mlkit-text-recognition = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition", version.ref = "playServicesMlkitTextRecognition" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro", version.ref = "benchmarkMacro" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
-firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
-kotest-runner-junit5           = { group = "io.kotest",          name = "kotest-runner-junit5",           version = "5.9.1" }
-kotest-assertions-core         = { group = "io.kotest",          name = "kotest-assertions-core",         version = "5.9.1" }
+kotest-runner-junit5           = { group = "io.kotest",          name = "kotest-runner-junit5",           version = "6.0.0" }
+kotest-assertions-core         = { group = "io.kotest",          name = "kotest-assertions-core",         version = "6.0.0" }
 junit-platform-launcher        = { group = "org.junit.platform", name = "junit-platform-launcher",        version.ref = "junitPlatformSuite" }
 junit-jupiter                  = { group = "org.junit.jupiter",  name = "junit-jupiter",                  version.ref = "junitJupiter" }
 junit-vintage-engine           = { group = "org.junit.vintage",  name = "junit-vintage-engine",           version.ref = "junitJupiter" }

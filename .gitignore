@@ -3,3 +3,9 @@
 /.kotlin/
 /build/
 /.claude/
+
+*.iml
+local.properties
+.DS_Store
+/captures
+/build

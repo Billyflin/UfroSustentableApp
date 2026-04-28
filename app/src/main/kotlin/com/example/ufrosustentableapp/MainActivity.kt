@@ -1,6 +1,5 @@
 package com.example.ufrosustentableapp
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -35,18 +34,15 @@ import com.example.ufrosustentableapp.screen.LoginScreen
 import com.example.ufrosustentableapp.ui.theme.AppTheme
 import com.example.ufrosustentableapp.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity", "onCreate: Activity created")
+        Log.d("MainActivity", "onCreate")
         enableEdgeToEdge()
         val preferencesManager = PreferencesManager(applicationContext)
 
@@ -56,16 +52,14 @@ class MainActivity : ComponentActivity() {
             var isDynamicColor by remember { mutableStateOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) }
             var contrastLevel by remember { mutableStateOf(ContrastLevel.NORMAL) }
 
-            // Load user preferences
             LaunchedEffect(Unit) {
-                Log.d("MainActivity", "LaunchedEffect: Loading user preferences")
-                preferencesManager.preferencesFlow.collect { userPreferences ->
-                    isDarkMode = userPreferences.darkMode
-                    isDynamicColor = userPreferences.dynamicColor
-                    contrastLevel = userPreferences.contrastLevel
-                    Log.d("MainActivity", "User preferences loaded: darkMode=$isDarkMode, dynamicColor=$isDynamicColor, contrastLevel=$contrastLevel")
+                preferencesManager.preferencesFlow.collect { prefs ->
+                    isDarkMode = prefs.darkMode
+                    isDynamicColor = prefs.dynamicColor
+                    contrastLevel = prefs.contrastLevel
                 }
             }
+
             AppTheme(
                 darkTheme = isDarkMode,
                 dynamicColor = isDynamicColor,
@@ -77,21 +71,15 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
 
                 DisposableEffect(Unit) {
-                    Log.d("MainActivity", "DisposableEffect: Adding Firebase AuthStateListener")
-                    val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+                    val listener = FirebaseAuth.AuthStateListener { auth ->
                         user = auth.currentUser
-                        Log.d("MainActivity", "AuthStateListener: User state changed, user=${user?.uid}")
                     }
-                    Firebase.auth.addAuthStateListener(authStateListener)
-                    onDispose {
-                        Firebase.auth.removeAuthStateListener(authStateListener)
-                        Log.d("MainActivity", "DisposableEffect: AuthStateListener removed")
-                    }
+                    Firebase.auth.addAuthStateListener(listener)
+                    onDispose { Firebase.auth.removeAuthStateListener(listener) }
                 }
 
                 val backstackEntry = navController.currentBackStackEntryAsState()
                 val currentScreen = backstackEntry.value?.destination?.route
-                Log.d("MainActivity", "Current screen: $currentScreen")
 
                 Scaffold(
                     topBar = {
@@ -103,9 +91,7 @@ class MainActivity : ComponentActivity() {
                                         painter = painterResource(id = R.drawable.ufro_sustentable_app_logo),
                                         contentDescription = "Logo",
                                         colorFilter = ColorFilter.tint(colorScheme.primary),
-                                        modifier = Modifier
-                                            .size(150.dp)
-                                            .padding(8.dp)
+                                        modifier = Modifier.size(150.dp).padding(8.dp)
                                     )
                                 }
                             )
@@ -118,36 +104,33 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     if (user != null) {
-                        Log.d("MainActivity", "User is logged in, displaying AppNavHost")
                         AppNavHost(
-                            Modifier.padding(innerPadding),
+                            modifier = Modifier.padding(innerPadding),
                             navController = navController,
                             user = user,
                             isDarkMode = isDarkMode,
                             onToggleDarkMode = {
                                 isDarkMode = !isDarkMode
                                 lifecycleScope.launch { preferencesManager.updateDarkMode(isDarkMode) }
-                                Log.d("MainActivity", "Dark mode toggled: $isDarkMode")
                             },
                             isDynamicColor = isDynamicColor,
                             onToggleDynamicColor = {
                                 isDynamicColor = !isDynamicColor
                                 lifecycleScope.launch { preferencesManager.updateDynamicColor(isDynamicColor) }
-                                Log.d("MainActivity", "Dynamic color toggled: $isDynamicColor")
                             },
                             onChangeContrastLevel = { newLevel ->
                                 contrastLevel = newLevel
                                 lifecycleScope.launch { preferencesManager.updateContrastLevel(newLevel) }
-                                Log.d("MainActivity", "Contrast level changed: $newLevel")
                             },
                             contrastLevel = contrastLevel,
                         )
                     } else {
-                        Log.d("MainActivity", "User is not logged in, displaying LoginScreen")
-                        LoginScreen(context = context) {
-                            navController.navigate(ScreenMap)
-                            Log.d("MainActivity", "Navigating to ScreenMap after login")
-                        }
+                        LoginScreen(
+                            context = context,
+                            onSignInSuccess = {
+                                navController.navigate(ScreenMap)
+                            }
+                        )
                     }
                 }
             }
@@ -155,33 +138,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun initializeRewards() {
-    val db = FirebaseFirestore.getInstance()
-    val rewardsCollection = db.collection("rewards")
-    Log.d("initializeRewards", "Initializing rewards collection")
-
-    val rewardTitles = listOf(
-        "Café Gratis", "Descuento en Tienda", "Entrada al Cine", "Tarjeta de Regalo", "Producto Ecológico"
-    )
-
-    val batch = db.batch()
-
-    rewardTitles.forEach { title ->
-        val pointsRequired = Random.nextInt(50, 2000) // Genera un número aleatorio entre 50 y 2000
-        val reward = mapOf(
-            "title" to title,
-            "pointsRequired" to pointsRequired
-        )
-        val newRewardRef = rewardsCollection.document()
-        batch.set(newRewardRef, reward)
-        Log.d("initializeRewards", "Reward added: title=$title, pointsRequired=$pointsRequired")
-    }
-
-    batch.commit()
-        .addOnSuccessListener {
-            Log.d("initializeRewards", "Recompensas inicializadas correctamente")
-        }
-        .addOnFailureListener { e ->
-            Log.e("initializeRewards", "Error al inicializar recompensas: ${e.message}")
-        }
-}

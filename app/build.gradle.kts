@@ -1,21 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
-
 }
 
 android {
     namespace = "com.example.ufrosustentableapp"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ufrosustentableapp.app"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -37,23 +35,19 @@ android {
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
-
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
     packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/LICENSE*.md"
@@ -75,10 +69,11 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -86,19 +81,19 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.crashlytics)
-    implementation (libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.ui.text.google.fonts)
-    implementation(libs.vision.common)
-    implementation(libs.barcode.scanning.common)
     implementation(libs.play.services.mlkit.barcode.scanning)
     implementation(libs.play.services.mlkit.text.recognition)
     implementation(libs.androidx.benchmark.macro)
     implementation(libs.androidx.navigation.testing)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
     testImplementation(libs.junit)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
@@ -112,28 +107,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation (libs.core)
-    implementation (libs.zxing.android.embedded)
-    implementation (libs.androidx.datastore.preferences)
-    implementation(libs.kotlinx.datetime) // Usa la versión más reciente
-
-
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.datetime)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
     implementation(libs.onetapcompose)
-    implementation (libs.guava)
-    implementation (libs.androidx.material.icons.extended)
-//    implementation (libs.androidx.material.symbols.core)
-//implementation gson
+    implementation(libs.guava)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.gson)
-    implementation (libs.maps.compose)
-    implementation (libs.maps.ktx)
-
-
-    implementation (libs.coil.compose)
-
+    implementation(libs.maps.compose)
+    implementation(libs.maps.ktx)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 }

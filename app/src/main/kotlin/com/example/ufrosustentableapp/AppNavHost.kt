@@ -4,16 +4,14 @@ import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.ufrosustentableapp.model.RecyclingRequest
 import com.example.ufrosustentableapp.model.RequestStatus
 import com.example.ufrosustentableapp.screen.CameraScreen
 import com.example.ufrosustentableapp.screen.HistoryScreen
@@ -24,17 +22,15 @@ import com.example.ufrosustentableapp.screen.RequestHistoryScreen
 import com.example.ufrosustentableapp.screen.RewardConfirmationScreen
 import com.example.ufrosustentableapp.screen.RewardsScreen
 import com.example.ufrosustentableapp.ui.theme.ContrastLevel
+import com.example.ufrosustentableapp.viewmodel.HistoryViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 import kotlinx.serialization.Serializable
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun AppNavHost(
-    navController1: Modifier,
+    modifier: Modifier,
     navController: NavHostController,
     user: FirebaseUser?,
     isDarkMode: Boolean,
@@ -45,36 +41,27 @@ fun AppNavHost(
     onChangeContrastLevel: (ContrastLevel) -> Unit
 ) {
     NavHost(
-        modifier = navController1,
+        modifier = modifier,
         navController = navController,
         startDestination = ScreenHistory
-//        startDestination = ScreenA
     ) {
         composable<ScreenMap> {
             MapScreen()
         }
         composable<ScreenQrScanner> {
             CameraScreen(
-                onDocumentFound = {
-                    navController.navigate(
-                        FormRecycle(it!!)
-                    )
+                onDocumentFound = { data ->
+                    navController.navigate(FormRecycle(data!!))
                 }
             )
         }
         composable<FormRecycle> {
             val args = it.toRoute<FormRecycle>()
-            RecycleFormScreen(
-                navController = navController,
-                data = args.data
-            )
+            RecycleFormScreen(navController = navController, data = args.data)
         }
         composable<ScreenRewards> {
             Log.d("AppNavHost", "user: ${user?.uid}")
-            RewardsScreen(
-                navController = navController,
-                userId = user?.uid ?: ""
-            )
+            RewardsScreen(navController = navController, userId = user?.uid ?: "")
         }
         composable<ScreenRewardConfimation> {
             val args = it.toRoute<ScreenRewardConfimation>()
@@ -95,22 +82,27 @@ fun AppNavHost(
                 onToggleDynamicColor = onToggleDynamicColor,
                 isDarkMode = isDarkMode,
                 isDynamicColor = isDynamicColor,
-                onLogout = {
-                    Firebase.auth.signOut()
-                },
+                onLogout = { Firebase.auth.signOut() },
                 onChangeContrastLevel = onChangeContrastLevel,
                 contrastLevel = contrastLevel
             )
         }
-        composable<ScreenRequestDetail> { it ->
-            val args = it.toRoute<ScreenRequestDetail>()
+        composable<ScreenRequestDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<ScreenRequestDetail>()
             Log.d("AppNavHost", "requestId: ${args.requestId}")
-            val request by getRequestById(args.requestId)
 
-            request?.let { it2 ->
+            val historyViewModel: HistoryViewModel = viewModel()
+            val request by historyViewModel.requestDetail.collectAsStateWithLifecycle()
+
+            LaunchedEffect(args.requestId) {
+                historyViewModel.loadRequestDetail(args.requestId)
+            }
+
+            request?.let { req ->
                 HistoryScreen(
                     navController = navController,
-                    activeProgressBar = when (it2.status) {
+                    viewModel = historyViewModel,
+                    activeProgressBar = when (req.status) {
                         RequestStatus.PROCESSING -> 0
                         RequestStatus.VALIDATING -> 1
                         RequestStatus.REWARD -> 2
@@ -118,65 +110,20 @@ fun AppNavHost(
                         RequestStatus.REEDEMED -> 3
                         RequestStatus.REJECTED -> 0
                     },
-                    requestTime = it2.requestTime,
-                    updateTime = it2.updateTime,
-                    imageUrl = it2.photoUrl,
-                    description = it2.description,
-                    status = it2.status,
-                    reward = it2.reward,
+                    requestTime = req.requestTime,
+                    updateTime = req.updateTime,
+                    imageUrl = req.photoUrl,
+                    description = req.description,
+                    status = req.status,
+                    reward = req.reward,
                     userId = user?.uid ?: "",
                     requestId = args.requestId,
-                    onCancel = { /* Lógica para cancelar */ }
+                    onCancel = {}
                 )
-            } ?: run {
-                // Muestra un estado de carga o error
-                Text(text = "Cargando...")
-            }
+            } ?: Text(text = "Cargando...")
         }
     }
 }
-
-@Composable
-fun getRequestById(requestId: String): State<RecyclingRequest?> {
-    val result = remember { mutableStateOf<RecyclingRequest?>(null) }
-
-    LaunchedEffect(requestId) {
-        val db = FirebaseFirestore.getInstance()
-        db.collection("recycling_requests").document(requestId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val status = try {
-                        RequestStatus.valueOf(
-                            document.getString("status")?.uppercase(Locale.ROOT) ?: "PROCESSING")
-                    } catch (e: IllegalArgumentException) {
-                        RequestStatus.PROCESSING // Valor predeterminado en caso de error
-                    }
-                    val request = RecyclingRequest(
-                        id = document.id,
-                        userId = document.getString("userId") ?: "",
-                        materialType = document.getString("materialType") ?: "",
-                        quantityKg = document.getDouble("quantityKg") ?: 0.0,
-                        photoUrl = document.getString("photoUrl") ?: "",
-                        status = status,
-                        requestTime = document.getTimestamp("timestamp")?.toDate()!!,
-                        updateTime = document.getTimestamp("updateTime")?.toDate() ?: Date(),
-                        description = document.getString("description") ?: "",
-                        reward = document.getLong("reward")?.toInt() ?: 0
-                    )
-                    result.value = request
-                } else {
-                    result.value = null
-                }
-            }
-            .addOnFailureListener {
-                result.value = null // En caso de error, devolver null
-            }
-    }
-
-    return result
-}
-
 
 @Serializable
 data class ScreenRequestDetail(val requestId: String)
@@ -214,3 +161,4 @@ object ScreenHistory
 
 @Serializable
 object ScreenProfile
+

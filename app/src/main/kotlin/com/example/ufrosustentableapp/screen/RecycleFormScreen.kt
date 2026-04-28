@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,75 +46,83 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.testing.TestNavHostController
 import com.example.ufrosustentableapp.RecyclingPoint
 import com.example.ufrosustentableapp.ScreenHistory
-import com.example.ufrosustentableapp.model.RequestStatus
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
+import com.example.ufrosustentableapp.viewmodel.RecycleFormUiState
+import com.example.ufrosustentableapp.viewmodel.RecycleFormViewModel
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 import kotlinx.serialization.json.Json
-import java.io.ByteArrayOutputStream
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecycleFormScreen(navController: NavHostController?, data: String?) {
+fun RecycleFormScreen(
+    navController: NavHostController?,
+    data: String?,
+    viewModel: RecycleFormViewModel = viewModel()
+) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val user = Firebase.auth.currentUser
 
     var expanded by remember { mutableStateOf(false) }
     var selectedMaterial by remember { mutableStateOf("") }
     val materials = listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos")
+    var kilos by remember { mutableStateOf("") }
+    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+
     var recyclingPoint: RecyclingPoint? = null
     try {
         Log.d("RecycleFormScreen", "Data: $data")
-        recyclingPoint = data?.let { Json.decodeFromString<RecyclingPoint>(data) }
-        Log.d("RecycleFormScreen", "Recycling Point: $recyclingPoint")
+        recyclingPoint = data?.let { Json.decodeFromString<RecyclingPoint>(it) }
     } catch (e: Exception) {
         Log.d("RecycleFormScreen", "Error: ${e.message}")
     }
 
-    var isUploading by remember { mutableStateOf(false) }
-    var kilos by remember { mutableStateOf("") }
-    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is RecycleFormUiState.Success -> {
+                Toast.makeText(context, "Solicitud creada exitosamente", Toast.LENGTH_SHORT).show()
+                navController?.navigate(ScreenHistory)
+                viewModel.resetState()
+            }
+            is RecycleFormUiState.Error -> {
+                Toast.makeText(
+                    context,
+                    (uiState as RecycleFormUiState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.resetState()
+            }
+            else -> {}
+        }
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap?
-            capturedImage = imageBitmap
+            capturedImage = result.data?.extras?.get("data") as Bitmap?
         }
     }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            cameraLauncher.launch(intent)
-        } else {
-            // Handle permission denied
-        }
+    ) { isGranted ->
+        if (isGranted) cameraLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
     }
 
     fun takePicture() {
-        when (PackageManager.PERMISSION_GRANTED) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                cameraLauncher.launch(intent)
-            }
-
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            cameraLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
-
-    val user = Firebase.auth.currentUser
 
     Column(
         modifier = Modifier
@@ -122,26 +131,19 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
             .padding(top = 70.dp, bottom = 130.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isUploading) {
-//            ciculo en el centro de la pantalla
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(50.dp)
-                    .padding(top = 200.dp)
-            )
+        if (uiState is RecycleFormUiState.Uploading) {
+            CircularProgressIndicator(modifier = Modifier.size(50.dp).padding(top = 200.dp))
         } else {
             Text(text = "Estás en el punto de reciclaje")
-            recyclingPoint.let {
-                it?.description?.let { it1 ->
-                    Text(
-                        text = it1,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
+            recyclingPoint?.description?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
             }
             Text(
                 text = "Completa la siguiente información para ganar puntos",
@@ -151,7 +153,6 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
             Text(
                 text = "¿Qué material vas a reciclar?*",
                 style = MaterialTheme.typography.bodyLarge,
@@ -200,7 +201,9 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
                 value = kilos,
                 onValueChange = { kilos = it },
                 label = { Text("Cantidad en kilos") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                ),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
@@ -215,24 +218,20 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
                 Image(
                     bitmap = it.asImageBitmap(),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(bottom = 16.dp)
+                    modifier = Modifier.size(100.dp).padding(bottom = 16.dp)
                 )
             }
 
             Button(
                 onClick = {
-                    if (capturedImage == null) {
-                        takePicture()
-                    } else {
-                        capturedImage = null
-                    }
+                    if (capturedImage == null) takePicture() else capturedImage = null
                 },
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (capturedImage == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
-                    contentColor = if (capturedImage == null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer,
+                    containerColor = if (capturedImage == null) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.errorContainer,
+                    contentColor = if (capturedImage == null) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onErrorContainer,
                 )
             ) {
                 Text(if (capturedImage == null) "Tomar Foto" else "Eliminar")
@@ -243,46 +242,15 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
             if (capturedImage != null) {
                 Button(
                     onClick = {
-                        isUploading = true
-                        capturedImage?.let { bitmap ->
-                            uploadImageToFirebaseStorage(bitmap) { photoUrl ->
-                                if (photoUrl != null) {
-                                    user?.uid?.let { userId ->
-                                        val materialType = selectedMaterial
-                                        val quantityKg = kilos.toDoubleOrNull() ?: 0.0
-
-                                        createRecyclingRequest(
-                                            recyclingPoint=recyclingPoint,
-                                            userId = userId,
-                                            materialType = materialType,
-                                            quantityKg = quantityKg,
-                                            photoUrl = photoUrl
-                                        ) { success ->
-                                            if (success) {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Solicitud creada exitosamente",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                                navController?.navigate(ScreenHistory)
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Error al crear la solicitud",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Error al subir la imagen",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
+                        val bitmap = capturedImage ?: return@Button
+                        val uid = user?.uid ?: return@Button
+                        viewModel.submitRequest(
+                            userId = uid,
+                            materialType = selectedMaterial,
+                            quantityKg = kilos.toDoubleOrNull() ?: 0.0,
+                            image = bitmap,
+                            description = recyclingPoint?.description
+                        )
                     },
                     shape = MaterialTheme.shapes.large
                 ) {
@@ -293,86 +261,12 @@ fun RecycleFormScreen(navController: NavHostController?, data: String?) {
     }
 }
 
-fun createRecyclingRequest(
-    userId: String,
-    materialType: String,
-    quantityKg: Double,
-    photoUrl: String,
-    recyclingPoint: RecyclingPoint?,
-    onComplete: (Boolean) -> Unit
-) {
-    val db = FirebaseFirestore.getInstance()
-    val newRequestRef = db.collection("recycling_requests").document()
-
-    val requestData = hashMapOf(
-        "description" to recyclingPoint?.description,
-        "userId" to userId,
-        "materialType" to materialType,
-        "quantityKg" to quantityKg,
-        "photoUrl" to photoUrl,
-        "status" to RequestStatus.PROCESSING,
-        "timestamp" to FieldValue.serverTimestamp(),
-        "updateTime" to FieldValue.serverTimestamp(),
-        "reward" to 0
-    )
-
-    newRequestRef.set(requestData)
-        .addOnSuccessListener {
-            // Update user's recyclingHistory
-            val userRef = db.collection("users").document(userId)
-            userRef.update("recyclingHistory", FieldValue.arrayUnion(newRequestRef.id))
-                .addOnSuccessListener {
-                    onComplete(true)
-                }
-                .addOnFailureListener {
-                    onComplete(false)
-                }
-        }
-        .addOnFailureListener {
-            onComplete(false)
-        }
-}
-
-
-fun uploadImageToFirebaseStorage(bitmap: Bitmap, onComplete: (String?) -> Unit) {
-    val storage = FirebaseStorage.getInstance()
-    val storageRef = storage.reference
-    val imagesRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
-
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-    val data = baos.toByteArray()
-
-    val uploadTask = imagesRef.putBytes(data)
-    uploadTask.continueWithTask { task ->
-        if (!task.isSuccessful) {
-            task.exception?.let {
-                throw it
-            }
-        }
-        imagesRef.downloadUrl
-    }.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            val downloadUri = task.result
-            onComplete(downloadUri.toString())
-        } else {
-            onComplete(null)
-        }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun RecycleFormScreenPreview() {
     RecycleFormScreen(
         navController = TestNavHostController(LocalContext.current),
-        data = """
-            {
-                "description": "Facultad de Ciencias Jurídicas y Empresariales UFRO",
-                "latitude": -38.736,
-                "longitude": -72.598
-            }
-        """.trimIndent()
+        data = """{"description":"Facultad de Ciencias Jurídicas","latitude":-38.736,"longitude":-72.598}"""
     )
 }
+

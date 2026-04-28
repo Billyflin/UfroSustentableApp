@@ -1,6 +1,5 @@
 package com.example.ufrosustentableapp.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,70 +14,51 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ufrosustentableapp.R
-import com.example.ufrosustentableapp.model.RewardItem
 import com.example.ufrosustentableapp.presentation.RewardCard
 import com.example.ufrosustentableapp.presentation.infiniteColorTransition
-import com.google.firebase.firestore.FirebaseFirestore
-
+import com.example.ufrosustentableapp.viewmodel.RewardsViewModel
 
 @Composable
-fun RewardsScreen(navController: NavHostController, userId: String) {
+fun RewardsScreen(
+    navController: NavHostController,
+    userId: String,
+    viewModel: RewardsViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colorScheme = MaterialTheme.colorScheme
-    var userPoints by remember { mutableIntStateOf(0) }
 
-    val rewards by produceState(initialValue = emptyList<RewardItem>()) {
-        fetchRewards { rewardsList ->
-            value = rewardsList
-        }
-    }
-    Log.d("RewardsScreen", "Antes del la corrutina for user $userId")
     LaunchedEffect(userId) {
-        Log.d("RewardsScreen", "Fetching user points for user $userId")
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(userId)
-        userRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.e("RewardsScreen", "Error fetching user points: ${e.message}")
-                return@addSnapshotListener
-            }
-            if (snapshot != null && snapshot.exists()) {
-                Log.d("RewardsScreen", "Current data: ${snapshot.data}")
-                userPoints = (snapshot.getLong("points") ?: 0).toInt()
-                Log.d("RewardsScreen", "User points: $userPoints")
-            } else {
-                Log.d("RewardsScreen", "No such document")
-            }
-        }
+        viewModel.initialize(userId)
     }
 
-    // Ordena las recompensas basadas en los puntos del usuario
-    val sortedRewards = rewards.sortedBy { it.pointsRequired > userPoints }
+    val sortedRewards = uiState.rewards.sortedBy { it.pointsRequired > uiState.userPoints }
 
     val containerColor by infiniteColorTransition(
         initialValue = colorScheme.primary,
         targetValue = colorScheme.inversePrimary,
         label = "containerColor"
     )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background).padding(16.dp)
+            .background(colorScheme.background)
+            .padding(16.dp)
     ) {
         Text(
             text = "Tus Puntos",
@@ -104,13 +84,13 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.baseline_workspace_premium_20), // Reemplaza con tu icono de medalla
+                    painter = painterResource(id = R.drawable.baseline_workspace_premium_20),
                     contentDescription = "Medalla",
                     tint = containerColor,
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
-                    text = "$userPoints puntos",
+                    text = "${uiState.userPoints} puntos",
                     style = MaterialTheme.typography.headlineLarge,
                     color = colorScheme.onSurface
                 )
@@ -124,36 +104,23 @@ fun RewardsScreen(navController: NavHostController, userId: String) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp),
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .fillMaxSize()
-        ) {
-            items(sortedRewards) { reward ->
-                RewardCard(navController, reward, userPoints)
+        when {
+            uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            uiState.error != null -> Text(
+                text = "Error: ${uiState.error}",
+                color = colorScheme.error
+            )
+            else -> LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 16.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .fillMaxSize()
+            ) {
+                items(sortedRewards) { reward ->
+                    RewardCard(navController, reward, uiState.userPoints)
+                }
             }
         }
     }
 }
-
-
-fun fetchRewards(onResult: (List<RewardItem>) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-    db.collection("rewards")
-        .get()
-        .addOnSuccessListener { result ->
-            val rewards = result.map { document ->
-                RewardItem(
-                    title = document.getString("title") ?: "",
-                    pointsRequired = document.getLong("pointsRequired")?.toInt() ?: 0
-                )
-            }
-            onResult(rewards)
-        }
-        .addOnFailureListener {
-            onResult(emptyList()) // En caso de error, devolver una lista vacía
-        }
-}
-
