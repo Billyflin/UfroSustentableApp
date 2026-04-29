@@ -33,15 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.ecosense.R
 
 @Composable
 fun RewardConfirmationScreen(
-    navController: NavHostController,
+    onBack:      () -> Unit,
     rewardTitle: String,
-    rewardCost: Int,
-    userPoints: Int
+    rewardCost:  Int,
+    userPoints:  Int
 ) {
     val colorScheme     = MaterialTheme.colorScheme
     val remainingPoints = userPoints - rewardCost
@@ -145,7 +144,7 @@ fun RewardConfirmationScreen(
                     Spacer(Modifier.height(24.dp))
 
                     Button(
-                        onClick  = { navController.popBackStack() },
+                        onClick  = { onBack() },
                         shape    = MaterialTheme.shapes.large,
                         modifier = Modifier.fillMaxWidth(),
                         enabled  = remainingPoints >= 0
@@ -156,7 +155,7 @@ fun RewardConfirmationScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedButton(
-                        onClick  = { navController.popBackStack() },
+                        onClick  = { onBack() },
                         shape    = MaterialTheme.shapes.large,
                         modifier = Modifier.fillMaxWidth()
                     ) {

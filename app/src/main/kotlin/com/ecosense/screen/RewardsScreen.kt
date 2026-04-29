@@ -34,7 +34,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.ecosense.R
 import com.ecosense.presentation.RewardCard
 import com.ecosense.presentation.infiniteColorTransition
@@ -42,7 +41,7 @@ import com.ecosense.viewmodel.RewardsViewModel
 
 @Composable
 fun RewardsScreen(
-    navController: NavHostController,
+    onNavigateToConfirmation: (title: String, cost: Int, points: Int) -> Unit,
     userId: String,
     viewModel: RewardsViewModel = viewModel()
 ) {
@@ -152,7 +151,7 @@ fun RewardsScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(rewards, key = { it.title }) { reward ->
-                        RewardCard(navController, reward, uiState.userPoints)
+                        RewardCard(onNavigateToConfirmation, reward, uiState.userPoints)
                     }
                 }
             }

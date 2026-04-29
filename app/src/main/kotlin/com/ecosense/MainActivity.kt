@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,16 +26,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.ecosense.presentation.BottomNavigationBar
 import com.ecosense.screen.LoginScreen
 import com.ecosense.ui.theme.AppTheme
 import com.ecosense.ui.theme.ContrastLevel
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.google.firebase.Firebase
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -49,9 +47,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val initColor = isSystemInDarkTheme()
-            var isDarkMode by remember { mutableStateOf(initColor) }
+            var isDarkMode    by remember { mutableStateOf(initColor) }
             var isDynamicColor by remember { mutableStateOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) }
-            var contrastLevel by remember { mutableStateOf(ContrastLevel.NORMAL) }
+            var contrastLevel  by remember { mutableStateOf(ContrastLevel.NORMAL) }
 
             LaunchedEffect(Unit) {
                 preferencesManager.preferencesFlow.collect { prefs ->
@@ -62,26 +60,33 @@ class MainActivity : ComponentActivity() {
             }
 
             AppTheme(
-                darkTheme = isDarkMode,
+                darkTheme    = isDarkMode,
                 dynamicColor = isDynamicColor,
                 contrastLevel = contrastLevel
             ) {
                 val colorScheme = MaterialTheme.colorScheme
-                val navController = rememberNavController()
+
+                // ── Navigation3: el back stack es Compose State ───────────────
+                val backStack = rememberNavBackStack(ScreenHistory)
+
                 var user by remember { mutableStateOf(Firebase.auth.currentUser) }
                 val context = LocalContext.current
 
                 DisposableEffect(Unit) {
-                    val listener = FirebaseAuth.AuthStateListener { auth ->
-                        user = auth.currentUser
-                    }
+                    val listener = FirebaseAuth.AuthStateListener { auth -> user = auth.currentUser }
                     Firebase.auth.addAuthStateListener(listener)
                     onDispose { Firebase.auth.removeAuthStateListener(listener) }
                 }
 
-                val backstackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = backstackEntry?.destination
-                val isOnQrScanner = currentDestination?.hasRoute(ScreenQrScanner::class) == true
+                // La pantalla actual es simplemente el último elemento del back stack
+                val currentKey: NavKey = backStack.lastOrNull() ?: ScreenHistory
+                val isOnQrScanner = currentKey is ScreenQrScanner
+
+                // Helper: navegar como bottom nav (popUpTo start + launchSingleTop)
+                fun navigateMain(dest: NavKey) {
+                    while (backStack.size > 1) backStack.removeLast()
+                    if (backStack.lastOrNull() != dest) backStack.add(dest)
+                }
 
                 Scaffold(
                     topBar = {
@@ -101,22 +106,27 @@ class MainActivity : ComponentActivity() {
                     },
                     bottomBar = {
                         if (user != null && !isOnQrScanner) {
-                            BottomNavigationBar(navController, user)
+                            BottomNavigationBar(
+                                currentKey = currentKey,
+                                onNavigate = ::navigateMain,
+                                onNavigateToQr = { backStack.add(ScreenQrScanner) },
+                                user = user
+                            )
                         }
                     }
                 ) { innerPadding ->
                     if (user != null) {
-                        AppNavHost(
-                            modifier = Modifier.padding(innerPadding),
-                            navController = navController,
-                            user = user,
-                            isDarkMode = isDarkMode,
-                            onToggleDarkMode = {
+                        AppNavigation(
+                            modifier              = Modifier.padding(innerPadding),
+                            backStack             = backStack,
+                            user                  = user,
+                            isDarkMode            = isDarkMode,
+                            onToggleDarkMode      = {
                                 isDarkMode = !isDarkMode
                                 lifecycleScope.launch { preferencesManager.updateDarkMode(isDarkMode) }
                             },
-                            isDynamicColor = isDynamicColor,
-                            onToggleDynamicColor = {
+                            isDynamicColor        = isDynamicColor,
+                            onToggleDynamicColor  = {
                                 isDynamicColor = !isDynamicColor
                                 lifecycleScope.launch { preferencesManager.updateDynamicColor(isDynamicColor) }
                             },
@@ -124,13 +134,14 @@ class MainActivity : ComponentActivity() {
                                 contrastLevel = newLevel
                                 lifecycleScope.launch { preferencesManager.updateContrastLevel(newLevel) }
                             },
-                            contrastLevel = contrastLevel,
+                            contrastLevel = contrastLevel
                         )
                     } else {
                         LoginScreen(
                             context = context,
                             onSignInSuccess = {
-                                navController.navigate(ScreenMap)
+                                // Navegar al mapa tras autenticarse
+                                backStack.add(ScreenMap)
                             }
                         )
                     }
@@ -139,6 +150,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-

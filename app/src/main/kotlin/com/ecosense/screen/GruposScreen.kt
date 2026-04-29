@@ -66,8 +66,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.ecosense.ScreenRanking
 import com.ecosense.model.Grupo
 import com.ecosense.model.TipoGrupo
 import com.ecosense.service.EntradaRankingInterno
@@ -77,8 +75,8 @@ import com.ecosense.viewmodel.GruposViewModel
 
 @Composable
 fun GruposScreen(
-    navController: NavHostController,
-    userId: String,
+    onNavigateToRanking: () -> Unit,
+    userId:   String,
     userName: String,
     viewModel: GruposViewModel = viewModel()
 ) {
@@ -117,7 +115,7 @@ fun GruposScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = { navController.navigate(ScreenRanking) }) {
+                IconButton(onClick = onNavigateToRanking) {
                     Icon(
                         imageVector = Icons.Default.Leaderboard,
                         contentDescription = "Ver ranking",

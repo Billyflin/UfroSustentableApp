@@ -16,7 +16,8 @@ espressoCore = "3.6.1"
 kotlinxDatetime = "0.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 composeBom = "2026.04.01"
-composeNavigation = "2.9.8"
+nav3 = "1.1.1"
+lifecycleViewmodelNav3 = "2.10.0"
 mapsCompose = "8.3.0"
 mapsKtx = "6.0.1"
 materialIconsExtended = "1.11.0"
@@ -34,7 +35,6 @@ barcodeScanningCommon = "17.3.0"
 playServicesMlkitBarcodeScanning = "18.3.1"
 playServicesMlkitTextRecognition = "19.0.1"
 benchmarkMacro = "1.4.0"
-navigationTesting = "2.9.8"
 firebaseFirestoreKtx = "25.2.0"
 firebaseStorageKtx = "21.1.0"
 runtimeLivedata = "1.8.0"
@@ -82,7 +82,9 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-ktx = { module = "com.google.maps.android:maps-ktx", version.ref = "mapsKtx" }
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3" }
+androidx-navigation3-ui     = { module = "androidx.navigation3:navigation3-ui",     version.ref = "nav3" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
@@ -97,7 +99,6 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
 play-services-mlkit-text-recognition = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition", version.ref = "playServicesMlkitTextRecognition" }
 androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro", version.ref = "benchmarkMacro" }
-androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }

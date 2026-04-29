@@ -61,10 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.testing.TestNavHostController
 import com.ecosense.RecyclingPoint
-import com.ecosense.ScreenHistory
 import com.ecosense.viewmodel.RecycleFormUiState
 import com.ecosense.viewmodel.RecycleFormViewModel
 import com.google.firebase.auth.auth
@@ -74,7 +71,7 @@ import kotlinx.serialization.json.Json
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecycleFormScreen(
-    navController: NavHostController?,
+    onNavigateToHistory: () -> Unit,
     data: String?,
     viewModel: RecycleFormViewModel = viewModel()
 ) {
@@ -99,7 +96,7 @@ fun RecycleFormScreen(
         when (uiState) {
             is RecycleFormUiState.Success -> {
                 Toast.makeText(context, "Solicitud creada exitosamente", Toast.LENGTH_SHORT).show()
-                navController?.navigate(ScreenHistory)
+                onNavigateToHistory()
                 viewModel.resetState()
             }
             is RecycleFormUiState.Error -> {
@@ -311,7 +308,7 @@ fun RecycleFormScreen(
 @Composable
 fun RecycleFormScreenPreview() {
     RecycleFormScreen(
-        navController = TestNavHostController(LocalContext.current),
+        onNavigateToHistory = {},
         data = """{"description":"Facultad de Ciencias Jurídicas","latitude":-38.736,"longitude":-72.598}"""
     )
 }

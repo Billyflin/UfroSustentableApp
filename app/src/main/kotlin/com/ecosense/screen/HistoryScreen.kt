@@ -53,7 +53,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -63,11 +62,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.testing.TestNavHostController
 import coil3.compose.rememberAsyncImagePainter
 import com.ecosense.R
-import com.ecosense.ScreenRequestDetail
 import com.ecosense.model.RecyclingRequest
 import com.ecosense.model.RequestStatus
 import com.ecosense.presentation.infiniteColorTransition
@@ -82,7 +78,7 @@ import java.util.Locale
 
 @Composable
 fun RequestHistoryScreen(
-    navController: NavHostController,
+    onNavigateToDetail: (String) -> Unit,
     userId: String,
     viewModel: HistoryViewModel = viewModel()
 ) {
@@ -210,7 +206,7 @@ fun RequestHistoryScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(sortedRequests, key = { it.id }) { request ->
-                                RequestItem(navController, request)
+                                RequestItem(onNavigateToDetail, request)
                             }
                         }
                     }
@@ -225,17 +221,17 @@ fun RequestHistoryScreen(
  * infinite color transitions aren't started for every card in the list.
  */
 @Composable
-fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
+fun RequestItem(onNavigateToDetail: (String) -> Unit, request: RecyclingRequest) {
     if (request.status == RequestStatus.REWARD) {
-        RequestItemAnimated(navController, request)
+        RequestItemAnimated(onNavigateToDetail, request)
     } else {
-        RequestItemStatic(navController, request)
+        RequestItemStatic(onNavigateToDetail, request)
     }
 }
 
 /** REWARD status — runs 4 infinite color transitions to pulse the card. */
 @Composable
-private fun RequestItemAnimated(navController: NavHostController, request: RecyclingRequest) {
+private fun RequestItemAnimated(onNavigateToDetail: (String) -> Unit, request: RecyclingRequest) {
     val colorScheme = MaterialTheme.colorScheme
     val cardColor   by infiniteColorTransition(colorScheme.primary,          colorScheme.inversePrimary,     "cardColor")
     val contentColor by infiniteColorTransition(colorScheme.onPrimary,       colorScheme.onSurfaceVariant,   "contentColor")
@@ -243,8 +239,8 @@ private fun RequestItemAnimated(navController: NavHostController, request: Recyc
     val accentColor3 by infiniteColorTransition(colorScheme.primaryContainer, colorScheme.primary,           "accentColor3")
 
     RequestItemCard(
-        navController   = navController,
-        request         = request,
+        onNavigateToDetail = onNavigateToDetail,
+        request            = request,
         cardContainer   = cardColor,
         cardContent     = contentColor,
         descriptionColor = accentColor2,
@@ -256,15 +252,15 @@ private fun RequestItemAnimated(navController: NavHostController, request: Recyc
 
 /** All other statuses — static colors, no ongoing animation overhead. */
 @Composable
-private fun RequestItemStatic(navController: NavHostController, request: RecyclingRequest) {
+private fun RequestItemStatic(onNavigateToDetail: (String) -> Unit, request: RecyclingRequest) {
     val colorScheme  = MaterialTheme.colorScheme
     val isRedeemed   = request.status == RequestStatus.REEDEMED
     val muted        = colorScheme.onSurfaceVariant
     val cardContainer = if (isRedeemed) colorScheme.surfaceContainerLow else colorScheme.surfaceContainerHigh
 
     RequestItemCard(
-        navController    = navController,
-        request          = request,
+        onNavigateToDetail = onNavigateToDetail,
+        request            = request,
         cardContainer    = cardContainer,
         cardContent      = if (isRedeemed) muted else colorScheme.onSurface,
         descriptionColor = if (isRedeemed) muted else colorScheme.tertiary,
@@ -276,8 +272,8 @@ private fun RequestItemStatic(navController: NavHostController, request: Recycli
 
 @Composable
 private fun RequestItemCard(
-    navController:    NavHostController,
-    request:          RecyclingRequest,
+    onNavigateToDetail: (String) -> Unit,
+    request:            RecyclingRequest,
     cardContainer:    androidx.compose.ui.graphics.Color,
     cardContent:      androidx.compose.ui.graphics.Color,
     descriptionColor: androidx.compose.ui.graphics.Color,
@@ -294,7 +290,7 @@ private fun RequestItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = !isRedeemed) {
-                navController.navigate(ScreenRequestDetail(request.id))
+                onNavigateToDetail(request.id)
             },
         shape  = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
@@ -372,7 +368,7 @@ fun HistoryScreen(
     userId: String = "",
     status: RequestStatus = RequestStatus.PROCESSING,
     onCancel: () -> Unit,
-    navController: NavHostController,
+    onBack: () -> Unit,
     viewModel: HistoryViewModel = viewModel()
 ) {
     val redeemState by viewModel.redeemState.collectAsStateWithLifecycle()
@@ -509,7 +505,7 @@ fun HistoryScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
-                                onClick = { navController.popBackStack() },
+                                onClick = onBack,
                                 shape = MaterialTheme.shapes.large,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -590,7 +586,7 @@ fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifie
 @Composable
 fun RequestItemPreview() {
     RequestItem(
-        navController = TestNavHostController(LocalContext.current),
+        onNavigateToDetail = {},
         request = RecyclingRequest(
             id = "1",
             userId = "userId",
@@ -610,7 +606,7 @@ fun RequestItemPreview() {
 @Composable
 fun RequestHistoryScreenPreview() {
     RequestHistoryScreen(
-        navController = TestNavHostController(LocalContext.current),
+        onNavigateToDetail = {},
         userId = "userId"
     )
 }
