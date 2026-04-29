@@ -10,13 +10,18 @@ import kotlinx.coroutines.tasks.await
 class RewardsRepository {
     private val db = FirebaseFirestore.getInstance()
 
-    suspend fun getRewards(): Result<List<RewardItem>> = runCatching {
-        val result = db.collection("rewards").get().await()
-        result.map { document ->
-            RewardItem(
-                title = document.getString("title") ?: "",
-                pointsRequired = document.getLong("pointsRequired")?.toInt() ?: 0
-            )
+    // In-memory cache so rewards don't reload on every back-navigation
+    private var cachedRewards: List<RewardItem>? = null
+
+    suspend fun getRewards(): Result<List<RewardItem>> {
+        cachedRewards?.let { return Result.success(it) }
+        return runCatching {
+            db.collection("rewards").get().await().map { doc ->
+                RewardItem(
+                    title          = doc.getString("title") ?: "",
+                    pointsRequired = doc.getLong("pointsRequired")?.toInt() ?: 0
+                )
+            }.also { cachedRewards = it }
         }
     }
 
@@ -29,5 +34,3 @@ class RewardsRepository {
         awaitClose { listener.remove() }
     }
 }
-
-

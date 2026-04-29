@@ -13,9 +13,9 @@ class RF17RankingGrupalSpec : BehaviorSpec({
     Given("tres grupos con distintos puntajes totales") {
         val service = RankingService()
         val grupos = listOf(
-            Grupo("G1", "EcoVerde", tipo = TipoGrupo.PUBLICO, puntajeTotal = 500),
+            Grupo("G1", "EcoVerde",        tipo = TipoGrupo.PUBLICO, puntajeTotal = 500),
             Grupo("G2", "RecicladoresUFRO", tipo = TipoGrupo.PUBLICO, puntajeTotal = 800),
-            Grupo("G3", "GreenTeam", tipo = TipoGrupo.PUBLICO, puntajeTotal = 200)
+            Grupo("G3", "GreenTeam",        tipo = TipoGrupo.PUBLICO, puntajeTotal = 200)
         )
 
         When("se calcula el ranking de grupos") {
@@ -56,8 +56,8 @@ class RF17RankingGrupalSpec : BehaviorSpec({
     Given("un grupo con 0 puntos compitiendo con grupos que sí tienen puntos") {
         val service = RankingService()
         val grupos = listOf(
-            Grupo("G1", "EcoVerde", tipo = TipoGrupo.PUBLICO, puntajeTotal = 300),
-            Grupo("G2", "SinPuntos", tipo = TipoGrupo.PUBLICO, puntajeTotal = 0)
+            Grupo("G1", "EcoVerde",   tipo = TipoGrupo.PUBLICO, puntajeTotal = 300),
+            Grupo("G2", "SinPuntos",  tipo = TipoGrupo.PUBLICO, puntajeTotal = 0)
         )
 
         When("se calcula el ranking") {
@@ -82,5 +82,3 @@ class RF17RankingGrupalSpec : BehaviorSpec({
         }
     }
 })
-
-

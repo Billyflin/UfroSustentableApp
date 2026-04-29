@@ -43,8 +43,8 @@ class RF11CrearGrupoSpec : BehaviorSpec({
             val resultado = service.crearGrupo(creadorId, "", "Sin nombre")
 
             Then("el sistema retorna un error indicando que el nombre es obligatorio") {
-                resultado.shouldBeInstanceOf<ResultadoCreacion.Error>()
-                (resultado as ResultadoCreacion.Error).mensaje shouldBe "El nombre del grupo no puede estar vacío"
+                val error = resultado.shouldBeInstanceOf<ResultadoCreacion.Error>()
+                error.mensaje shouldBe "El nombre del grupo no puede estar vacío"
             }
         }
 
@@ -62,11 +62,9 @@ class RF11CrearGrupoSpec : BehaviorSpec({
             val resultado = service.crearGrupo(creadorId, "E", "Grupo mínimo")
 
             Then("el grupo se crea exitosamente con ese nombre") {
-                resultado.shouldBeInstanceOf<ResultadoCreacion.Exitoso>()
-                (resultado as ResultadoCreacion.Exitoso).grupo.nombre shouldBe "E"
+                val exitoso = resultado.shouldBeInstanceOf<ResultadoCreacion.Exitoso>()
+                exitoso.grupo.nombre shouldBe "E"
             }
         }
     }
 })
-
-

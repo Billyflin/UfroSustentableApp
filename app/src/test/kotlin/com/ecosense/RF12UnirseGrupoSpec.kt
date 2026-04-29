@@ -65,8 +65,8 @@ class RF12UnirseGrupoSpec : BehaviorSpec({
             val resultado = service.unirseAGrupo(usuario, "G001")
 
             Then("el resultado es Error indicando que ya pertenece a un grupo") {
-                resultado.shouldBeInstanceOf<ResultadoUnion.Error>()
-                (resultado as ResultadoUnion.Error).mensaje shouldBe "El usuario ya pertenece a un grupo"
+                val error = resultado.shouldBeInstanceOf<ResultadoUnion.Error>()
+                error.mensaje shouldBe "El usuario ya pertenece a un grupo"
             }
         }
 
@@ -76,11 +76,9 @@ class RF12UnirseGrupoSpec : BehaviorSpec({
             val resultado = service.unirseAGrupo(usuario, "G001")
 
             Then("el resultado es Error indicando que ya es miembro de ese grupo") {
-                resultado.shouldBeInstanceOf<ResultadoUnion.Error>()
-                (resultado as ResultadoUnion.Error).mensaje shouldBe "El usuario ya pertenece a este grupo"
+                val error = resultado.shouldBeInstanceOf<ResultadoUnion.Error>()
+                error.mensaje shouldBe "El usuario ya pertenece a este grupo"
             }
         }
     }
 })
-
-

@@ -12,7 +12,9 @@ class RF15RecompensasGrupalesSpec : BehaviorSpec({
 
     Given("un grupo que supera la meta de puntaje establecida") {
         val service = GrupoService()
-        service.agregarGrupo(Grupo("G001", "EcoVerde", tipo = TipoGrupo.PUBLICO, puntajeTotal = 1200, metaPuntaje = 1000))
+        service.agregarGrupo(
+            Grupo("G001", "EcoVerde", tipo = TipoGrupo.PUBLICO, puntajeTotal = 1200, metaPuntaje = 1000)
+        )
 
         When("el sistema verifica la recompensa grupal") {
             val recompensa = service.verificarRecompensaGrupal("G001")
@@ -72,5 +74,3 @@ class RF15RecompensasGrupalesSpec : BehaviorSpec({
         }
     }
 })
-
-

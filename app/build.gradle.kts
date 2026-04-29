@@ -31,10 +31,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // x86 / x86_64 son sólo para emuladores; ningún teléfono físico los usa.
+            // Excluirlos del release elimina libtracing_perfetto.so (Firebase/gRPC)
+            // que no cumple la alineación 16 KB exigida por Play desde nov-2025.
+            ndk {
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            }
         }
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
+            // Debug conserva x86_64 para poder correr en emuladores
         }
     }
     compileOptions {
@@ -97,6 +104,9 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.cucumber.java)
+    testImplementation(libs.cucumber.junit.platform.engine)
+    testImplementation(libs.junit.platform.suite)
     testImplementation(libs.junit.platform.launcher)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.vintage.engine)

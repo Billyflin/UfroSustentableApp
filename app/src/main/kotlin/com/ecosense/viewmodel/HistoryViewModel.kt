@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class HistoryUiState {
-    object Loading : HistoryUiState()
+    data object Loading : HistoryUiState()
     data class Success(val requests: List<RecyclingRequest>) : HistoryUiState()
     data class Error(val message: String) : HistoryUiState()
 }
 
 sealed class RedeemState {
-    object Idle : RedeemState()
-    object Loading : RedeemState()
-    object Success : RedeemState()
+    data object Idle    : RedeemState()
+    data object Loading : RedeemState()
+    data object Success : RedeemState()
     data class Error(val message: String) : RedeemState()
 }
 

@@ -32,16 +32,21 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
     val colorScheme = MaterialTheme.colorScheme
     val isRedeemable = userPoints >= reward.pointsRequired
 
-    val containerColor by infiniteColorTransition(
+    // Only run the infinite animation for unlocked rewards — saves CPU for locked cards
+    val animatedContainer by infiniteColorTransition(
         initialValue = colorScheme.primary,
-        targetValue = colorScheme.inversePrimary,
-        label = "containerColor"
+        targetValue  = colorScheme.inversePrimary,
+        label        = "containerColor"
     )
-    val iconColor by infiniteColorTransition(
+    val animatedIcon by infiniteColorTransition(
         initialValue = colorScheme.onPrimary,
-        targetValue = colorScheme.onSurfaceVariant,
-        label = "iconColor"
+        targetValue  = colorScheme.onSurfaceVariant,
+        label        = "iconColor"
     )
+    val containerColor = if (isRedeemable) animatedContainer else colorScheme.surfaceContainerLow
+    val iconColor      = if (isRedeemable) animatedIcon      else colorScheme.primary
+    val textColor      = if (isRedeemable) animatedIcon      else colorScheme.onSurface
+    val subTextColor   = if (isRedeemable) animatedIcon.copy(alpha = 0.75f) else colorScheme.onSurfaceVariant
 
     ElevatedCard(
         modifier = Modifier
@@ -50,43 +55,40 @@ fun RewardCard(navController: NavHostController, reward: RewardItem, userPoints:
                 navController.navigate(
                     ScreenRewardConfimation(
                         rewardTitle = reward.title,
-                        rewardCost = reward.pointsRequired,
-                        userPoints = userPoints
+                        rewardCost  = reward.pointsRequired,
+                        userPoints  = userPoints
                     )
                 )
             },
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = if (isRedeemable) containerColor else colorScheme.surfaceContainerLow
-        )
+        shape  = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(containerColor = containerColor)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(16.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_emoji_events_20),
+                painter           = painterResource(id = R.drawable.baseline_emoji_events_20),
                 contentDescription = reward.title,
-                tint = if (isRedeemable) iconColor else colorScheme.primary,
-                modifier = Modifier.size(48.dp)
+                tint               = iconColor,
+                modifier           = Modifier.size(48.dp)
             )
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = reward.title,
+                    text  = reward.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (isRedeemable) iconColor else colorScheme.onSurface
+                    color = textColor
                 )
                 Text(
-                    text = "${reward.pointsRequired} puntos",
+                    text  = "${reward.pointsRequired} puntos",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isRedeemable) iconColor.copy(alpha = 0.75f) else colorScheme.onSurfaceVariant
+                    color = subTextColor
                 )
             }
             if (!isRedeemable) {
-                val needed = reward.pointsRequired - userPoints
                 Text(
-                    text = "Faltan $needed",
+                    text  = "Faltan ${reward.pointsRequired - userPoints}",
                     style = MaterialTheme.typography.labelSmall,
                     color = colorScheme.onSurfaceVariant
                 )

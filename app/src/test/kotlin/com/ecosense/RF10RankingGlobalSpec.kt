@@ -89,5 +89,3 @@ class RF10RankingGlobalSpec : BehaviorSpec({
         }
     }
 })
-
-

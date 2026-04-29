@@ -220,35 +220,75 @@ fun RequestHistoryScreen(
     }
 }
 
+/**
+ * Routes to the animated variant only for REWARD-status requests so that
+ * infinite color transitions aren't started for every card in the list.
+ */
 @Composable
 fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
-    val colorScheme = MaterialTheme.colorScheme
+    if (request.status == RequestStatus.REWARD) {
+        RequestItemAnimated(navController, request)
+    } else {
+        RequestItemStatic(navController, request)
+    }
+}
 
-    val containerColor by infiniteColorTransition(
-        initialValue = colorScheme.primary,
-        targetValue = colorScheme.inversePrimary,
-        label = "containerColor"
+/** REWARD status — runs 4 infinite color transitions to pulse the card. */
+@Composable
+private fun RequestItemAnimated(navController: NavHostController, request: RecyclingRequest) {
+    val colorScheme = MaterialTheme.colorScheme
+    val cardColor   by infiniteColorTransition(colorScheme.primary,          colorScheme.inversePrimary,     "cardColor")
+    val contentColor by infiniteColorTransition(colorScheme.onPrimary,       colorScheme.onSurfaceVariant,   "contentColor")
+    val accentColor2 by infiniteColorTransition(colorScheme.tertiaryContainer, colorScheme.tertiary,         "accentColor2")
+    val accentColor3 by infiniteColorTransition(colorScheme.primaryContainer, colorScheme.primary,           "accentColor3")
+
+    RequestItemCard(
+        navController   = navController,
+        request         = request,
+        cardContainer   = cardColor,
+        cardContent     = contentColor,
+        descriptionColor = accentColor2,
+        materialColor   = accentColor3,
+        quantityColor   = accentColor3,
+        timeColor       = accentColor3
     )
-    val containerColorIcon by infiniteColorTransition(
-        initialValue = colorScheme.onPrimary,
-        targetValue = colorScheme.onSurfaceVariant,
-        label = "containerColorIcon"
+}
+
+/** All other statuses — static colors, no ongoing animation overhead. */
+@Composable
+private fun RequestItemStatic(navController: NavHostController, request: RecyclingRequest) {
+    val colorScheme  = MaterialTheme.colorScheme
+    val isRedeemed   = request.status == RequestStatus.REEDEMED
+    val muted        = colorScheme.onSurfaceVariant
+    val cardContainer = if (isRedeemed) colorScheme.surfaceContainerLow else colorScheme.surfaceContainerHigh
+
+    RequestItemCard(
+        navController    = navController,
+        request          = request,
+        cardContainer    = cardContainer,
+        cardContent      = if (isRedeemed) muted else colorScheme.onSurface,
+        descriptionColor = if (isRedeemed) muted else colorScheme.tertiary,
+        materialColor    = if (isRedeemed) muted else colorScheme.primary,
+        quantityColor    = if (isRedeemed) muted else colorScheme.primary,
+        timeColor        = if (isRedeemed) muted else colorScheme.primary
     )
-    val containerColorIcon2 by infiniteColorTransition(
-        initialValue = colorScheme.tertiaryContainer,
-        targetValue = colorScheme.tertiary,
-        label = "containerColorIcon2"
-    )
-    val containerColorIcon3 by infiniteColorTransition(
-        initialValue = colorScheme.primaryContainer,
-        targetValue = colorScheme.primary,
-        label = "containerColorIcon3"
-    )
-    val dateFormat = SimpleDateFormat("dd/MM/yy", Locale("es", "ES"))
-    val timeFormat = SimpleDateFormat("h:mm", Locale("es", "ES"))
-    val formattedDate = dateFormat.format(request.requestTime)
-    val formattedTime = timeFormat.format(request.requestTime)
-    val isRedeemed = request.status == RequestStatus.REEDEMED
+}
+
+@Composable
+private fun RequestItemCard(
+    navController:    NavHostController,
+    request:          RecyclingRequest,
+    cardContainer:    androidx.compose.ui.graphics.Color,
+    cardContent:      androidx.compose.ui.graphics.Color,
+    descriptionColor: androidx.compose.ui.graphics.Color,
+    materialColor:    androidx.compose.ui.graphics.Color,
+    quantityColor:    androidx.compose.ui.graphics.Color,
+    timeColor:        androidx.compose.ui.graphics.Color
+) {
+    val colorScheme  = MaterialTheme.colorScheme
+    val isRedeemed   = request.status == RequestStatus.REEDEMED
+    val dateFormat   = remember { SimpleDateFormat("dd/MM/yy", Locale.forLanguageTag("es-ES")) }
+    val timeFormat   = remember { SimpleDateFormat("h:mm",     Locale.forLanguageTag("es-ES")) }
 
     ElevatedCard(
         modifier = Modifier
@@ -256,77 +296,63 @@ fun RequestItem(navController: NavHostController, request: RecyclingRequest) {
             .clickable(enabled = !isRedeemed) {
                 navController.navigate(ScreenRequestDetail(request.id))
             },
-        shape = MaterialTheme.shapes.large,
+        shape  = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
-            containerColor = if (isRedeemed) colorScheme.surfaceContainerLow
-            else if (request.status == RequestStatus.REWARD) containerColor
-            else colorScheme.surfaceContainerHigh,
-            contentColor = if (isRedeemed) colorScheme.onSurfaceVariant
-            else if (request.status == RequestStatus.REWARD) containerColorIcon
-            else colorScheme.onSurface
+            containerColor = cardContainer,
+            contentColor   = cardContent
         )
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier              = Modifier.padding(16.dp),
+            verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
-                modifier = Modifier.weight(0.83f),
+                modifier            = Modifier.weight(0.83f)
             ) {
                 Text(
-                    text = request.description,
+                    text  = request.description,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isRedeemed) colorScheme.onSurfaceVariant
-                    else if (request.status == RequestStatus.REWARD) containerColorIcon2
-                    else colorScheme.tertiary
+                    color = descriptionColor
                 )
                 Text(
-                    text = request.materialType,
+                    text  = request.materialType,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (isRedeemed) colorScheme.onSurfaceVariant
-                    else if (request.status == RequestStatus.REWARD) containerColorIcon3
-                    else colorScheme.primary
+                    color = materialColor
                 )
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = if (isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onSurface)) {
+                        withStyle(SpanStyle(color = if (isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onSurface)) {
                             append("Cantidad: ")
                         }
-                        withStyle(
-                            style = SpanStyle(
-                                color = if (isRedeemed) colorScheme.onSurfaceVariant
-                                else if (request.status == RequestStatus.REWARD) containerColorIcon3
-                                else colorScheme.primary
-                            )
-                        ) { append("${request.quantityKg} kg") }
+                        withStyle(SpanStyle(color = quantityColor)) {
+                            append("${request.quantityKg} kg")
+                        }
                     },
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             Column(
-                modifier = Modifier.weight(0.17f),
+                modifier            = Modifier.weight(0.17f),
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = formattedDate,
+                    text  = dateFormat.format(request.requestTime),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (isRedeemed) colorScheme.onSurfaceVariant else colorScheme.onSurface
                 )
                 Text(
-                    text = formattedTime,
+                    text  = timeFormat.format(request.requestTime),
                     style = MaterialTheme.typography.titleSmall,
-                    color = if (isRedeemed) colorScheme.onSurfaceVariant
-                    else if (request.status == RequestStatus.REWARD) containerColorIcon3
-                    else colorScheme.primary
+                    color = timeColor
                 )
                 if (isRedeemed) {
                     Icon(
-                        painter = painterResource(id = R.drawable.baseline_workspace_premium_20),
+                        painter            = painterResource(id = R.drawable.baseline_workspace_premium_20),
                         contentDescription = "Canjeado",
-                        tint = colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(40.dp)
+                        tint               = colorScheme.onSurfaceVariant,
+                        modifier           = Modifier.size(40.dp)
                     )
                 }
             }
@@ -519,20 +545,20 @@ fun HistoryScreen(
 
 @Composable
 fun AnimatedProgressBar(progress: Float, isAnimating: Boolean, modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val colorScheme = MaterialTheme.colorScheme
-    val animatedProgress = if (isAnimating) {
-        infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 1000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ), label = ""
-        ).value
-    } else {
-        progress
-    }
+    val colorScheme        = MaterialTheme.colorScheme
+    val infiniteTransition = rememberInfiniteTransition(label = "progressPulse")
+    // Always call animateFloat unconditionally — Compose rules prohibit conditional hook calls.
+    // The value is only used when isAnimating = true.
+    val pulseProgress by infiniteTransition.animateFloat(
+        initialValue  = 0f,
+        targetValue   = 1f,
+        animationSpec = infiniteRepeatable(
+            animation  = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "progressPulse"
+    )
+    val animatedProgress = if (isAnimating) pulseProgress else progress
 
     Canvas(modifier.height(6.dp)) {
         val barWidth = size.width

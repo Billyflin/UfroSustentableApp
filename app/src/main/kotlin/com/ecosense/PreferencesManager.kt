@@ -14,42 +14,36 @@ class PreferencesManager(context: Context) {
     private val dataStore = context.dataStore
 
     companion object {
-        val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
+        // String key so absent = null = "follow system" (never overwrites isSystemInDarkTheme())
+        val DARK_MODE_KEY     = stringPreferencesKey("dark_mode_override")
         val DYNAMIC_COLOR_KEY = booleanPreferencesKey("dynamic_color")
         val CONTRAST_LEVEL_KEY = stringPreferencesKey("contrast_level")
     }
 
     val preferencesFlow: Flow<UserPreferences> = dataStore.data
         .map { preferences ->
-            val darkMode = preferences[DARK_MODE_KEY] ?: false
-            val dynamicColor = preferences[DYNAMIC_COLOR_KEY] ?: false
-            val contrastLevel = preferences[CONTRAST_LEVEL_KEY] ?: ContrastLevel.NORMAL.name
-            UserPreferences(darkMode, dynamicColor, ContrastLevel.valueOf(contrastLevel))
+            val darkModeOverride = preferences[DARK_MODE_KEY]?.toBooleanStrictOrNull()
+            val dynamicColor     = preferences[DYNAMIC_COLOR_KEY] ?: false
+            val contrastLevel    = preferences[CONTRAST_LEVEL_KEY] ?: ContrastLevel.NORMAL.name
+            UserPreferences(darkModeOverride, dynamicColor, ContrastLevel.valueOf(contrastLevel))
         }
 
     suspend fun updateDarkMode(darkMode: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[DARK_MODE_KEY] = darkMode
-        }
+        dataStore.edit { it[DARK_MODE_KEY] = darkMode.toString() }
     }
 
     suspend fun updateDynamicColor(dynamicColor: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[DYNAMIC_COLOR_KEY] = dynamicColor
-        }
+        dataStore.edit { it[DYNAMIC_COLOR_KEY] = dynamicColor }
     }
 
     suspend fun updateContrastLevel(contrastLevel: ContrastLevel) {
-        dataStore.edit { preferences ->
-            preferences[CONTRAST_LEVEL_KEY] = contrastLevel.name
-        }
+        dataStore.edit { it[CONTRAST_LEVEL_KEY] = contrastLevel.name }
     }
 }
 
 data class UserPreferences(
-    val darkMode: Boolean,
+    /** null means "not yet set — follow system dark theme" */
+    val darkModeOverride: Boolean?,
     val dynamicColor: Boolean,
     val contrastLevel: ContrastLevel
 )
-
-

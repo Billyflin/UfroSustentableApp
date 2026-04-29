@@ -63,8 +63,8 @@ class RF16AdminGrupoSpec : BehaviorSpec({
             val resultado = service.gestionarMiembro("U001", "G001", AccionGestion.AGREGAR, "U003")
 
             Then("el sistema bloquea la acción por falta de permisos") {
-                resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
-                (resultado as ResultadoGestion.Error).mensaje shouldBe "No tienes permisos de administrador"
+                val error = resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
+                error.mensaje shouldBe "No tienes permisos de administrador"
             }
         }
     }
@@ -76,8 +76,8 @@ class RF16AdminGrupoSpec : BehaviorSpec({
             val resultado = service.gestionarMiembro("ADMIN", "G001", AccionGestion.AGREGAR, "U001")
 
             Then("el sistema retorna error indicando que ya es miembro") {
-                resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
-                (resultado as ResultadoGestion.Error).mensaje shouldBe "El usuario ya es miembro del grupo"
+                val error = resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
+                error.mensaje shouldBe "El usuario ya es miembro del grupo"
             }
         }
     }
@@ -89,11 +89,9 @@ class RF16AdminGrupoSpec : BehaviorSpec({
             val resultado = service.gestionarMiembro("ADMIN", "G001", AccionGestion.ELIMINAR, "U999")
 
             Then("el sistema retorna error indicando que el usuario no es miembro") {
-                resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
-                (resultado as ResultadoGestion.Error).mensaje shouldBe "El usuario no es miembro del grupo"
+                val error = resultado.shouldBeInstanceOf<ResultadoGestion.Error>()
+                error.mensaje shouldBe "El usuario no es miembro del grupo"
             }
         }
     }
 })
-
-

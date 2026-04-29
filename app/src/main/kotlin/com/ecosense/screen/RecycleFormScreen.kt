@@ -114,7 +114,8 @@ fun RecycleFormScreen(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            capturedImage = result.data?.extras?.get("data") as Bitmap?
+            @Suppress("DEPRECATION")
+            capturedImage = result.data?.extras?.get("data") as? Bitmap
         }
     }
 

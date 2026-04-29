@@ -55,9 +55,9 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 preferencesManager.preferencesFlow.collect { prefs ->
-                    isDarkMode = prefs.darkMode
+                    prefs.darkModeOverride?.let { isDarkMode = it }
                     isDynamicColor = prefs.dynamicColor
-                    contrastLevel = prefs.contrastLevel
+                    contrastLevel  = prefs.contrastLevel
                 }
             }
 

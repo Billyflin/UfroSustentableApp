@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class RecycleFormUiState {
-    object Idle : RecycleFormUiState()
-    object Uploading : RecycleFormUiState()
-    object Success : RecycleFormUiState()
+    data object Idle     : RecycleFormUiState()
+    data object Uploading: RecycleFormUiState()
+    data object Success  : RecycleFormUiState()
     data class Error(val message: String) : RecycleFormUiState()
 }
 

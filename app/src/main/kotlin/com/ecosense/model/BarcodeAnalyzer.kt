@@ -20,6 +20,8 @@ class BarcodeAnalyzer(
     private val onDocumentFound: (String?) -> Unit
 ) : ImageAnalysis.Analyzer {
 
+    private val db = FirebaseFirestore.getInstance()
+
     private val scanner = BarcodeScanning.getClient(
         BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
     )
@@ -30,37 +32,34 @@ class BarcodeAnalyzer(
             val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
             scanner.process(inputImage)
                 .addOnSuccessListener { barcodes ->
-                    barcodes.firstOrNull()?.rawValue?.let { rawValue ->
-                        checkDocumentExists(rawValue)
-                    }
+                    barcodes.firstOrNull()?.rawValue?.let { checkDocumentExists(it) }
                 }
-                .addOnCompleteListener {
-                    imageProxy.close()
-                }
+                .addOnCompleteListener { imageProxy.close() }
         }
     }
 
     private fun checkDocumentExists(documentId: String) {
-        val db = FirebaseFirestore.getInstance()
-        val docRef = db.collection("recycling_points").document(documentId)
-        docRef.get()
+        db.collection("recycling_points").document(documentId).get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    Log.d("CameraScreen", "DocumentSnapshot data: ${document.data.toString()}")
-                    val recyclingPoint = RecyclingPoint(
-                        latitude = document.data?.get("latitude") as Double,
-                        longitude = document.data?.get("longitude") as Double,
-                        description = document.data?.get("description") as String
-                    )
-                    val recyclingPointString = Json.encodeToString(recyclingPoint)
-                    onDocumentFound(recyclingPointString)
-                } else {
-                    Toast.makeText(context, "Documento no encontrado", Toast.LENGTH_SHORT).show()
+                if (!document.exists()) {
+                    Toast.makeText(context, "Código QR no reconocido", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
                 }
+                Log.d("BarcodeAnalyzer", "Datos del punto: ${document.data}")
+                val lat  = (document.get("latitude")    as? Double) ?: run {
+                    Toast.makeText(context, "Datos del punto incompletos", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+                val lng  = (document.get("longitude")   as? Double) ?: run {
+                    Toast.makeText(context, "Datos del punto incompletos", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+                val desc = (document.getString("description")) ?: ""
+                val encoded = Json.encodeToString(RecyclingPoint(lat, lng, desc))
+                onDocumentFound(encoded)
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Error al acceder a Firestore", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error al leer el punto de reciclaje", Toast.LENGTH_SHORT).show()
             }
     }
 }
-
