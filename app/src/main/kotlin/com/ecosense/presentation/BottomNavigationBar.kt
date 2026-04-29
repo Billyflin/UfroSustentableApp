@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -34,11 +34,11 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.ecosense.R
+import com.ecosense.ScreenGrupos
 import com.ecosense.ScreenHistory
 import com.ecosense.ScreenMap
 import com.ecosense.ScreenProfile
 import com.ecosense.ScreenQrScanner
-import com.ecosense.ScreenRewards
 import com.google.firebase.auth.FirebaseUser
 
 @Composable
@@ -86,11 +86,11 @@ fun BottomNavigationBar(navController: NavHostController, user: FirebaseUser?) {
                 alwaysShowLabel = false
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Star, contentDescription = null) },
-                label = { Text("Premios") },
-                selected = currentDestination?.hasRoute(ScreenRewards::class) == true,
+                icon = { Icon(Icons.Default.Groups, contentDescription = null) },
+                label = { Text("Grupos") },
+                selected = currentDestination?.hasRoute(ScreenGrupos::class) == true,
                 onClick = {
-                    navController.navigate(ScreenRewards) {
+                    navController.navigate(ScreenGrupos) {
                         popUpTo(navController.graph.startDestinationId)
                         launchSingleTop = true
                     }

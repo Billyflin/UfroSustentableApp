@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,6 +74,7 @@ fun ProfileScreen(
     isDynamicColor: Boolean,
     onChangeContrastLevel: (ContrastLevel) -> Unit,
     contrastLevel: ContrastLevel,
+    onVerPremios: () -> Unit = {},
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val scope       = rememberCoroutineScope()
@@ -146,6 +148,42 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Cerrar sesión")
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // ──── Premios ─────────────────────────────────────────────────
+        ElevatedCard(
+            onClick   = onVerPremios,
+            shape     = MaterialTheme.shapes.extraLarge,
+            modifier  = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.size(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Premios", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        text  = "Canjea tus puntos de reciclaje",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))

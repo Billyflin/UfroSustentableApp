@@ -22,9 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ecosense.model.RequestStatus
 import com.ecosense.screen.CameraScreen
+import com.ecosense.screen.GruposScreen
 import com.ecosense.screen.HistoryScreen
 import com.ecosense.screen.MapScreen
 import com.ecosense.screen.ProfileScreen
+import com.ecosense.screen.RankingScreen
 import com.ecosense.screen.RecycleFormScreen
 import com.ecosense.screen.RequestHistoryScreen
 import com.ecosense.screen.RewardConfirmationScreen
@@ -96,8 +98,19 @@ fun AppNavHost(
                 isDynamicColor         = isDynamicColor,
                 onLogout               = { Firebase.auth.signOut() },
                 onChangeContrastLevel  = onChangeContrastLevel,
-                contrastLevel          = contrastLevel
+                contrastLevel          = contrastLevel,
+                onVerPremios           = { navController.navigate(ScreenRewards) }
             )
+        }
+        composable<ScreenGrupos> {
+            GruposScreen(
+                navController = navController,
+                userId        = user?.uid ?: "",
+                userName      = user?.displayName ?: "Usuario"
+            )
+        }
+        composable<ScreenRanking> {
+            RankingScreen(navController = navController)
         }
         composable<ScreenRequestDetail> { backStackEntry ->
             val args             = backStackEntry.toRoute<ScreenRequestDetail>()
@@ -146,6 +159,8 @@ fun AppNavHost(
 @Serializable object ScreenRewards
 @Serializable object ScreenHistory
 @Serializable object ScreenProfile
+@Serializable object ScreenGrupos
+@Serializable object ScreenRanking
 
 @Serializable data class ScreenRequestDetail(val requestId: String)
 @Serializable data class ScreenRewardConfimation(
