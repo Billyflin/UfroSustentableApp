@@ -103,7 +103,8 @@ fun RecycleFormScreen(
                 Toast.makeText(context, (uiState as RecycleFormUiState.Error).message, Toast.LENGTH_SHORT).show()
                 viewModel.resetState()
             }
-            else -> {}
+            RecycleFormUiState.Idle,
+            RecycleFormUiState.Uploading -> Unit
         }
     }
 

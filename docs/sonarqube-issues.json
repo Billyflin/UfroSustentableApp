@@ -1,0 +1,1848 @@
+﻿{
+    "total":  20,
+    "p":  1,
+    "ps":  100,
+    "paging":  {
+                   "pageIndex":  1,
+                   "pageSize":  100,
+                   "total":  20
+               },
+    "effortTotal":  196,
+    "issues":  [
+                   {
+                       "key":  "AZ5n-T_Y3mtGwcJowx2H",
+                       "rule":  "kotlin:S107",
+                       "severity":  "MAJOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/AppNavHost.kt",
+                       "project":  "ecosense",
+                       "line":  74,
+                       "hash":  "1c4ee13320f11cdfd138438513534249",
+                       "textRange":  {
+                                         "startLine":  74,
+                                         "endLine":  74,
+                                         "startOffset":  4,
+                                         "endOffset":  17
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/AppNavHost.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  82,
+                                                                                 "endLine":  82,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  39
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/AppNavHost.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  83,
+                                                                                 "endLine":  83,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  49
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "This function has 9 parameters, which is greater than the 7 authorized.",
+                       "effort":  "20min",
+                       "debt":  "20min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T06:28:44+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T_j3mtGwcJowx2I",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                       "project":  "ecosense",
+                       "line":  42,
+                       "hash":  "4cdcbd42ee58b0f168e6ed8bde18c71e",
+                       "textRange":  {
+                                         "startLine":  42,
+                                         "endLine":  42,
+                                         "startOffset":  17,
+                                         "endOffset":  25
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  87,
+                                                                                 "endLine":  87,
+                                                                                 "startOffset":  20,
+                                                                                 "endOffset":  25
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  88,
+                                                                                 "endLine":  88,
+                                                                                 "startOffset":  20,
+                                                                                 "endOffset":  22
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  93,
+                                                                                 "endLine":  93,
+                                                                                 "startOffset":  24,
+                                                                                 "endOffset":  26
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  93,
+                                                                                 "endLine":  93,
+                                                                                 "startOffset":  41,
+                                                                                 "endOffset":  43
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  108,
+                                                                                 "endLine":  108,
+                                                                                 "startOffset":  24,
+                                                                                 "endOffset":  26
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  108,
+                                                                                 "endLine":  108,
+                                                                                 "startOffset":  41,
+                                                                                 "endOffset":  43
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  118,
+                                                                                 "endLine":  118,
+                                                                                 "startOffset":  20,
+                                                                                 "endOffset":  22
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  139,
+                                                                                 "endLine":  139,
+                                                                                 "startOffset":  22,
+                                                                                 "endOffset":  26
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.",
+                       "effort":  "13min",
+                       "debt":  "13min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T06:28:44+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T8o3mtGwcJowx12",
+                       "rule":  "kotlin:S107",
+                       "severity":  "MAJOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                       "project":  "ecosense",
+                       "line":  360,
+                       "hash":  "12f95f23d57fbe6a0c7b0720d485dbd6",
+                       "textRange":  {
+                                         "startLine":  360,
+                                         "endLine":  360,
+                                         "startOffset":  4,
+                                         "endOffset":  17
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  368,
+                                                                                 "endLine":  368,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  23
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  369,
+                                                                                 "endLine":  369,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  52
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  370,
+                                                                                 "endLine":  370,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  24
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  371,
+                                                                                 "endLine":  371,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  22
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  372,
+                                                                                 "endLine":  372,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  45
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "This function has 12 parameters, which is greater than the 7 authorized.",
+                       "effort":  "20min",
+                       "debt":  "20min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T06:28:44+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9S3mtGwcJowx17",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                       "project":  "ecosense",
+                       "line":  25,
+                       "hash":  "682f13b79d2bff2f600aabeee7fbb930",
+                       "textRange":  {
+                                         "startLine":  25,
+                                         "endLine":  25,
+                                         "startOffset":  7,
+                                         "endOffset":  54
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9S3mtGwcJowx18",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                       "project":  "ecosense",
+                       "line":  26,
+                       "hash":  "b606645823c2d2fe8ae4d71355d3f6ca",
+                       "textRange":  {
+                                         "startLine":  26,
+                                         "endLine":  26,
+                                         "startOffset":  7,
+                                         "endOffset":  49
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9S3mtGwcJowx19",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                       "project":  "ecosense",
+                       "line":  38,
+                       "hash":  "495d422b5cdb33070cdb005a1a924e28",
+                       "textRange":  {
+                                         "startLine":  38,
+                                         "endLine":  38,
+                                         "startOffset":  7,
+                                         "endOffset":  48
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9S3mtGwcJowx1-",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                       "project":  "ecosense",
+                       "line":  45,
+                       "hash":  "11424141c2ca42ca144eda3419cb3de5",
+                       "textRange":  {
+                                         "startLine":  45,
+                                         "endLine":  45,
+                                         "startOffset":  7,
+                                         "endOffset":  48
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9S3mtGwcJowx1_",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                       "project":  "ecosense",
+                       "line":  300,
+                       "hash":  "43916ea2cb81c0ee57d6925c73fe0aa2",
+                       "textRange":  {
+                                         "startLine":  300,
+                                         "endLine":  300,
+                                         "startOffset":  12,
+                                         "endOffset":  26
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  327,
+                                                                                 "endLine":  327,
+                                                                                 "startOffset":  16,
+                                                                                 "endOffset":  18
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  338,
+                                                                                 "endLine":  338,
+                                                                                 "startOffset":  16,
+                                                                                 "endOffset":  18
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  376,
+                                                                                 "endLine":  376,
+                                                                                 "startOffset":  18,
+                                                                                 "endOffset":  22
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  338,
+                                                                                 "endLine":  338,
+                                                                                 "startOffset":  37,
+                                                                                 "endOffset":  39
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  361,
+                                                                                 "endLine":  361,
+                                                                                 "startOffset":  20,
+                                                                                 "endOffset":  22
+                                                                             },
+                                                               "msg":  "+5 (incl 4 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  368,
+                                                                                 "endLine":  368,
+                                                                                 "startOffset":  22,
+                                                                                 "endOffset":  26
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  405,
+                                                                                 "endLine":  405,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  12
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+                       "effort":  "8min",
+                       "debt":  "8min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T-B3mtGwcJowx2C",
+                       "rule":  "kotlin:S107",
+                       "severity":  "MAJOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                       "project":  "ecosense",
+                       "line":  68,
+                       "hash":  "8c5c6ee50a8dbcc5773a9416c1b2afa6",
+                       "textRange":  {
+                                         "startLine":  68,
+                                         "endLine":  68,
+                                         "startOffset":  4,
+                                         "endOffset":  17
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  76,
+                                                                                 "endLine":  76,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  32
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  77,
+                                                                                 "endLine":  77,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  33
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "This function has 9 parameters, which is greater than the 7 authorized.",
+                       "effort":  "20min",
+                       "debt":  "20min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T7w3mtGwcJowx10",
+                       "rule":  "kotlin:S1135",
+                       "severity":  "INFO",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/viewmodel/RankingViewModel.kt",
+                       "project":  "ecosense",
+                       "line":  29,
+                       "hash":  "8297d4864fa676d2104cfd61d601f89f",
+                       "textRange":  {
+                                         "startLine":  29,
+                                         "endLine":  29,
+                                         "startOffset":  11,
+                                         "endOffset":  15
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Complete the task associated to this TODO comment.",
+                       "effort":  "0min",
+                       "debt":  "0min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "cwe"
+                                ],
+                       "creationDate":  "2026-04-29T06:04:23+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T2D3mtGwcJowx1z",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/repository/SeedRepository.kt",
+                       "project":  "ecosense",
+                       "line":  4,
+                       "hash":  "260d197c49d41d3f73073d3d0b65f794",
+                       "textRange":  {
+                                         "startLine":  4,
+                                         "endLine":  4,
+                                         "startOffset":  7,
+                                         "endOffset":  47
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T05:50:32+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T8o3mtGwcJowx11",
+                       "rule":  "kotlin:S107",
+                       "severity":  "MAJOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                       "project":  "ecosense",
+                       "line":  274,
+                       "hash":  "9983a34d6ac57aca8730fe22b0dcebbc",
+                       "textRange":  {
+                                         "startLine":  274,
+                                         "endLine":  274,
+                                         "startOffset":  12,
+                                         "endOffset":  27
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  282,
+                                                                                 "endLine":  282,
+                                                                                 "startOffset":  4,
+                                                                                 "endOffset":  56
+                                                                             },
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "This function has 8 parameters, which is greater than the 7 authorized.",
+                       "effort":  "20min",
+                       "debt":  "20min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T05:50:32+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T-B3mtGwcJowx2D",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                       "project":  "ecosense",
+                       "line":  48,
+                       "hash":  "2b887511732191aed1b101e8fe184748",
+                       "textRange":  {
+                                         "startLine":  48,
+                                         "endLine":  48,
+                                         "startOffset":  7,
+                                         "endOffset":  46
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T05:50:32+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T-B3mtGwcJowx2E",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                       "project":  "ecosense",
+                       "line":  54,
+                       "hash":  "865107ff2be10726836d255a05a35026",
+                       "textRange":  {
+                                         "startLine":  54,
+                                         "endLine":  54,
+                                         "startOffset":  7,
+                                         "endOffset":  21
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2026-04-29T05:50:32+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T-B3mtGwcJowx2F",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                       "project":  "ecosense",
+                       "line":  68,
+                       "hash":  "8c5c6ee50a8dbcc5773a9416c1b2afa6",
+                       "textRange":  {
+                                         "startLine":  68,
+                                         "endLine":  68,
+                                         "startOffset":  4,
+                                         "endOffset":  17
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  102,
+                                                                                 "endLine":  102,
+                                                                                 "startOffset":  12,
+                                                                                 "endOffset":  14
+                                                                             },
+                                                               "msg":  "+3 (incl 2 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  112,
+                                                                                 "endLine":  112,
+                                                                                 "startOffset":  14,
+                                                                                 "endOffset":  18
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  130,
+                                                                                 "endLine":  130,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  218,
+                                                                                 "endLine":  218,
+                                                                                 "startOffset":  20,
+                                                                                 "endOffset":  24
+                                                                             },
+                                                               "msg":  "+5 (incl 4 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  227,
+                                                                                 "endLine":  227,
+                                                                                 "startOffset":  60,
+                                                                                 "endOffset":  62
+                                                                             },
+                                                               "msg":  "+9 (incl 8 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  273,
+                                                                                 "endLine":  273,
+                                                                                 "startOffset":  43,
+                                                                                 "endOffset":  45
+                                                                             },
+                                                               "msg":  "+7 (incl 6 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  326,
+                                                                                 "endLine":  326,
+                                                                                 "startOffset":  16,
+                                                                                 "endOffset":  18
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  336,
+                                                                                 "endLine":  336,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.",
+                       "effort":  "23min",
+                       "debt":  "23min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-29T05:50:32+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T8p3mtGwcJowx15",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                       "project":  "ecosense",
+                       "line":  360,
+                       "hash":  "12f95f23d57fbe6a0c7b0720d485dbd6",
+                       "textRange":  {
+                                         "startLine":  360,
+                                         "endLine":  360,
+                                         "startOffset":  4,
+                                         "endOffset":  17
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  387,
+                                                                                 "endLine":  387,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  416,
+                                                                                 "endLine":  416,
+                                                                                 "startOffset":  27,
+                                                                                 "endOffset":  31
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  440,
+                                                                                 "endLine":  440,
+                                                                                 "startOffset":  12,
+                                                                                 "endOffset":  15
+                                                                             },
+                                                               "msg":  "+3 (incl 2 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  442,
+                                                                                 "endLine":  442,
+                                                                                 "startOffset":  31,
+                                                                                 "endOffset":  33
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  449,
+                                                                                 "endLine":  449,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  449,
+                                                                                 "endLine":  449,
+                                                                                 "startOffset":  34,
+                                                                                 "endOffset":  36
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  464,
+                                                                                 "endLine":  464,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  474,
+                                                                                 "endLine":  474,
+                                                                                 "startOffset":  16,
+                                                                                 "endOffset":  20
+                                                                             },
+                                                               "msg":  "+4 (incl 3 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  476,
+                                                                                 "endLine":  476,
+                                                                                 "startOffset":  24,
+                                                                                 "endOffset":  26
+                                                                             },
+                                                               "msg":  "+5 (incl 4 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.",
+                       "effort":  "17min",
+                       "debt":  "17min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-28T12:22:52+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T9p3mtGwcJowx2B",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                       "project":  "ecosense",
+                       "line":  73,
+                       "hash":  "1f42ad8357ff5c0663d6fbb3a7498b57",
+                       "textRange":  {
+                                         "startLine":  73,
+                                         "endLine":  73,
+                                         "startOffset":  4,
+                                         "endOffset":  21
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  91,
+                                                                                 "endLine":  91,
+                                                                                 "startOffset":  6,
+                                                                                 "endOffset":  11
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  96,
+                                                                                 "endLine":  96,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  12
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  114,
+                                                                                 "endLine":  114,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  123,
+                                                                                 "endLine":  123,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  127,
+                                                                                 "endLine":  127,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  129,
+                                                                                 "endLine":  129,
+                                                                                 "startOffset":  10,
+                                                                                 "endOffset":  14
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  139,
+                                                                                 "endLine":  139,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  153,
+                                                                                 "endLine":  153,
+                                                                                 "startOffset":  10,
+                                                                                 "endOffset":  14
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  265,
+                                                                                 "endLine":  265,
+                                                                                 "startOffset":  36,
+                                                                                 "endOffset":  38
+                                                                             },
+                                                               "msg":  "+6 (incl 5 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  268,
+                                                                                 "endLine":  268,
+                                                                                 "startOffset":  45,
+                                                                                 "endOffset":  47
+                                                                             },
+                                                               "msg":  "+5 (incl 4 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  270,
+                                                                                 "endLine":  270,
+                                                                                 "startOffset":  43,
+                                                                                 "endOffset":  45
+                                                                             },
+                                                               "msg":  "+5 (incl 4 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  275,
+                                                                                 "endLine":  275,
+                                                                                 "startOffset":  29,
+                                                                                 "endOffset":  31
+                                                                             },
+                                                               "msg":  "+6 (incl 5 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  293,
+                                                                                 "endLine":  293,
+                                                                                 "startOffset":  68,
+                                                                                 "endOffset":  70
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.",
+                       "effort":  "26min",
+                       "debt":  "26min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-28T12:22:52+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T863mtGwcJowx16",
+                       "rule":  "kotlin:S3776",
+                       "severity":  "CRITICAL",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                       "project":  "ecosense",
+                       "line":  62,
+                       "hash":  "359a5cb824082a1eb65c2702b4be7616",
+                       "textRange":  {
+                                         "startLine":  62,
+                                         "endLine":  62,
+                                         "startOffset":  4,
+                                         "endOffset":  15
+                                     },
+                       "flows":  [
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  76,
+                                                                                 "endLine":  76,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  10
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  103,
+                                                                                 "endLine":  103,
+                                                                                 "startOffset":  12,
+                                                                                 "endOffset":  14
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  103,
+                                                                                 "endLine":  103,
+                                                                                 "startOffset":  47,
+                                                                                 "endOffset":  49
+                                                                             },
+                                                               "msg":  "+1",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  107,
+                                                                                 "endLine":  107,
+                                                                                 "startOffset":  10,
+                                                                                 "endOffset":  15
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  110,
+                                                                                 "endLine":  110,
+                                                                                 "startOffset":  10,
+                                                                                 "endOffset":  15
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  128,
+                                                                                 "endLine":  128,
+                                                                                 "startOffset":  8,
+                                                                                 "endOffset":  12
+                                                                             },
+                                                               "msg":  "+2 (incl 1 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     },
+                                     {
+                                         "locations":  [
+                                                           {
+                                                               "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                                                               "textRange":  {
+                                                                                 "startLine":  173,
+                                                                                 "endLine":  173,
+                                                                                 "startOffset":  32,
+                                                                                 "endOffset":  34
+                                                                             },
+                                                               "msg":  "+7 (incl 6 for nesting)",
+                                                               "msgFormattings":  [
+
+                                                                                  ]
+                                                           }
+                                                       ]
+                                     }
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Refactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.",
+                       "effort":  "8min",
+                       "debt":  "8min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "brain-overload"
+                                ],
+                       "creationDate":  "2026-04-28T10:24:24+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T8p3mtGwcJowx13",
+                       "rule":  "kotlin:S1172",
+                       "severity":  "MAJOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                       "project":  "ecosense",
+                       "line":  370,
+                       "hash":  "f26594f09650b551e9af74b55572d5d0",
+                       "textRange":  {
+                                         "startLine":  370,
+                                         "endLine":  370,
+                                         "startOffset":  4,
+                                         "endOffset":  12
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused function parameter \"onCancel\".",
+                       "effort":  "5min",
+                       "debt":  "5min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2024-06-26T13:40:42+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   },
+                   {
+                       "key":  "AZ5n-T8p3mtGwcJowx14",
+                       "rule":  "kotlin:S1128",
+                       "severity":  "MINOR",
+                       "component":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                       "project":  "ecosense",
+                       "line":  37,
+                       "hash":  "f80ecc43ddc21a3510cbd92d531c13c2",
+                       "textRange":  {
+                                         "startLine":  37,
+                                         "endLine":  37,
+                                         "startOffset":  7,
+                                         "endOffset":  48
+                                     },
+                       "flows":  [
+
+                                 ],
+                       "status":  "OPEN",
+                       "message":  "Remove this unused import.",
+                       "effort":  "2min",
+                       "debt":  "2min",
+                       "author":  "billymartinezc@gmail.com",
+                       "tags":  [
+                                    "unused"
+                                ],
+                       "creationDate":  "2024-06-24T03:54:15+0000",
+                       "updateDate":  "2026-05-27T05:46:57+0000",
+                       "type":  "CODE_SMELL",
+                       "scope":  "MAIN",
+                       "quickFixAvailable":  false,
+                       "messageFormattings":  [
+
+                                              ]
+                   }
+               ],
+    "components":  [
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "HistoryScreen.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/screen/HistoryScreen.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/repository/SeedRepository.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "SeedRepository.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/repository/SeedRepository.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/repository/SeedRepository.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "LoginScreen.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/screen/LoginScreen.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/viewmodel/RankingViewModel.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "RankingViewModel.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/viewmodel/RankingViewModel.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/viewmodel/RankingViewModel.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "GruposScreen.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/screen/GruposScreen.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "RecycleFormScreen.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "ProfileScreen.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/screen/ProfileScreen.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "MainActivity.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/MainActivity.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/MainActivity.kt"
+                       },
+                       {
+                           "key":  "ecosense:app/src/main/kotlin/com/ecosense/AppNavHost.kt",
+                           "enabled":  true,
+                           "qualifier":  "FIL",
+                           "name":  "AppNavHost.kt",
+                           "longName":  "app/src/main/kotlin/com/ecosense/AppNavHost.kt",
+                           "path":  "app/src/main/kotlin/com/ecosense/AppNavHost.kt"
+                       },
+                       {
+                           "key":  "ecosense",
+                           "enabled":  true,
+                           "qualifier":  "TRK",
+                           "name":  "EcoSense",
+                           "longName":  "EcoSense"
+                       }
+                   ],
+    "rules":  [
+                  {
+                      "key":  "kotlin:S1172",
+                      "name":  "Unused function parameters should be removed",
+                      "lang":  "kotlin",
+                      "status":  "READY",
+                      "langName":  "Kotlin"
+                  },
+                  {
+                      "key":  "kotlin:S1128",
+                      "name":  "Unnecessary imports should be removed",
+                      "lang":  "kotlin",
+                      "status":  "READY",
+                      "langName":  "Kotlin"
+                  },
+                  {
+                      "key":  "kotlin:S3776",
+                      "name":  "Cognitive Complexity of functions should not be too high",
+                      "lang":  "kotlin",
+                      "status":  "READY",
+                      "langName":  "Kotlin"
+                  },
+                  {
+                      "key":  "kotlin:S107",
+                      "name":  "Functions should not have too many parameters",
+                      "lang":  "kotlin",
+                      "status":  "READY",
+                      "langName":  "Kotlin"
+                  },
+                  {
+                      "key":  "kotlin:S1135",
+                      "name":  "Track uses of \"TODO\" tags",
+                      "lang":  "kotlin",
+                      "status":  "READY",
+                      "langName":  "Kotlin"
+                  }
+              ],
+    "facets":  [
+
+               ]
+}
