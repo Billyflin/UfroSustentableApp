@@ -106,3 +106,5 @@ El manejo explicito de estados reemplazo el bloque `else` vacio en `RecycleFormS
 ## Conclusion
 
 El resultado general es favorable en seguridad, confiabilidad y duplicacion: no hay bugs, no hay vulnerabilidades y la duplicacion es 0.0%. El principal riesgo actual esta en mantenibilidad y cobertura. La cobertura aparece en 0.0% porque no se importo reporte XML, y varias pantallas Compose concentran demasiada logica. Se corrigieron dos code smells y quedaron acciones propuestas para los hallazgos de mayor impacto.
+
+La baja cantidad de incidencias detectadas en las metricas de SonarQube puede atribuirse a que se trata de un proyecto de tamano relativamente reducido y que, ademas, ha sido sometido previamente a procesos de refactorizacion y limpieza de codigo. Esto ha contribuido a disminuir la presencia de code smells y a mantener un mayor cumplimiento de las buenas practicas de desarrollo.
