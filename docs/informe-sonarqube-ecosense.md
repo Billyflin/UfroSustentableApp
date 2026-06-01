@@ -78,6 +78,31 @@ Archivos de evidencia generados:
 - `docs/sonarqube-resolved-issues.json`
 - `docs/sonarqube-qualitygate.json`
 
+### Evidencia para la entrega
+
+| Tipo de evidencia | Detalle |
+|---|---|
+| Commit del repositorio | `32e2729 Add integration testing and SonarQube reports`, enviado a `origin/main`. Incluye ejecucion de pruebas, reporte SonarQube y correcciones aplicadas. |
+| Nueva ejecucion de SonarQube | La ejecucion posterior a las correcciones dejo el Quality Gate en `OK`, `Bugs = 0`, `Vulnerabilities = 0`, `Code Smells = 20`, `Coverage = 0.0%` y `Duplications = 0.0%`. |
+| Captura antes/despues | No se adjunta captura en el repositorio. Se deja evidencia reproducible mediante salidas JSON de SonarQube antes/despues: `docs/sonarqube-issues.json`, `docs/sonarqube-resolved-issues.json` y `docs/sonarqube-metrics.json`. |
+| Pull request | No aplica en esta entrega: el trabajo se integro directamente en `main` y fue enviado al remoto. |
+| Justificacion tecnica de pendientes | Los hallazgos pendientes requieren cambios de configuracion o refactorizacion con mayor alcance: cobertura JaCoCo/Kover, division de `RecycleFormScreen` y simplificacion de parametros en `AppNavigation`. |
+
+Fragmentos de codigo corregidos:
+
+```kotlin
+private const val USER_NOT_FOUND = "Usuario no encontrado"
+```
+
+La constante anterior reemplazo las ocurrencias duplicadas del mensaje de error en `GrupoApplicationService`, resolviendo el hallazgo `kotlin:S1192`.
+
+```kotlin
+RecycleFormUiState.Idle,
+RecycleFormUiState.Uploading -> Unit
+```
+
+El manejo explicito de estados reemplazo el bloque `else` vacio en `RecycleFormScreen`, resolviendo el hallazgo `kotlin:S108`.
+
 ## Conclusion
 
 El resultado general es favorable en seguridad, confiabilidad y duplicacion: no hay bugs, no hay vulnerabilidades y la duplicacion es 0.0%. El principal riesgo actual esta en mantenibilidad y cobertura. La cobertura aparece en 0.0% porque no se importo reporte XML, y varias pantallas Compose concentran demasiada logica. Se corrigieron dos code smells y quedaron acciones propuestas para los hallazgos de mayor impacto.
