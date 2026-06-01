@@ -1,0 +1,34 @@
+@startuml EcoSense_Contenedores
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+title EcoSense - C4 Nivel 2 - Contenedores
+
+Person(estudiante, "Estudiante UFRO", "Usuario final de la aplicacion movil.")
+Person(adminCampus, "Administrador del programa", "Gestiona datos del programa de reciclaje.")
+
+System_Boundary(ecosense, "Sistema EcoSense") {
+    Container(androidApp, "App Android EcoSense", "Kotlin, Jetpack Compose, Android SDK", "Interfaz movil y logica de aplicacion para autenticacion, reciclaje, mapa, grupos, ranking e historial.")
+}
+
+System_Ext(googleIdentity, "Google Identity Services", "Autenticacion federada con Google.")
+Container_Ext(firebaseAuth, "Firebase Authentication", "Firebase Auth", "Administra sesiones de usuarios Google o anonimos.")
+ContainerDb_Ext(firestore, "Cloud Firestore", "Base de datos NoSQL", "Guarda usuarios, solicitudes de reciclaje, recompensas, grupos y puntos de reciclaje.")
+Container_Ext(firebaseStorage, "Firebase Storage", "Object Storage", "Almacena fotografias asociadas a solicitudes de reciclaje.")
+Container_Ext(crashlytics, "Firebase Crashlytics", "Observabilidad", "Registra fallos de la app.")
+System_Ext(googleMaps, "Google Maps Platform", "Renderiza mapas y puntos geograficos.")
+System_Ext(cameraQr, "Camara / QR", "Hardware y librerias de escaneo", "CamaraX, ML Kit y ZXing para lectura de codigos QR.")
+ContainerDb_Ext(datastore, "DataStore local", "AndroidX DataStore", "Guarda preferencias locales de apariencia y configuracion.")
+
+Rel(estudiante, androidApp, "Usa", "Android")
+Rel(adminCampus, firestore, "Mantiene datos maestros", "Firebase Console")
+Rel(androidApp, googleIdentity, "Solicita credencial Google", "Google Sign-In")
+Rel(androidApp, firebaseAuth, "Crea y valida sesion", "Firebase SDK")
+Rel(androidApp, firestore, "Lee y escribe datos de dominio", "Firebase Firestore SDK")
+Rel(androidApp, firebaseStorage, "Sube imagenes de reciclaje", "Firebase Storage SDK")
+Rel(androidApp, crashlytics, "Reporta fallos", "Firebase Crashlytics SDK")
+Rel(androidApp, googleMaps, "Muestra mapa del campus", "Maps Compose / Maps SDK")
+Rel(androidApp, cameraQr, "Captura foto y escanea QR", "CameraX / ML Kit / ZXing")
+Rel(androidApp, datastore, "Lee y guarda preferencias", "DataStore Preferences")
+
+@enduml

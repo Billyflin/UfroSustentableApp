@@ -1,0 +1,24 @@
+@startuml EcoSense_Contexto
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+title EcoSense - C4 Nivel 1 - Contexto del sistema
+
+Person(estudiante, "Estudiante UFRO", "Usuario que recicla, consulta puntos de reciclaje, revisa historial y canjea recompensas.")
+Person(adminCampus, "Administrador del programa", "Responsable de mantener puntos de reciclaje, recompensas y revision operativa.")
+
+System(ecosense, "EcoSense / UFRO Sustentable App", "Aplicacion movil Android para promover reciclaje en campus mediante puntos, historial, grupos, ranking y recompensas.")
+
+System_Ext(googleIdentity, "Google Identity Services", "Proveedor externo usado para autenticacion con cuenta Google.")
+System_Ext(firebase, "Firebase", "Backend administrado para autenticacion, datos, almacenamiento y crash reporting.")
+System_Ext(googleMaps, "Google Maps Platform", "Servicios de mapas para visualizar puntos de reciclaje.")
+System_Ext(deviceHardware, "Dispositivo movil", "Camara, GPS y recursos locales del telefono.")
+
+Rel(estudiante, ecosense, "Usa para registrar reciclaje, revisar mapas, grupos, rankings y recompensas", "Android")
+Rel(adminCampus, ecosense, "Configura o supervisa datos operativos del programa", "Consola Firebase / datos")
+Rel(ecosense, googleIdentity, "Solicita inicio de sesion", "OAuth / Google Sign-In")
+Rel(ecosense, firebase, "Autentica usuarios, persiste datos y almacena fotos", "Firebase SDK")
+Rel(ecosense, googleMaps, "Obtiene y muestra mapas", "Google Maps SDK")
+Rel(ecosense, deviceHardware, "Usa camara, lector QR y ubicacion", "Android APIs")
+
+@enduml

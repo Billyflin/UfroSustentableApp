@@ -1,0 +1,62 @@
+@startuml EcoSense_Componentes_Android
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+title EcoSense - C4 Nivel 3 - Componentes de la app Android
+
+Container_Boundary(androidApp, "App Android EcoSense") {
+    Component(mainActivity, "MainActivity", "Android Activity", "Punto de entrada de la aplicacion y configuracion inicial de Compose.")
+    Component(navHost, "AppNavHost", "Navigation Compose", "Coordina rutas entre login, mapa, reciclaje, historial, recompensas, grupos, ranking y perfil.")
+    Component(screens, "Pantallas Compose", "Jetpack Compose", "LoginScreen, MapScreen, QrScannerScreen, RecycleFormScreen, HistoryScreen, RewardsScreen, GruposScreen, RankingScreen y ProfileScreen.")
+    Component(viewModels, "ViewModels", "AndroidX Lifecycle", "Mantienen estado UI y coordinan acciones de usuario.")
+
+    Component(authRepo, "AuthRepository", "Repository", "Inicio de sesion Google/anonimo y creacion de documento de usuario.")
+    Component(recyclingRepo, "RecyclingRepository", "Repository", "Gestiona solicitudes, historial, canje de recompensas y subida de imagenes.")
+    Component(rewardsRepo, "RewardsRepository", "Repository", "Consulta recompensas y observa puntos del usuario.")
+    Component(mapRepo, "MapRepository", "Repository", "Obtiene puntos de reciclaje locales y desde Firestore.")
+    Component(seedRepo, "SeedRepository", "Repository", "Carga datos iniciales cuando corresponde.")
+    Component(prefs, "PreferencesManager", "DataStore wrapper", "Administra preferencias locales de tema y apariencia.")
+
+    Component(recyclingAppService, "RecyclingApplicationService", "Application Service", "Orquesta registro de reciclaje, almacenamiento de foto, historial y eventos.")
+    Component(grupoAppService, "GrupoApplicationService", "Application Service", "Orquesta creacion de grupos, union, puntos grupales, ranking y eventos.")
+    Component(domainServices, "GrupoService / RankingService", "Domain Services", "Reglas de dominio para grupos, rankings y recompensas grupales.")
+    Component(scanner, "BarcodeAnalyzer", "Camera / ML Kit", "Analiza frames de camara para detectar codigos QR.")
+}
+
+Container_Ext(firebaseAuth, "Firebase Authentication", "Firebase Auth", "Sesion de usuario.")
+ContainerDb_Ext(firestore, "Cloud Firestore", "NoSQL", "Usuarios, solicitudes, grupos, recompensas y puntos.")
+Container_Ext(firebaseStorage, "Firebase Storage", "Object Storage", "Fotos de solicitudes.")
+Container_Ext(googleMaps, "Google Maps Platform", "Maps SDK", "Mapas del campus.")
+Container_Ext(cameraLibs, "CameraX / ML Kit / ZXing", "Android libraries", "Captura y lectura QR.")
+ContainerDb_Ext(datastore, "DataStore local", "Preferences", "Preferencias locales.")
+
+Rel(mainActivity, navHost, "Inicializa")
+Rel(navHost, screens, "Renderiza rutas")
+Rel(screens, viewModels, "Observa estado e invoca acciones")
+Rel(screens, scanner, "Solicita lectura QR")
+
+Rel(viewModels, authRepo, "Autenticacion")
+Rel(viewModels, recyclingRepo, "Solicitudes, historial y recompensas")
+Rel(viewModels, rewardsRepo, "Recompensas y puntos")
+Rel(viewModels, mapRepo, "Puntos de reciclaje")
+Rel(viewModels, prefs, "Preferencias de usuario")
+Rel(viewModels, recyclingAppService, "Casos de uso de reciclaje integrados")
+Rel(viewModels, grupoAppService, "Casos de uso de grupos integrados")
+
+Rel(recyclingAppService, domainServices, "Aplica reglas cuando corresponde")
+Rel(grupoAppService, domainServices, "Aplica reglas de grupos y rankings")
+Rel(recyclingAppService, recyclingRepo, "Persiste solicitud")
+Rel(recyclingAppService, authRepo, "Valida usuario mediante puerto/adaptador conceptual")
+Rel(grupoAppService, firestore, "Persiste grupos y usuarios mediante repositorios")
+
+Rel(authRepo, firebaseAuth, "Inicia sesion", "Firebase SDK")
+Rel(authRepo, firestore, "Crea/actualiza usuario", "Firestore SDK")
+Rel(recyclingRepo, firestore, "Lee/escribe solicitudes y usuarios", "Firestore SDK")
+Rel(recyclingRepo, firebaseStorage, "Sube imagenes", "Storage SDK")
+Rel(rewardsRepo, firestore, "Lee recompensas y escucha puntos", "Firestore SDK")
+Rel(mapRepo, firestore, "Lee puntos configurados", "Firestore SDK")
+Rel(mapRepo, googleMaps, "Entrega coordenadas para visualizacion")
+Rel(scanner, cameraLibs, "Procesa imagenes")
+Rel(prefs, datastore, "Lee/escribe preferencias")
+
+@enduml
