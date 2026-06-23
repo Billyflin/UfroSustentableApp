@@ -34,11 +34,19 @@ class HistoryViewModel(
     private val _requestDetail = MutableStateFlow<RecyclingRequest?>(null)
     val requestDetail: StateFlow<RecyclingRequest?> = _requestDetail
 
-    fun loadRequests(userId: String) {
+    private var loadedUserId: String? = null
+
+    fun loadRequests(userId: String, forceRefresh: Boolean = false) {
+        if (!forceRefresh && loadedUserId == userId && _uiState.value is HistoryUiState.Success) {
+            return
+        }
         viewModelScope.launch {
             _uiState.value = HistoryUiState.Loading
             recyclingRepository.getRequestsForUser(userId)
-                .onSuccess { _uiState.value = HistoryUiState.Success(it) }
+                .onSuccess {
+                    loadedUserId = userId
+                    _uiState.value = HistoryUiState.Success(it)
+                }
                 .onFailure { _uiState.value = HistoryUiState.Error(it.message ?: "Error al cargar solicitudes") }
         }
     }
@@ -64,5 +72,4 @@ class HistoryViewModel(
         _redeemState.value = RedeemState.Idle
     }
 }
-
 

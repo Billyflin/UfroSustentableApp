@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -37,11 +38,21 @@ android {
             ndk {
                 abiFilters += listOf("arm64-v8a", "armeabi-v7a")
             }
+            buildConfigField("boolean", "BENCHMARK_MODE", "false")
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            isProfileable = true
+            buildConfigField("boolean", "BENCHMARK_MODE", "true")
         }
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
             // Debug conserva x86_64 para poder correr en emuladores
+            buildConfigField("boolean", "BENCHMARK_MODE", "false")
         }
     }
     compileOptions {
@@ -50,11 +61,9 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
-        jniLibs {
-            useLegacyPackaging = false
-        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/LICENSE*.md"
@@ -91,16 +100,13 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.play.services.mlkit.barcode.scanning)
-    implementation(libs.play.services.mlkit.text.recognition)
-    implementation(libs.androidx.benchmark.macro)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     testImplementation(libs.junit)
@@ -119,8 +125,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.core)
-    implementation(libs.zxing.android.embedded)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.datetime)
 
@@ -130,7 +134,6 @@ dependencies {
     implementation(libs.onetapcompose)
     implementation(libs.guava)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.gson)
     implementation(libs.maps.compose)
     implementation(libs.maps.ktx)
     implementation(libs.coil.compose)
@@ -139,4 +142,5 @@ dependencies {
     implementation("androidx.credentials:credentials:1.6.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+    baselineProfile(project(":benchmark"))
 }

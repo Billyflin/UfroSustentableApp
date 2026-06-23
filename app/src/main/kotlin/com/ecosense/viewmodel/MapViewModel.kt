@@ -22,12 +22,12 @@ class MapViewModel(
     val uiState: StateFlow<MapUiState> = _uiState
 
     init {
-        loadRecyclingPoints()
+        loadRecyclingPoints(forceRefresh = false)
     }
 
-    private fun loadRecyclingPoints() {
+    private fun loadRecyclingPoints(forceRefresh: Boolean) {
         viewModelScope.launch {
-            mapRepository.getRecyclingPoints()
+            mapRepository.getRecyclingPoints(forceRefresh)
                 .onSuccess { points ->
                     _uiState.value = MapUiState(recyclingPoints = points, isLoading = false)
                 }
@@ -39,7 +39,7 @@ class MapViewModel(
 
     fun retry() {
         _uiState.value = MapUiState(isLoading = true)
-        loadRecyclingPoints()
+        loadRecyclingPoints(forceRefresh = true)
     }
 }
 

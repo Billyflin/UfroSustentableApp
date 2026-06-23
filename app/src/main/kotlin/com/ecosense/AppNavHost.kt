@@ -82,6 +82,9 @@ fun AppNavigation(
     contrastLevel:        ContrastLevel,
     onChangeContrastLevel:(ContrastLevel) -> Unit
 ) {
+    val effectiveUserId = user?.uid ?: if (BuildConfig.BENCHMARK_MODE) "benchmark-user" else ""
+    val effectiveUserName = user?.displayName ?: "Usuario"
+
     NavDisplay(
         modifier  = modifier,
         backStack = backStack,
@@ -117,7 +120,7 @@ fun AppNavigation(
                     onNavigateToConfirmation = { title, cost, points ->
                         backStack.add(ScreenRewardConfimation(title, cost, points))
                     },
-                    userId = user?.uid ?: ""
+                    userId = effectiveUserId
                 )
             }
 
@@ -133,7 +136,7 @@ fun AppNavigation(
             entry<ScreenHistory> {
                 RequestHistoryScreen(
                     onNavigateToDetail = { id -> backStack.add(ScreenRequestDetail(id)) },
-                    userId = user?.uid ?: ""
+                    userId = effectiveUserId
                 )
             }
 
@@ -154,8 +157,8 @@ fun AppNavigation(
             entry<ScreenGrupos> {
                 GruposScreen(
                     onNavigateToRanking = { backStack.add(ScreenRanking) },
-                    userId   = user?.uid ?: "",
-                    userName = user?.displayName ?: "Usuario"
+                    userId   = effectiveUserId,
+                    userName = effectiveUserName
                 )
             }
 
@@ -189,7 +192,7 @@ fun AppNavigation(
                         description  = req.description,
                         status       = req.status,
                         reward       = req.reward,
-                        userId       = user?.uid ?: "",
+                        userId       = effectiveUserId,
                         requestId    = key.requestId,
                         onCancel     = {}
                     )

@@ -6,6 +6,12 @@ import com.google.firebase.Firebase
 import kotlinx.coroutines.tasks.await
 
 class MapRepository {
+    private companion object {
+        private const val CACHE_TTL_MS = 5 * 60 * 1_000L
+        private var cachedPoints: List<RecyclingPoint>? = null
+        private var cachedAt: Long = 0L
+    }
+
     private val db = Firebase.firestore
 
     // Puntos hardcoded cerca de la UFRO — siempre visibles sin Firestore
@@ -22,7 +28,10 @@ class MapRepository {
         RecyclingPoint(-38.74431, -72.61482, "Acceso Principal – Francisco Salazar 01145"),
     )
 
-    suspend fun getRecyclingPoints(): Result<List<RecyclingPoint>> = runCatching {
+    suspend fun getRecyclingPoints(forceRefresh: Boolean = false): Result<List<RecyclingPoint>> = runCatching {
+        val now = System.currentTimeMillis()
+        cachedPoints?.takeIf { !forceRefresh && now - cachedAt < CACHE_TTL_MS }?.let { return@runCatching it }
+
         // Intentar traer puntos adicionales de Firestore y fusionar
         val firestorePoints = try {
             db.collection("recycling_points").get().await().map { doc ->
@@ -39,5 +48,9 @@ class MapRepository {
         // Evitar duplicados exactos por coordenada
         val all = (ufroPoints + firestorePoints)
         all.distinctBy { "${it.latitude},${it.longitude}" }
+            .also {
+                cachedPoints = it
+                cachedAt = now
+            }
     }
 }

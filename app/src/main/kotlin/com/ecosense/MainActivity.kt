@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                 // La pantalla actual es simplemente el último elemento del back stack
                 val currentKey: NavKey = backStack.lastOrNull() ?: ScreenHistory
                 val isOnQrScanner = currentKey is ScreenQrScanner
+                val hasAuthenticatedContent = user != null || BuildConfig.BENCHMARK_MODE
 
                 // Helper: navegar como bottom nav (popUpTo start + launchSingleTop)
                 fun navigateMain(dest: NavKey) {
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        if (user != null && !isOnQrScanner) {
+                        if (hasAuthenticatedContent && !isOnQrScanner) {
                             TopAppBar(
                                 title = {},
                                 navigationIcon = {
@@ -105,7 +106,7 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     bottomBar = {
-                        if (user != null && !isOnQrScanner) {
+                        if (hasAuthenticatedContent && !isOnQrScanner) {
                             BottomNavigationBar(
                                 currentKey = currentKey,
                                 onNavigate = ::navigateMain,
@@ -115,7 +116,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    if (user != null) {
+                    if (hasAuthenticatedContent) {
                         AppNavigation(
                             modifier              = Modifier.padding(innerPadding),
                             backStack             = backStack,

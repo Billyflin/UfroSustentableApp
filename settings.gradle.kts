@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "EcoSense"
 include(":app")
+include(":benchmark")

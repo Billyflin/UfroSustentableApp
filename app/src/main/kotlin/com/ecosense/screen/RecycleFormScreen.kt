@@ -81,15 +81,16 @@ fun RecycleFormScreen(
 
     var expanded by remember { mutableStateOf(false) }
     var selectedMaterial by remember { mutableStateOf("") }
-    val materials = listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos")
+    val materials = remember { listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos") }
     var kilos by remember { mutableStateOf("") }
     var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
 
-    var recyclingPoint: RecyclingPoint? = null
-    try {
-        recyclingPoint = data?.let { Json.decodeFromString<RecyclingPoint>(it) }
-    } catch (e: Exception) {
-        Log.d("RecycleFormScreen", "Error parsing QR data: ${e.message}")
+    val recyclingPoint = remember(data) {
+        runCatching {
+            data?.let { Json.decodeFromString<RecyclingPoint>(it) }
+        }.onFailure { e ->
+            Log.d("RecycleFormScreen", "Error parsing QR data: ${e.message}")
+        }.getOrNull()
     }
 
     LaunchedEffect(uiState) {

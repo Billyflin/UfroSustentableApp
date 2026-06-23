@@ -199,7 +199,9 @@ fun RequestHistoryScreen(
                             )
                         }
                     } else {
-                        val sortedRequests = state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
+                        val sortedRequests = remember(state.requests) {
+                            state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
+                        }
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             contentPadding = PaddingValues(bottom = 20.dp),
@@ -372,7 +374,7 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel()
 ) {
     val redeemState by viewModel.redeemState.collectAsStateWithLifecycle()
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val formatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault()) }
 
     val formattedRequestTime = requestTime?.toInstant()
         ?.atZone(ZoneId.systemDefault())?.toLocalDateTime()?.format(formatter) ?: "Desconocido"

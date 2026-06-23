@@ -122,6 +122,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
             mapStyleOptions = mapStyleOptions
         )
     }
+    val mapUiSettings = remember { MapUiSettings(zoomControlsEnabled = false) }
 
     if (locationPermissionGranted.value) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -129,11 +130,12 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 properties = mapProperties,
-                uiSettings = MapUiSettings(zoomControlsEnabled = false)
+                uiSettings = mapUiSettings
             ) {
                 key("ufro") {
+                    val markerState = remember { MarkerState(position = universidadDeLaFrontera) }
                     Marker(
-                        state = MarkerState(position = universidadDeLaFrontera),
+                        state = markerState,
                         title = "Universidad de La Frontera",
                         snippet = "Temuco, Chile",
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
@@ -141,8 +143,11 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 }
                 uiState.recyclingPoints.forEach { point ->
                     key(point.latitude, point.longitude) {
+                        val markerState = remember(point.latitude, point.longitude) {
+                            MarkerState(position = LatLng(point.latitude, point.longitude))
+                        }
                         Marker(
-                            state = MarkerState(position = LatLng(point.latitude, point.longitude)),
+                            state = markerState,
                             title = point.description,
                             snippet = "Punto de reciclaje",
                             icon = leafIcon.value
