@@ -1,0 +1,21 @@
+﻿EcoSense Avance 02 - JaCoCo summary
+Generated: 2026-06-24 03:32:43 -04:00
+
+Command:
+.\gradlew.bat :app:jacocoDebugUnitTestReport --rerun-tasks --console=plain
+
+Test summary:
+tests=83 failures=0 errors=0 skipped=0 xml_time_seconds=2,00
+
+Coverage summary:
+LINE         covered=265 missed=32 total=297 percent=89,23%
+BRANCH       covered=81 missed=23 total=104 percent=77,88%
+INSTRUCTION  covered=1661 missed=509 total=2170 percent=76,54%
+METHOD       covered=94 missed=73 total=167 percent=56,29%
+CLASS        covered=27 missed=19 total=46 percent=58,7%
+
+Generated reports:
+app/build/reports/jacoco/jacocoDebugUnitTestReport/html/index.html
+app/build/reports/jacoco/jacocoDebugUnitTestReport/jacocoDebugUnitTestReport.xml
+app/build/reports/tests/testDebugUnitTest/index.html
+app/build/reports/cucumber/cucumber-report.html

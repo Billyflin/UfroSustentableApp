@@ -148,6 +148,16 @@ El avance implementa y evidencia el bloque funcional RF10-RF17 asociado a grupos
 
 Resultado actual: `{int(tests["tests"])}` tests JVM ejecutados, `{int(tests["failures"])}` fallos, `{int(tests["errors"])}` errores y `{int(tests["skipped"])}` omitidos. La cobertura local sobre el alcance configurado del avance es **{fmt(line["percent"])}% lines** y **{fmt(branch["percent"])}% branches**.
 
+## Casos de uso totales vs implementados
+
+| Concepto | Cantidad | Porcentaje | Evidencia |
+|---|---:|---:|---|
+| Backlog funcional semestral usado como base de conteo | 20 CU/RF | 100% | RF01-RF20 como alcance planificado del proyecto semestral |
+| Casos implementados y evidenciados en Avance 02 | 8 CU/RF | 40% | RF10-RF17: grupos, ranking y recompensas |
+| Casos fuera del conteo cuantitativo de este avance | 12 CU/RF | 60% | Login, mapa, QR, historial, perfil y recompensas individuales quedan como contexto funcional o deuda de pruebas |
+
+Lectura de cumplimiento: `8 / 20 = 40%`. El informe limita cobertura y TDD/BDD al bloque efectivamente desarrollado y testeado; no infla el porcentaje con pantallas o servicios que no tienen evidencia nueva equivalente.
+
 ## Linea base historica y evidencia previa
 
 | Fecha | Evidencia del repo | Resultado documentado | Lectura para Avance 02 |
@@ -217,6 +227,16 @@ Se evidencian ciclos por comportamiento en los specs RF10-RF17:
 | Grupo/RF12 | Se especifican errores al unirse a grupos publicos, privados y repetidos | `GrupoService.unirseAGrupo` implementa reglas puras | `GrupoApplicationService` orquesta repositorios y eventos sin cambiar la regla |
 | Ranking/RF10-RF17 | Specs ordenan usuarios/grupos y posiciones globales | `RankingService` implementa ordenamientos deterministas | BDD reutiliza el servicio y evita duplicar reglas |
 | Integracion reciclaje | Casos IT-05 a IT-08 fuerzan storage, historial, eventos y errores | `RecyclingApplicationService` coordina ports in-memory | Nuevos casos IT-16 e IT-17 cubren validaciones negativas |
+
+Commits concretos usados como evidencia TDD/evolutiva:
+
+| Commit | Fecha | Evidencia |
+|---|---|---|
+| `9661ba6` | 2026-04-29 | Agrega logica para unirse a grupos y gestionar miembros, junto con pruebas de comportamiento para esos escenarios. |
+| `32e2729` | 2026-05-27 | Agrega suite de integracion y reportes SonarQube, base historica para calidad y deuda tecnica. |
+| `efd6dd6` | 2026-06-24 | Prepara evidencia Avance 02: BDD, JaCoCo, informe y pruebas ampliadas. |
+| `4bb8c4a` | 2026-06-24 | Mejora el informe con evidencia historica y lectura antes/despues de Sonar. |
+| `755c650` | 2026-06-24 | Expande el PDF a formato de informe semestral con mas detalle tecnico y evaluativo. |
 
 ## Pruebas unitarias y cobertura
 
@@ -292,6 +312,31 @@ La lectura correcta de SonarQube debe considerar la evidencia historica del repo
 
 Accion tomada en este avance: se agrego `sonar.coverage.jacoco.xmlReportPaths` y se genero el XML JaCoCo. La re-ejecucion local de SonarQube no pudo completarse porque Docker Desktop no esta disponible en el entorno actual (`dockerDesktopLinuxEngine` no existe). El reporte local de cobertura queda listo para importarse en el proximo Sonar.
 
+## Evidencias para video y reproduccion local
+
+Carpeta versionada de evidencia:
+
+- `docs/evidencias-avance-02/tests-unitarios-integracion.log`: salida completa de `:app:testDebugUnitTest`.
+- `docs/evidencias-avance-02/jacoco-gradle.log`: salida completa de `:app:jacocoDebugUnitTestReport`.
+- `docs/evidencias-avance-02/jacoco-summary.txt`: resumen de tests, lineas, ramas, instrucciones, metodos y clases desde XML.
+- `docs/evidencias-avance-02/sonarqube-run.log`: intento real de ejecucion SonarQube local; falla por Docker Desktop no activo.
+- `docs/guion-video-avance-02.md`: guion de grabacion <= 5 minutos.
+
+No se graba un video desde este entorno porque no hay una herramienta de captura interactiva disponible y el dashboard Sonar local requiere Docker Desktop activo. La entrega deja comandos, logs y rutas exactas para grabarlo localmente.
+
+## Estado final de entrega
+
+| Criterio | Estado | Evidencia |
+|---|---|---|
+| Implementacion funcional >= 40% CU | Cumple | 8/20 CU implementados: RF10-RF17 |
+| TDD evidenciado | Cumple | Specs RF10-RF17, commits `9661ba6`, `efd6dd6`, `4bb8c4a`, `755c650` |
+| BDD ejecutable | Cumple | Features Gherkin + glue Cucumber en `app/src/test` |
+| Unitarias >= 70% scope | Cumple | JaCoCo lines {fmt(line["percent"])}%, branches {fmt(branch["percent"])}% |
+| Integracion entre componentes | Cumple | `EcoSenseIntegrationSpec` IT-01 a IT-17 |
+| SonarQube | Parcial verificable | Historico Quality Gate OK; reanalisis local bloqueado por Docker Desktop |
+| Video <= 5 min | Preparado | Guion y logs listos para grabacion local |
+| Repositorio | Cumple al pushear | Rama `codex/performance-optimizations` con docs/evidencias versionadas |
+
 ## Mejoras y deuda tecnica
 
 | Prioridad | Mejora | Motivo |
@@ -313,6 +358,7 @@ La entrega queda funcionalmente avanzada para el bloque RF10-RF17, con TDD/BDD e
 - Reporte Sonar previo: `docs/informe-sonarqube-ecosense.md`
 - Reporte rendimiento: `docs/informe-rendimiento-ecosense.md`
 - Guion de video: `docs/guion-video-avance-02.md`
+- Logs de evidencia: `docs/evidencias-avance-02/`
 """
 
 
@@ -321,19 +367,28 @@ def video_guide() -> str:
 
 Duracion objetivo: 4 a 5 minutos.
 
-1. Mostrar rama y estado:
+Este guion asume grabacion local con Docker Desktop activo solo si se quiere mostrar el dashboard SonarQube actualizado. Si Docker no esta activo, usar `docs/evidencias-avance-02/sonarqube-run.log` como evidencia de limitacion y mostrar los JSON historicos versionados.
+
+1. Mostrar rama, commit y estado:
 
 ```powershell
 git status --short --branch
+git log --oneline -5
 ```
 
-2. Ejecutar pruebas unitarias, BDD e integracion con cobertura:
+2. Ejecutar pruebas unitarias, BDD e integracion:
+
+```powershell
+.\\gradlew.bat :app:testDebugUnitTest --rerun-tasks --console=plain
+```
+
+3. Ejecutar cobertura JaCoCo:
 
 ```powershell
 .\\gradlew.bat :app:jacocoDebugUnitTestReport --rerun-tasks --console=plain
 ```
 
-3. Abrir reportes locales:
+4. Abrir reportes locales:
 
 ```powershell
 start app\\build\\reports\\tests\\testDebugUnitTest\\index.html
@@ -341,7 +396,14 @@ start app\\build\\reports\\cucumber\\cucumber-report.html
 start app\\build\\reports\\jacoco\\jacocoDebugUnitTestReport\\html\\index.html
 ```
 
-4. Mostrar evidencia Sonar previa y explicar que el dashboard se regenera con Docker Desktop activo:
+5. Mostrar resumen versionado para no depender solo de pantalla:
+
+```powershell
+Get-Content docs\\evidencias-avance-02\\jacoco-summary.txt
+Get-Content docs\\evidencias-avance-02\\tests-unitarios-integracion.log -Tail 20
+```
+
+6. Mostrar evidencia Sonar previa y explicar que el dashboard se regenera con Docker Desktop activo:
 
 ```powershell
 Get-Content docs\\informe-sonarqube-ecosense.md
@@ -351,18 +413,33 @@ Get-Content docs\\sonarqube-resolved-issues.json
 powershell -ExecutionPolicy Bypass -File .\\scripts\\run-sonarqube-analysis.ps1
 ```
 
-5. Mostrar evidencia historica complementaria:
+Si Docker no esta activo:
+
+```powershell
+Get-Content docs\\evidencias-avance-02\\sonarqube-run.log
+```
+
+7. Mostrar evidencia historica complementaria:
 
 ```powershell
 Get-Content docs\\pruebas-integracion-ecosense.md
 Get-Content docs\\diagramas-c4\\README.md
 ```
 
-6. Mostrar el informe final:
+8. Mostrar el informe final:
 
 ```powershell
 start docs\\informe-avance-02-ecosense.pdf
 ```
+
+Checklist verbal para cerrar el video:
+
+- 8 de 20 casos de uso implementados: RF10-RF17, equivalente a 40%.
+- 83 tests JVM, 0 failures, 0 errors.
+- JaCoCo lines >= 70% y branches >= 70%.
+- BDD ejecutable con Gherkin + glue.
+- Integracion IT-01 a IT-17.
+- Sonar historico OK y reanalisis local pendiente solo por Docker Desktop.
 """
 
 
@@ -672,6 +749,7 @@ def build_pdf_expanded(
             [
                 ["Dimension", "Resultado"],
                 ["Casos de uso implementados", "RF10-RF17, bloque de grupos, ranking y recompensas"],
+                ["Cobertura funcional del avance", "8 de 20 CU/RF planificados = 40%"],
                 ["BDD", "Escenarios Gherkin para RF10, RF11, RF12, RF13, RF14, RF15, RF16 y RF17"],
                 ["TDD", "Specs Kotest por comportamiento y ampliacion de integracion antes de cerrar cobertura"],
                 ["Integracion", "EcoSenseIntegrationSpec valida IT-01 a IT-17 sin Firebase ni red"],
@@ -701,6 +779,16 @@ def build_pdf_expanded(
 
         p("Alcance Del Avance 02", styles["H1Eco2"]),
         p("El avance se concentra en los casos de uso relacionados con colaboracion y competencia sustentable. La tabla muestra implementacion, pruebas unitarias, escenarios BDD e integracion asociada.", styles["BodyEco2"]),
+        table(
+            [
+                ["Concepto", "Cantidad", "Porcentaje", "Evidencia"],
+                ["Backlog funcional semestral usado como base", "20 CU/RF", "100%", "RF01-RF20 como alcance planificado"],
+                ["Implementados y evidenciados en Avance 02", "8 CU/RF", "40%", "RF10-RF17 con unitarias, BDD e integracion"],
+                ["Fuera del conteo cuantitativo del avance", "12 CU/RF", "60%", "Login, mapa, QR, historial, perfil y recompensas individuales"],
+            ],
+            [4.5, 2.2, 2.2, 5.8],
+            styles["SmallEco2"],
+        ),
         table(scope_rows, [1.6, 3.4, 3.8, 3.2, 3.2], styles["SmallEco2"]),
         p("El resto de la app - autenticacion, mapa, QR, historial, recompensas individuales y pantallas Compose - se mantiene como contexto funcional, pero la cobertura cuantitativa se limita al bloque efectivamente implementado y probado en esta entrega.", styles["BodyEco2"]),
         PageBreak(),
@@ -784,7 +872,19 @@ def build_pdf_expanded(
             [2.4, 4.0, 4.0, 5.0],
             styles["SmallEco2"],
         ),
-        p("Commits relevantes del historial: 9661ba6 agrega logica de grupos y pruebas de comportamiento; 32e2729 agrega integracion y reportes Sonar; efd6dd6 agrega evidencia Avance 02; 4bb8c4a mejora el informe con evidencia historica.", styles["BodyEco2"]),
+        p("Commits relevantes del historial: 9661ba6 agrega logica de grupos y pruebas de comportamiento; 32e2729 agrega integracion y reportes Sonar; efd6dd6 agrega evidencia Avance 02; 4bb8c4a mejora el informe con evidencia historica; 755c650 expande el PDF al formato semestral.", styles["BodyEco2"]),
+        table(
+            [
+                ["Commit", "Fecha", "Evidencia"],
+                ["9661ba6", "2026-04-29", "Unirse a grupos, gestion de miembros y pruebas de comportamiento"],
+                ["32e2729", "2026-05-27", "Integracion y reportes SonarQube"],
+                ["efd6dd6", "2026-06-24", "BDD, JaCoCo e informe Avance 02"],
+                ["4bb8c4a", "2026-06-24", "Lectura historica de Sonar y evidencia antes/despues"],
+                ["755c650", "2026-06-24", "Expansion del informe PDF a entrega semestral"],
+            ],
+            [2.0, 2.4, 10.0],
+            styles["SmallEco2"],
+        ),
         PageBreak(),
 
         p("Pruebas Unitarias", styles["H1Eco2"]),
@@ -927,6 +1027,25 @@ def build_pdf_expanded(
         p("Limitacion actual: Docker Desktop no esta activo en este entorno, por lo que el script Sonar falla rapido con mensaje claro. En el equipo de entrega se debe ejecutar con Docker activo para capturar el dashboard actualizado.", styles["BodyEco2"]),
         PageBreak(),
 
+        p("Estado Final De Entrega", styles["H1Eco2"]),
+        table(
+            [
+                ["Criterio", "Estado", "Evidencia"],
+                ["Implementacion funcional >= 40% CU", "Cumple", "8/20 CU implementados: RF10-RF17"],
+                ["TDD evidenciado", "Cumple", "Specs RF10-RF17 y commits 9661ba6, efd6dd6, 4bb8c4a, 755c650"],
+                ["BDD ejecutable", "Cumple", "Features Gherkin y glue Cucumber en app/src/test"],
+                ["Unitarias >= 70% scope", "Cumple", f"JaCoCo lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%"],
+                ["Integracion entre componentes", "Cumple", "EcoSenseIntegrationSpec IT-01 a IT-17"],
+                ["SonarQube", "Parcial verificable", "Historico Quality Gate OK; reanalisis local bloqueado por Docker Desktop"],
+                ["Video <= 5 min", "Preparado", "Guion y logs listos para grabacion local"],
+                ["Repositorio", "Cumple al pushear", "Rama codex/performance-optimizations con docs/evidencias versionadas"],
+            ],
+            [4.4, 3.0, 7.1],
+            styles["SmallEco2"],
+        ),
+        p("Logs versionados para la grabacion: tests-unitarios-integracion.log, jacoco-gradle.log, jacoco-summary.txt y sonarqube-run.log dentro de docs/evidencias-avance-02.", styles["BodyEco2"]),
+        PageBreak(),
+
         p("Mejoras Y Deuda Tecnica", styles["H1Eco2"]),
         table(
             [
@@ -959,6 +1078,7 @@ def build_pdf_expanded(
                 ["Sonar JSON", "docs/sonarqube-metrics.json, issues, resolved, qualitygate"],
                 ["C4", "docs/diagramas-c4/*.puml"],
                 ["Rendimiento", "docs/informe-rendimiento-ecosense.md"],
+                ["Logs Avance 02", "docs/evidencias-avance-02/*.log y jacoco-summary.txt"],
             ],
             [4.0, 10.0],
             styles["SmallEco2"],
