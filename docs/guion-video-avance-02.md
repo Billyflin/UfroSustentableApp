@@ -25,12 +25,21 @@ start app\build\reports\jacoco\jacocoDebugUnitTestReport\html\index.html
 4. Mostrar evidencia Sonar previa y explicar que el dashboard se regenera con Docker Desktop activo:
 
 ```powershell
+Get-Content docs\informe-sonarqube-ecosense.md
 Get-Content docs\sonarqube-qualitygate.json
 Get-Content docs\sonarqube-metrics.json
+Get-Content docs\sonarqube-resolved-issues.json
 powershell -ExecutionPolicy Bypass -File .\scripts\run-sonarqube-analysis.ps1
 ```
 
-5. Mostrar el informe final:
+5. Mostrar evidencia historica complementaria:
+
+```powershell
+Get-Content docs\pruebas-integracion-ecosense.md
+Get-Content docs\diagramas-c4\README.md
+```
+
+6. Mostrar el informe final:
 
 ```powershell
 start docs\informe-avance-02-ecosense.pdf

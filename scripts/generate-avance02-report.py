@@ -73,15 +73,66 @@ def read_sonar() -> tuple[dict[str, str], str]:
     return measures, gate
 
 
+def count_by(items: list[dict], key: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for item in items:
+        value = item.get(key, "N/D")
+        counts[value] = counts.get(value, 0) + 1
+    return counts
+
+
+def read_sonar_history() -> dict:
+    issues_path = DOCS / "sonarqube-issues.json"
+    resolved_path = DOCS / "sonarqube-resolved-issues.json"
+    issues = []
+    resolved = []
+    if issues_path.exists():
+        issues = json.loads(issues_path.read_text(encoding="utf-8-sig")).get("issues", [])
+    if resolved_path.exists():
+        resolved = json.loads(resolved_path.read_text(encoding="utf-8-sig")).get("issues", [])
+
+    severity_counts = count_by(issues, "severity")
+    rule_counts = count_by(issues, "rule")
+    resolved_rules = [
+        {
+            "rule": item.get("rule", "N/D"),
+            "severity": item.get("severity", "N/D"),
+            "component": item.get("component", "N/D").replace("ecosense:", ""),
+            "message": item.get("message", "N/D"),
+        }
+        for item in resolved
+    ]
+    return {
+        "open_count": len(issues),
+        "resolved_count": len(resolved),
+        "iteration_total": len(issues) + len(resolved),
+        "severity_counts": severity_counts,
+        "rule_counts": rule_counts,
+        "resolved_rules": resolved_rules,
+    }
+
+
 def fmt(value: float | int | str) -> str:
     if isinstance(value, float):
         return f"{value:.2f}".rstrip("0").rstrip(".")
     return str(value)
 
 
-def build_markdown(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float | int], sonar: dict[str, str], gate: str) -> str:
+def build_markdown(
+    jacoco: dict[str, dict[str, float | int]],
+    tests: dict[str, float | int],
+    sonar: dict[str, str],
+    gate: str,
+    history: dict,
+) -> str:
     line = jacoco["LINE"]
     branch = jacoco["BRANCH"]
+    severity = history["severity_counts"]
+    rules = history["rule_counts"]
+    resolved_rows = "\n".join(
+        f'| `{item["rule"]}` | {item["severity"]} | `{item["component"]}` | {item["message"]} |'
+        for item in history["resolved_rules"]
+    )
     return f"""# Entrega Avance 02 - Proyecto semestral EcoSense
 
 **Curso:** Pruebas de software
@@ -91,9 +142,22 @@ def build_markdown(jacoco: dict[str, dict[str, float | int]], tests: dict[str, f
 
 ## Resumen ejecutivo
 
+Este informe consolida la evidencia historica ya versionada en `docs/` y la evidencia nueva generada para Avance 02. No se interpreta solo la fotografia actual del proyecto: se registra la linea base de SonarQube, los hallazgos corregidos, la suite de integracion original y la ampliacion actual de BDD/cobertura.
+
 El avance implementa y evidencia el bloque funcional RF10-RF17 asociado a grupos, ranking y recompensas. Este bloque cubre 8 casos de uso priorizados y se considera el 40% del alcance funcional planificado para esta entrega. La evidencia incluye pruebas unitarias con Kotest, escenarios BDD ejecutables con Cucumber/Gherkin, pruebas de integracion de servicios y reporte local de cobertura JaCoCo.
 
 Resultado actual: `{int(tests["tests"])}` tests JVM ejecutados, `{int(tests["failures"])}` fallos, `{int(tests["errors"])}` errores y `{int(tests["skipped"])}` omitidos. La cobertura local sobre el alcance configurado del avance es **{fmt(line["percent"])}% lines** y **{fmt(branch["percent"])}% branches**.
+
+## Linea base historica y evidencia previa
+
+| Fecha | Evidencia del repo | Resultado documentado | Lectura para Avance 02 |
+|---|---|---|---|
+| 27/05/2026 | `docs/pruebas-integracion-ecosense.md` | Suite `EcoSenseIntegrationSpec` original con 15 tests, 0 failures, 0 errors; `BUILD SUCCESSFUL in 5s`. | Punto de partida de integracion entre servicios, repositorios in-memory, storage fake y eventos. |
+| 27/05/2026 | `docs/informe-sonarqube-ecosense.md` + `docs/sonarqube-*.json` | Quality Gate OK, Bugs 0, Vulnerabilities 0, Duplications 0.0%, Coverage Sonar 0.0% por falta de XML JaCoCo. | La cobertura 0.0% era una limitacion de importacion, no ausencia de pruebas. |
+| 27/05/2026 | `docs/sonarqube-issues.json` + `docs/sonarqube-resolved-issues.json` | Iteracion Sonar con {history["iteration_total"]} code smells detectados: {history["open_count"]} abiertos y {history["resolved_count"]} corregidos. | Permite mostrar antes/despues real: los issues corregidos ya no aparecen abiertos en el analisis posterior. |
+| 01/06/2026 | `docs/diagramas-c4/*.puml` | Diagramas C4 de contexto, contenedores y componentes Android. | Base de arquitectura para mapear CU implementados. |
+| 23/06/2026 | `docs/informe-rendimiento-ecosense.md` | APK release baja de 34.727.433 a 8.413.167 bytes y startup mediana baja de 5.596 ms a 3.842 ms. | Evidencia complementaria de calidad/performance del proyecto. |
+| 24/06/2026 | Reporte actual Avance 02 | 83 tests JVM, BDD RF10-RF17, JaCoCo lines {fmt(line["percent"])}%, branches {fmt(branch["percent"])}%. | Evidencia actual para el requisito de TDD/BDD/cobertura. |
 
 ## Alcance del avance 02
 
@@ -197,21 +261,34 @@ Las pruebas integran servicios de aplicacion con puertos in-memory:
 
 La suite `EcoSenseIntegrationSpec` contiene IT-01 a IT-17 y valida caminos correctos, conflictos, 404, timeouts, validaciones de entrada, ranking y efectos laterales.
 
-## Calidad con SonarQube
+## Calidad con SonarQube: evolucion antes/despues
 
-Evidencia previa en `docs/sonarqube-*.json`:
+La lectura correcta de SonarQube debe considerar la evidencia historica del repositorio. Si solo se mira una ejecucion posterior a correcciones, se pierde el contexto: dos issues ya fueron cerrados y por eso no aparecen como abiertos.
 
-| Metrica | Resultado |
+| Momento | Evidencia | Bugs | Vulnerabilities | Code smells | Coverage | Duplications | Quality Gate |
+|---|---|---:|---:|---:|---:|---:|---|
+| Linea base de la iteracion Sonar | `sonarqube-issues.json` + `sonarqube-resolved-issues.json` | 0 | 0 | {history["iteration_total"]} detectados ({history["open_count"]} abiertos + {history["resolved_count"]} corregidos) | 0.0% | 0.0% | OK |
+| Despues de correcciones documentadas | `sonarqube-metrics.json` + `informe-sonarqube-ecosense.md` | {sonar.get("bugs", "N/D")} | {sonar.get("vulnerabilities", "N/D")} | {sonar.get("code_smells", "N/D")} abiertos | {sonar.get("coverage", "N/D")}% | {sonar.get("duplicated_lines_density", "N/D")}% | {gate} |
+| Estado actual de Avance 02 | JaCoCo XML + `sonar-project.properties` | No reejecutado | No reejecutado | No reejecutado localmente | JaCoCo lines {fmt(line["percent"])}%, branches {fmt(branch["percent"])}% | No reejecutado | Pendiente de reanalisis con Docker |
+
+### Hallazgos Sonar corregidos
+
+| Regla | Severidad | Archivo | Accion documentada |
+|---|---|---|---|
+{resolved_rows}
+
+### Hallazgos Sonar abiertos despues de correcciones
+
+| Vista | Resultado |
 |---|---:|
-| Quality Gate | {gate} |
-| Bugs | {sonar.get("bugs", "N/D")} |
-| Vulnerabilities | {sonar.get("vulnerabilities", "N/D")} |
-| Code Smells | {sonar.get("code_smells", "N/D")} |
-| Coverage Sonar previo | {sonar.get("coverage", "N/D")}% |
-| Duplications | {sonar.get("duplicated_lines_density", "N/D")}% |
-| Maintainability rating | {sonar.get("sqale_rating", "N/D")} |
-| Security rating | {sonar.get("security_rating", "N/D")} |
-| Reliability rating | {sonar.get("reliability_rating", "N/D")} |
+| Total abiertos | {history["open_count"]} |
+| Critical | {severity.get("CRITICAL", 0)} |
+| Major | {severity.get("MAJOR", 0)} |
+| Minor | {severity.get("MINOR", 0)} |
+| Info | {severity.get("INFO", 0)} |
+| Complejidad cognitiva `kotlin:S3776` | {rules.get("kotlin:S3776", 0)} |
+| Demasiados parametros `kotlin:S107` | {rules.get("kotlin:S107", 0)} |
+| Imports sin uso `kotlin:S1128` | {rules.get("kotlin:S1128", 0)} |
 
 Accion tomada en este avance: se agrego `sonar.coverage.jacoco.xmlReportPaths` y se genero el XML JaCoCo. La re-ejecucion local de SonarQube no pudo completarse porque Docker Desktop no esta disponible en el entorno actual (`dockerDesktopLinuxEngine` no existe). El reporte local de cobertura queda listo para importarse en el proximo Sonar.
 
@@ -219,16 +296,16 @@ Accion tomada en este avance: se agrego `sonar.coverage.jacoco.xmlReportPaths` y
 
 | Prioridad | Mejora | Motivo |
 |---|---|---|
-| Alta | Re-ejecutar SonarQube con Docker Desktop activo | Actualizar dashboard con coverage JaCoCo real |
-| Alta | Reducir complejidad de `RecycleFormScreen` | Sonar marco complejidad cognitiva critica |
-| Media | Reducir parametros en `AppNavHost` | Mejor mantenibilidad de navegacion |
+| Alta | Re-ejecutar SonarQube con Docker Desktop activo | Actualizar dashboard con coverage JaCoCo real y conservar comparacion historica |
+| Alta | Reducir complejidad de `RecycleFormScreen`, `MainActivity` y `GruposScreen` | Sonar mantiene hallazgos `kotlin:S3776` abiertos |
+| Media | Reducir parametros en `AppNavHost`, `HistoryScreen` y `ProfileScreen` | Sonar mantiene hallazgos `kotlin:S107` abiertos |
 | Media | Agregar tests instrumentados de UI minima | Cubrir flujos Compose no incluidos en JVM |
 | Media | Automatizar reporte en CI | Evitar evidencia manual y regresiones |
 | Baja | Grabar video final de evidencia | Entregable audiovisual requerido |
 
 ## Conclusiones
 
-La entrega queda funcionalmente avanzada para el bloque RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al 70% en lineas y ramas. El principal pendiente externo es regenerar el dashboard SonarQube con Docker activo y grabar el video final de evidencia.
+La entrega queda funcionalmente avanzada para el bloque RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al 70% en lineas y ramas. La evidencia historica muestra que SonarQube detecto {history["iteration_total"]} code smells en la iteracion registrada, de los cuales {history["resolved_count"]} fueron corregidos y {history["open_count"]} quedaron como deuda tecnica priorizada. El principal pendiente externo es regenerar el dashboard SonarQube con Docker activo para importar el XML JaCoCo actual y grabar el video final de evidencia.
 
 ## Referencias y anexos
 
@@ -267,12 +344,21 @@ start app\\build\\reports\\jacoco\\jacocoDebugUnitTestReport\\html\\index.html
 4. Mostrar evidencia Sonar previa y explicar que el dashboard se regenera con Docker Desktop activo:
 
 ```powershell
+Get-Content docs\\informe-sonarqube-ecosense.md
 Get-Content docs\\sonarqube-qualitygate.json
 Get-Content docs\\sonarqube-metrics.json
+Get-Content docs\\sonarqube-resolved-issues.json
 powershell -ExecutionPolicy Bypass -File .\\scripts\\run-sonarqube-analysis.ps1
 ```
 
-5. Mostrar el informe final:
+5. Mostrar evidencia historica complementaria:
+
+```powershell
+Get-Content docs\\pruebas-integracion-ecosense.md
+Get-Content docs\\diagramas-c4\\README.md
+```
+
+6. Mostrar el informe final:
 
 ```powershell
 start docs\\informe-avance-02-ecosense.pdf
@@ -306,7 +392,13 @@ def table(rows: list[list[str]], widths: list[float], style: ParagraphStyle) -> 
     return result
 
 
-def build_pdf(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float | int], sonar: dict[str, str], gate: str) -> None:
+def build_pdf(
+    jacoco: dict[str, dict[str, float | int]],
+    tests: dict[str, float | int],
+    sonar: dict[str, str],
+    gate: str,
+    history: dict,
+) -> None:
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle("CoverTitle", parent=styles["Title"], fontSize=24, leading=28, textColor=colors.HexColor("#225C57"), alignment=TA_CENTER, spaceAfter=16))
     styles.add(ParagraphStyle("CoverSub", parent=styles["BodyText"], fontSize=12, leading=16, alignment=TA_CENTER, spaceAfter=8))
@@ -318,6 +410,17 @@ def build_pdf(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float 
     line = jacoco["LINE"]
     branch = jacoco["BRANCH"]
     instructions = jacoco["INSTRUCTION"]
+    severity = history["severity_counts"]
+    rules = history["rule_counts"]
+    resolved_pdf_rows = [
+        [
+            item["rule"],
+            item["severity"],
+            item["component"],
+            item["message"],
+        ]
+        for item in history["resolved_rules"]
+    ]
     story = [
         Spacer(1, 4.5 * cm),
         p("Entrega Avance 02 - Proyecto semestral", styles["CoverTitle"]),
@@ -327,8 +430,21 @@ def build_pdf(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float 
         PageBreak(),
         p("Resumen Ejecutivo", styles["H1Eco"]),
         p(
-            f"El avance implementa RF10-RF17: grupos, ranking y recompensas. La ejecucion local consolida {int(tests['tests'])} tests JVM sin fallos y cobertura JaCoCo de {fmt(line['percent'])}% lines y {fmt(branch['percent'])}% branches sobre el alcance del avance.",
+            f"Este informe consolida evidencia historica del repositorio y evidencia nueva de Avance 02. El avance implementa RF10-RF17: grupos, ranking y recompensas. La ejecucion local consolida {int(tests['tests'])} tests JVM sin fallos y cobertura JaCoCo de {fmt(line['percent'])}% lines y {fmt(branch['percent'])}% branches sobre el alcance del avance.",
             styles["BodyEco"],
+        ),
+        p("Linea Base Historica", styles["H1Eco"]),
+        table(
+            [
+                ["Fecha", "Evidencia", "Resultado", "Lectura"],
+                ["27/05/2026", "Integracion original", "15 tests de integracion, 0 failures, 0 errors", "Base original de servicios/repositorios/eventos"],
+                ["27/05/2026", "SonarQube JSON", f"{history['iteration_total']} smells detectados: {history['open_count']} abiertos + {history['resolved_count']} corregidos", "Muestra antes/despues de hallazgos Sonar"],
+                ["01/06/2026", "Diagramas C4", "Contexto, contenedores y componentes Android", "Base de arquitectura"],
+                ["23/06/2026", "Rendimiento", "APK -75.77% y startup mediana -31.34%", "Evidencia complementaria de calidad"],
+                ["24/06/2026", "Informe actual", f"{int(tests['tests'])} tests, lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%", "Evidencia actual TDD/BDD/cobertura"],
+            ],
+            [2.2, 4.2, 4.7, 4.8],
+            styles["SmallEco"],
         ),
         p("Alcance Del Avance 02", styles["H1Eco"]),
         table(
@@ -403,19 +519,35 @@ def build_pdf(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float 
         PageBreak(),
         p("Pruebas De Integracion", styles["H1Eco"]),
         p("EcoSenseIntegrationSpec valida IT-01 a IT-17. Integra servicios de aplicacion, repositorios in-memory, storage fake y publicador de eventos. Cubre caminos correctos, errores 404/409, timeout, validaciones de entrada, ranking y efectos laterales.", styles["BodyEco"]),
-        p("Calidad Con SonarQube", styles["H1Eco"]),
+        p("Calidad Con SonarQube: Evolucion", styles["H1Eco"]),
         table(
             [
-                ["Metrica", "Resultado"],
-                ["Quality Gate", gate],
-                ["Bugs", sonar.get("bugs", "N/D")],
-                ["Vulnerabilities", sonar.get("vulnerabilities", "N/D")],
-                ["Code Smells", sonar.get("code_smells", "N/D")],
-                ["Coverage Sonar previo", sonar.get("coverage", "N/D") + "%"],
-                ["Duplications", sonar.get("duplicated_lines_density", "N/D") + "%"],
-                ["Maintainability rating", sonar.get("sqale_rating", "N/D")],
-                ["Security rating", sonar.get("security_rating", "N/D")],
-                ["Reliability rating", sonar.get("reliability_rating", "N/D")],
+                ["Momento", "Evidencia", "Code smells", "Coverage", "Quality Gate"],
+                ["Linea base Sonar", "issues + resolved JSON", f"{history['iteration_total']} detectados ({history['open_count']} abiertos + {history['resolved_count']} corregidos)", "0.0% por falta de XML", "OK"],
+                ["Despues de correcciones", "metrics JSON", sonar.get("code_smells", "N/D") + " abiertos", sonar.get("coverage", "N/D") + "%", gate],
+                ["Estado actual", "JaCoCo + sonar-project", "Pendiente de reanalisis", f"lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%", "Pendiente Docker"],
+            ],
+            [3.2, 3.9, 4.2, 3.0, 2.2],
+            styles["SmallEco"],
+        ),
+        p("Hallazgos corregidos de Sonar", styles["H2Eco"]),
+        table(
+            [["Regla", "Severidad", "Archivo", "Mensaje"], *resolved_pdf_rows],
+            [2.2, 2.0, 5.4, 6.1],
+            styles["SmallEco"],
+        ),
+        p("Hallazgos abiertos despues de correcciones", styles["H2Eco"]),
+        table(
+            [
+                ["Vista", "Resultado"],
+                ["Total abiertos", str(history["open_count"])],
+                ["Critical", str(severity.get("CRITICAL", 0))],
+                ["Major", str(severity.get("MAJOR", 0))],
+                ["Minor", str(severity.get("MINOR", 0))],
+                ["Info", str(severity.get("INFO", 0))],
+                ["kotlin:S3776 complejidad", str(rules.get("kotlin:S3776", 0))],
+                ["kotlin:S107 parametros", str(rules.get("kotlin:S107", 0))],
+                ["kotlin:S1128 imports", str(rules.get("kotlin:S1128", 0))],
             ],
             [6.0, 5.0],
             styles["SmallEco"],
@@ -425,17 +557,18 @@ def build_pdf(jacoco: dict[str, dict[str, float | int]], tests: dict[str, float 
         table(
             [
                 ["Prioridad", "Mejora", "Motivo"],
-                ["Alta", "Re-ejecutar SonarQube con Docker activo", "Actualizar dashboard con coverage real"],
-                ["Alta", "Reducir complejidad de RecycleFormScreen", "Hallazgo critico de mantenibilidad"],
-                ["Media", "Reducir parametros en AppNavHost", "Menos acoplamiento de navegacion"],
+                ["Alta", "Re-ejecutar SonarQube con Docker activo", "Actualizar dashboard con coverage real e historial"],
+                ["Alta", "Reducir complejidad de RecycleFormScreen/MainActivity/GruposScreen", "Hallazgos S3776 abiertos"],
+                ["Media", "Reducir parametros en AppNavHost/History/Profile", "Hallazgos S107 abiertos"],
                 ["Media", "Agregar tests instrumentados UI", "Cubrir Compose y flujos visuales"],
                 ["Baja", "Grabar video final", "Entregable audiovisual requerido"],
             ],
             [2.5, 6.2, 6.2],
             styles["SmallEco"],
         ),
+        PageBreak(),
         p("Conclusiones", styles["H1Eco"]),
-        p("La entrega queda funcionalmente avanzada para RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al umbral de 70% en lineas y ramas. Los pendientes externos son regenerar SonarQube con Docker activo y grabar el video final.", styles["BodyEco"]),
+        p(f"La entrega queda funcionalmente avanzada para RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al umbral de 70% en lineas y ramas. SonarQube registro {history['iteration_total']} code smells en la iteracion documentada: {history['resolved_count']} corregidos y {history['open_count']} abiertos como deuda tecnica. Los pendientes externos son regenerar SonarQube con Docker activo y grabar el video final.", styles["BodyEco"]),
         p("Anexos", styles["H1Eco"]),
         p("Reportes: docs/pruebas-integracion-ecosense.md, docs/informe-sonarqube-ecosense.md, docs/informe-rendimiento-ecosense.md y docs/guion-video-avance-02.md.", styles["BodyEco"]),
     ]
@@ -456,9 +589,10 @@ def main() -> None:
     jacoco = read_jacoco()
     tests = read_tests()
     sonar, gate = read_sonar()
-    REPORT_MD.write_text(build_markdown(jacoco, tests, sonar, gate), encoding="utf-8")
+    history = read_sonar_history()
+    REPORT_MD.write_text(build_markdown(jacoco, tests, sonar, gate, history), encoding="utf-8")
     VIDEO_GUIDE.write_text(video_guide(), encoding="utf-8")
-    build_pdf(jacoco, tests, sonar, gate)
+    build_pdf(jacoco, tests, sonar, gate, history)
     print(REPORT_MD)
     print(REPORT_PDF)
     print(VIDEO_GUIDE)

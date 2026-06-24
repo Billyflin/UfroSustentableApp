@@ -7,9 +7,22 @@
 
 ## Resumen ejecutivo
 
+Este informe consolida la evidencia historica ya versionada en `docs/` y la evidencia nueva generada para Avance 02. No se interpreta solo la fotografia actual del proyecto: se registra la linea base de SonarQube, los hallazgos corregidos, la suite de integracion original y la ampliacion actual de BDD/cobertura.
+
 El avance implementa y evidencia el bloque funcional RF10-RF17 asociado a grupos, ranking y recompensas. Este bloque cubre 8 casos de uso priorizados y se considera el 40% del alcance funcional planificado para esta entrega. La evidencia incluye pruebas unitarias con Kotest, escenarios BDD ejecutables con Cucumber/Gherkin, pruebas de integracion de servicios y reporte local de cobertura JaCoCo.
 
 Resultado actual: `83` tests JVM ejecutados, `0` fallos, `0` errores y `0` omitidos. La cobertura local sobre el alcance configurado del avance es **89.23% lines** y **77.88% branches**.
+
+## Linea base historica y evidencia previa
+
+| Fecha | Evidencia del repo | Resultado documentado | Lectura para Avance 02 |
+|---|---|---|---|
+| 27/05/2026 | `docs/pruebas-integracion-ecosense.md` | Suite `EcoSenseIntegrationSpec` original con 15 tests, 0 failures, 0 errors; `BUILD SUCCESSFUL in 5s`. | Punto de partida de integracion entre servicios, repositorios in-memory, storage fake y eventos. |
+| 27/05/2026 | `docs/informe-sonarqube-ecosense.md` + `docs/sonarqube-*.json` | Quality Gate OK, Bugs 0, Vulnerabilities 0, Duplications 0.0%, Coverage Sonar 0.0% por falta de XML JaCoCo. | La cobertura 0.0% era una limitacion de importacion, no ausencia de pruebas. |
+| 27/05/2026 | `docs/sonarqube-issues.json` + `docs/sonarqube-resolved-issues.json` | Iteracion Sonar con 22 code smells detectados: 20 abiertos y 2 corregidos. | Permite mostrar antes/despues real: los issues corregidos ya no aparecen abiertos en el analisis posterior. |
+| 01/06/2026 | `docs/diagramas-c4/*.puml` | Diagramas C4 de contexto, contenedores y componentes Android. | Base de arquitectura para mapear CU implementados. |
+| 23/06/2026 | `docs/informe-rendimiento-ecosense.md` | APK release baja de 34.727.433 a 8.413.167 bytes y startup mediana baja de 5.596 ms a 3.842 ms. | Evidencia complementaria de calidad/performance del proyecto. |
+| 24/06/2026 | Reporte actual Avance 02 | 83 tests JVM, BDD RF10-RF17, JaCoCo lines 89.23%, branches 77.88%. | Evidencia actual para el requisito de TDD/BDD/cobertura. |
 
 ## Alcance del avance 02
 
@@ -113,21 +126,35 @@ Las pruebas integran servicios de aplicacion con puertos in-memory:
 
 La suite `EcoSenseIntegrationSpec` contiene IT-01 a IT-17 y valida caminos correctos, conflictos, 404, timeouts, validaciones de entrada, ranking y efectos laterales.
 
-## Calidad con SonarQube
+## Calidad con SonarQube: evolucion antes/despues
 
-Evidencia previa en `docs/sonarqube-*.json`:
+La lectura correcta de SonarQube debe considerar la evidencia historica del repositorio. Si solo se mira una ejecucion posterior a correcciones, se pierde el contexto: dos issues ya fueron cerrados y por eso no aparecen como abiertos.
 
-| Metrica | Resultado |
+| Momento | Evidencia | Bugs | Vulnerabilities | Code smells | Coverage | Duplications | Quality Gate |
+|---|---|---:|---:|---:|---:|---:|---|
+| Linea base de la iteracion Sonar | `sonarqube-issues.json` + `sonarqube-resolved-issues.json` | 0 | 0 | 22 detectados (20 abiertos + 2 corregidos) | 0.0% | 0.0% | OK |
+| Despues de correcciones documentadas | `sonarqube-metrics.json` + `informe-sonarqube-ecosense.md` | 0 | 0 | 20 abiertos | 0.0% | 0.0% | OK |
+| Estado actual de Avance 02 | JaCoCo XML + `sonar-project.properties` | No reejecutado | No reejecutado | No reejecutado localmente | JaCoCo lines 89.23%, branches 77.88% | No reejecutado | Pendiente de reanalisis con Docker |
+
+### Hallazgos Sonar corregidos
+
+| Regla | Severidad | Archivo | Accion documentada |
+|---|---|---|---|
+| `kotlin:S1192` | CRITICAL | `app/src/main/kotlin/com/ecosense/service/GrupoApplicationService.kt` | Define a constant instead of duplicating this literal "Usuario no encontrado" 3 times. |
+| `kotlin:S108` | MAJOR | `app/src/main/kotlin/com/ecosense/screen/RecycleFormScreen.kt` | Either remove or fill this block of code. |
+
+### Hallazgos Sonar abiertos despues de correcciones
+
+| Vista | Resultado |
 |---|---:|
-| Quality Gate | OK |
-| Bugs | 0 |
-| Vulnerabilities | 0 |
-| Code Smells | 20 |
-| Coverage Sonar previo | 0.0% |
-| Duplications | 0.0% |
-| Maintainability rating | 1.0 |
-| Security rating | 1.0 |
-| Reliability rating | 1.0 |
+| Total abiertos | 20 |
+| Critical | 6 |
+| Major | 5 |
+| Minor | 8 |
+| Info | 1 |
+| Complejidad cognitiva `kotlin:S3776` | 6 |
+| Demasiados parametros `kotlin:S107` | 4 |
+| Imports sin uso `kotlin:S1128` | 8 |
 
 Accion tomada en este avance: se agrego `sonar.coverage.jacoco.xmlReportPaths` y se genero el XML JaCoCo. La re-ejecucion local de SonarQube no pudo completarse porque Docker Desktop no esta disponible en el entorno actual (`dockerDesktopLinuxEngine` no existe). El reporte local de cobertura queda listo para importarse en el proximo Sonar.
 
@@ -135,16 +162,16 @@ Accion tomada en este avance: se agrego `sonar.coverage.jacoco.xmlReportPaths` y
 
 | Prioridad | Mejora | Motivo |
 |---|---|---|
-| Alta | Re-ejecutar SonarQube con Docker Desktop activo | Actualizar dashboard con coverage JaCoCo real |
-| Alta | Reducir complejidad de `RecycleFormScreen` | Sonar marco complejidad cognitiva critica |
-| Media | Reducir parametros en `AppNavHost` | Mejor mantenibilidad de navegacion |
+| Alta | Re-ejecutar SonarQube con Docker Desktop activo | Actualizar dashboard con coverage JaCoCo real y conservar comparacion historica |
+| Alta | Reducir complejidad de `RecycleFormScreen`, `MainActivity` y `GruposScreen` | Sonar mantiene hallazgos `kotlin:S3776` abiertos |
+| Media | Reducir parametros en `AppNavHost`, `HistoryScreen` y `ProfileScreen` | Sonar mantiene hallazgos `kotlin:S107` abiertos |
 | Media | Agregar tests instrumentados de UI minima | Cubrir flujos Compose no incluidos en JVM |
 | Media | Automatizar reporte en CI | Evitar evidencia manual y regresiones |
 | Baja | Grabar video final de evidencia | Entregable audiovisual requerido |
 
 ## Conclusiones
 
-La entrega queda funcionalmente avanzada para el bloque RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al 70% en lineas y ramas. El principal pendiente externo es regenerar el dashboard SonarQube con Docker activo y grabar el video final de evidencia.
+La entrega queda funcionalmente avanzada para el bloque RF10-RF17, con TDD/BDD ejecutable, integracion de servicios y cobertura local superior al 70% en lineas y ramas. La evidencia historica muestra que SonarQube detecto 22 code smells en la iteracion registrada, de los cuales 2 fueron corregidos y 20 quedaron como deuda tecnica priorizada. El principal pendiente externo es regenerar el dashboard SonarQube con Docker activo para importar el XML JaCoCo actual y grabar el video final de evidencia.
 
 ## Referencias y anexos
 
