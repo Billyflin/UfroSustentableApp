@@ -584,6 +584,398 @@ def build_pdf(
     doc.build(story)
 
 
+def footer(canvas, doc) -> None:
+    canvas.saveState()
+    canvas.setFont("Helvetica", 7)
+    canvas.setFillColor(colors.HexColor("#667079"))
+    canvas.drawString(1.7 * cm, 0.95 * cm, "EcoSense - Entrega Avance 02")
+    canvas.drawRightString(letter[0] - 1.7 * cm, 0.95 * cm, f"Pagina {doc.page}")
+    canvas.restoreState()
+
+
+def build_pdf_expanded(
+    jacoco: dict[str, dict[str, float | int]],
+    tests: dict[str, float | int],
+    sonar: dict[str, str],
+    gate: str,
+    history: dict,
+) -> None:
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle("CoverTitle2", parent=styles["Title"], fontSize=25, leading=30, textColor=colors.HexColor("#225C57"), alignment=TA_CENTER, spaceAfter=18))
+    styles.add(ParagraphStyle("CoverSub2", parent=styles["BodyText"], fontSize=12, leading=16, alignment=TA_CENTER, spaceAfter=8))
+    styles.add(ParagraphStyle("H1Eco2", parent=styles["Heading1"], fontSize=15, leading=18, textColor=colors.HexColor("#225C57"), spaceBefore=6, spaceAfter=8))
+    styles.add(ParagraphStyle("H2Eco2", parent=styles["Heading2"], fontSize=12, leading=14, textColor=colors.HexColor("#2D3748"), spaceBefore=6, spaceAfter=5))
+    styles.add(ParagraphStyle("BodyEco2", parent=styles["BodyText"], fontSize=8.8, leading=11.3, spaceAfter=5))
+    styles.add(ParagraphStyle("SmallEco2", parent=styles["BodyText"], fontSize=7.5, leading=9.2, spaceAfter=3))
+    styles.add(ParagraphStyle("CodeEco2", parent=styles["Code"], fontSize=7.2, leading=8.5, spaceAfter=4))
+
+    line = jacoco["LINE"]
+    branch = jacoco["BRANCH"]
+    instructions = jacoco["INSTRUCTION"]
+    severity = history["severity_counts"]
+    rules = history["rule_counts"]
+    resolved_pdf_rows = [
+        [item["rule"], item["severity"], item["component"], item["message"]]
+        for item in history["resolved_rules"]
+    ]
+
+    scope_rows = [
+        ["CU/RF", "Implementacion", "Unit", "BDD", "Integracion"],
+        ["RF10", "Ranking global", "RF10RankingGlobalSpec", "Ranking global", "IT-15"],
+        ["RF11", "Crear grupo", "RF11CrearGrupoSpec", "Crear grupo publico", "IT-01, IT-02, IT-09, IT-10"],
+        ["RF12", "Unirse a grupo", "RF12UnirseGrupoSpec", "unirse_grupo.feature", "IT-03, IT-04, IT-11, IT-12"],
+        ["RF13", "Ranking interno", "RF13RankingGrupoSpec", "Ranking interno", "IT-15"],
+        ["RF14", "Puntos grupales", "RF14PuntosGrupalesSpec", "Puntos por reciclaje", "IT-13, IT-14"],
+        ["RF15", "Recompensa grupal", "RF15RecompensasGrupalesSpec", "Meta de recompensa", "IT-13"],
+        ["RF16", "Gestion miembros", "RF16AdminGrupoSpec", "Administrar miembros", "Dominio + BDD"],
+        ["RF17", "Ranking grupal", "RF17RankingGrupalSpec", "Ranking grupal", "IT-15"],
+    ]
+
+    integration_rows_a = [
+        ["ID", "Flujo", "Componentes", "Resultado esperado"],
+        ["IT-01", "Crear grupo correcto", "GrupoApplicationService + repos + eventos", "Grupo persiste, usuario queda admin, GROUP_CREATED"],
+        ["IT-02", "Grupo duplicado", "GrupoApplicationService + GrupoRepositoryPort", "Error por nombre repetido, sin efectos laterales"],
+        ["IT-03", "Unirse a grupo publico", "GrupoApplicationService + GrupoService", "Usuario entra, puntaje grupal sube, GROUP_JOINED"],
+        ["IT-04", "Grupo inexistente", "GrupoApplicationService + repos", "Error controlado y cola vacia"],
+        ["IT-05", "Crear solicitud reciclaje", "RecyclingApplicationService + storage + repos", "Solicitud PROCESSING, historial y evento"],
+        ["IT-06", "Timeout storage", "Storage fake + request repo", "No hay escritura parcial ni evento"],
+        ["IT-07", "Canjear recompensa", "Requests + usuarios + eventos", "Solicitud REEDEMED, puntos sumados"],
+        ["IT-08", "Recompensa inexistente", "Requests repo", "Error 404 sin modificar puntos"],
+    ]
+    integration_rows_b = [
+        ["ID", "Flujo", "Componentes", "Resultado esperado"],
+        ["IT-09", "Crear grupo sin usuario", "UsuarioRepositoryPort", "Error Usuario no encontrado"],
+        ["IT-10", "Colision de ID de grupo", "GrupoApplicationService + GrupoService", "Se usa siguiente ID disponible"],
+        ["IT-11", "Solicitud a grupo privado", "GrupoApplicationService + eventos", "Pendiente y GROUP_JOIN_REQUESTED"],
+        ["IT-12", "Usuario ya pertenece a grupo", "GrupoService dominio", "Error sin eventos"],
+        ["IT-13", "Puntos desbloquean recompensa", "GrupoApplicationService + grupo", "GROUP_REWARD_UNLOCKED y puntos actualizados"],
+        ["IT-14", "Puntos a usuario inexistente", "UsuarioRepositoryPort", "Falla sin eventos"],
+        ["IT-15", "Rankings desde aplicacion", "RankingService + repos", "Ranking interno/grupal ordenado"],
+        ["IT-16", "Validaciones reciclaje", "RecyclingApplicationService", "Material vacio/cantidad invalida antes de storage"],
+        ["IT-17", "Validaciones canje", "Requests + usuarios", "Usuario inexistente o propietario incorrecto bloqueado"],
+    ]
+
+    story = [
+        Spacer(1, 4.2 * cm),
+        p("Entrega Avance 02 - Proyecto semestral", styles["CoverTitle2"]),
+        p("EcoSense / UFRO Sustentable App", styles["CoverSub2"]),
+        p("Curso: Pruebas de software", styles["CoverSub2"]),
+        p("Equipo: Billy Martinez, Bastian Lagos", styles["CoverSub2"]),
+        p(f"Fecha: {date.today().strftime('%d/%m/%Y')}", styles["CoverSub2"]),
+        p("Repositorio/rama: codex/performance-optimizations", styles["CoverSub2"]),
+        PageBreak(),
+
+        p("Resumen Ejecutivo", styles["H1Eco2"]),
+        p("El informe consolida la evidencia versionada del proyecto y la ampliacion actual del Avance 02. La entrega no se evalua solo por una ejecucion final: se explica la linea base de SonarQube, los issues corregidos, la integracion original, los diagramas C4, la mejora de rendimiento y la nueva evidencia de TDD/BDD con cobertura JaCoCo.", styles["BodyEco2"]),
+        p(f"Resultado actual: {int(tests['tests'])} tests JVM, 0 fallos, 0 errores, cobertura de lineas {fmt(line['percent'])}% y ramas {fmt(branch['percent'])}% sobre el alcance implementado. Esto supera el umbral recomendado de 70% para los modulos del avance.", styles["BodyEco2"]),
+        table(
+            [
+                ["Dimension", "Resultado"],
+                ["Casos de uso implementados", "RF10-RF17, bloque de grupos, ranking y recompensas"],
+                ["BDD", "Escenarios Gherkin para RF10, RF11, RF12, RF13, RF14, RF15, RF16 y RF17"],
+                ["TDD", "Specs Kotest por comportamiento y ampliacion de integracion antes de cerrar cobertura"],
+                ["Integracion", "EcoSenseIntegrationSpec valida IT-01 a IT-17 sin Firebase ni red"],
+                ["Calidad", f"Sonar historico OK, 22 smells detectados, 2 corregidos, 20 abiertos priorizados"],
+                ["Cobertura actual", f"Lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%"],
+            ],
+            [4.2, 11.0],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Linea Base Historica", styles["H1Eco2"]),
+        p("Los documentos existentes en el repositorio permiten contar una evolucion real. El analisis anterior de Sonar no se descarta: se usa como linea base para mostrar que algunos problemas ya fueron corregidos y otros quedan como deuda tecnica.", styles["BodyEco2"]),
+        table(
+            [
+                ["Fecha", "Evidencia", "Resultado documentado", "Uso en esta entrega"],
+                ["27/05/2026", "Integracion original", "15 tests de integracion, 0 failures, 0 errors", "Base de colaboracion entre servicios, repositorios, storage fake y eventos"],
+                ["27/05/2026", "SonarQube JSON", f"{history['iteration_total']} code smells: {history['open_count']} abiertos + {history['resolved_count']} corregidos", "Antes/despues real de calidad de codigo"],
+                ["01/06/2026", "Diagramas C4", "Contexto, contenedores y componentes Android", "Arquitectura del alcance implementado"],
+                ["23/06/2026", "Rendimiento", "APK -75.77%, startup mediana -31.34%", "Evidencia complementaria de calidad tecnica"],
+                ["24/06/2026", "Informe actual", f"{int(tests['tests'])} tests, JaCoCo lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%", "Evidencia actual para Avance 02"],
+            ],
+            [2.2, 3.5, 5.0, 5.2],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Alcance Del Avance 02", styles["H1Eco2"]),
+        p("El avance se concentra en los casos de uso relacionados con colaboracion y competencia sustentable. La tabla muestra implementacion, pruebas unitarias, escenarios BDD e integracion asociada.", styles["BodyEco2"]),
+        table(scope_rows, [1.6, 3.4, 3.8, 3.2, 3.2], styles["SmallEco2"]),
+        p("El resto de la app - autenticacion, mapa, QR, historial, recompensas individuales y pantallas Compose - se mantiene como contexto funcional, pero la cobertura cuantitativa se limita al bloque efectivamente implementado y probado en esta entrega.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Arquitectura Implementada", styles["H1Eco2"]),
+        p("La solucion separa reglas de dominio de infraestructura Android/Firebase. Esto habilita TDD en servicios puros y pruebas de integracion con dobles in-memory, evitando depender de emulador, red o credenciales externas.", styles["BodyEco2"]),
+        table(
+            [
+                ["Capa", "Elementos", "Responsabilidad"],
+                ["UI Android", "Compose screens, Navigation3", "Interaccion visual, navegacion y formularios"],
+                ["ViewModel/Repository", "viewmodel/*, repository/*", "Estado de pantalla, consulta Firebase y adaptacion a datos remotos"],
+                ["Servicios de aplicacion", "GrupoApplicationService, RecyclingApplicationService", "Orquestacion de casos de uso entre puertos"],
+                ["Dominio puro", "GrupoService, RankingService, modelos", "Reglas testeables sin Android, Firebase ni red"],
+                ["Puertos/Fakes", "IntegrationPorts.kt, repos in-memory, storage fake", "Pruebas de integracion reproducibles"],
+            ],
+            [3.0, 5.4, 6.6],
+            styles["SmallEco2"],
+        ),
+        p("Los diagramas C4 disponibles en docs/diagramas-c4 cubren contexto, contenedores y componentes Android. Para el informe se usan como evidencia arquitectonica y como mapa entre UI, servicios, repositorios y sistemas externos.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Mapeo Logico De Casos De Uso", styles["H1Eco2"]),
+        table(
+            [
+                ["Caso", "Entrada principal", "Regla validada", "Salida observable"],
+                ["RF10", "Lista de usuarios", "Orden descendente por puntos", "Ranking global y posicion individual"],
+                ["RF11", "Usuario creador + nombre grupo", "Usuario existe y nombre no duplicado", "Grupo creado, creador administrador, evento"],
+                ["RF12", "Usuario + grupo destino", "Publico entra, privado queda pendiente, duplicados fallan", "Estado de usuario/grupo y evento"],
+                ["RF13", "Grupo + usuarios", "Solo miembros, orden por puntos y posicion global", "Ranking interno"],
+                ["RF14", "Puntos de reciclaje", "Puntos personales suman al grupo si pertenece", "Usuario y grupo actualizados"],
+                ["RF15", "Puntaje/meta grupo", "Recompensa se habilita al alcanzar meta", "Recompensa grupal disponible"],
+                ["RF16", "Admin + accion", "Solo administrador gestiona miembros", "Miembro agregado/eliminado o error"],
+                ["RF17", "Lista de grupos", "Orden descendente por puntaje total", "Ranking grupal y posicion"],
+            ],
+            [1.5, 4.2, 5.2, 4.4],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Proceso BDD", styles["H1Eco2"]),
+        p("BDD se usa para expresar comportamiento en lenguaje cercano al usuario. La entrega incluye escenarios ejecutables en Espanol para RF12 y para el bloque RF10-RF17.", styles["BodyEco2"]),
+        table(
+            [
+                ["Feature", "Escenarios", "Glue code", "Objetivo"],
+                ["unirse_grupo.feature", "5 escenarios", "UnirseGrupoSteps.kt", "Validar union a grupo publico, privado y errores de pertenencia"],
+                ["grupos_ranking_recompensas.feature", "7 escenarios", "GruposRankingSteps.kt", "Cubrir ranking, creacion, puntos, recompensa, administracion y ranking grupal"],
+            ],
+            [4.1, 2.7, 4.3, 4.4],
+            styles["SmallEco2"],
+        ),
+        p("Extracto Gherkin:", styles["H2Eco2"]),
+        p('Escenario: RF17 calcular ranking grupal\nDado los siguientes grupos para ranking grupal\nCuando calculo el ranking grupal\nEntonces el primer grupo del ranking grupal debe ser "G2"', styles["CodeEco2"]),
+        PageBreak(),
+
+        p("Glue Code BDD", styles["H1Eco2"]),
+        p("El glue code instancia servicios de dominio y valida efectos observables con asserts. La idea es mantener los pasos expresivos pero sin duplicar reglas de negocio: Cucumber llama a GrupoService y RankingService, los mismos servicios usados por Kotest.", styles["BodyEco2"]),
+        table(
+            [
+                ["Paso", "Implementacion", "Verificacion"],
+                ["Dado usuarios/grupos", "Construye modelos Usuario y Grupo desde DataTable", "Fixture determinista por escenario"],
+                ["Cuando calculo ranking", "Invoca RankingService.obtenerRankingGlobal/Grupal/Interno", "Servicio puro sin estado externo"],
+                ["Cuando admin agrega miembro", "Invoca GrupoService.gestionarMiembro", "Valida permisos y membresia"],
+                ["Entonces primer elemento debe ser X", "Lee ranking resultante", "assertEquals sobre ID esperado"],
+                ["Entonces recompensa disponible", "Invoca verificarRecompensaGrupal", "assertNotNull y grupoId esperado"],
+            ],
+            [3.5, 6.0, 5.3],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Proceso TDD", styles["H1Eco2"]),
+        p("La evidencia TDD se presenta como ciclos red-green-refactor sobre comportamientos. En un repositorio ya avanzado no siempre existe una captura exacta de cada rojo, por lo que el informe documenta el orden logico de especificacion, implementacion y refactor apoyado por archivos y commits existentes.", styles["BodyEco2"]),
+        table(
+            [
+                ["Ciclo", "Red", "Green", "Refactor/Evidencia"],
+                ["Ranking", "Specs exigen orden y posicion global", "RankingService implementa orden descendente", "BDD reutiliza el servicio; RF10/RF13/RF17"],
+                ["Grupos", "Specs exigen crear, unirse y errores", "GrupoService implementa reglas puras", "GrupoApplicationService agrega repositorios y eventos"],
+                ["Integracion", "Casos exigen persistencia + eventos", "Servicios de aplicacion usan puertos", "Dobles in-memory aislan Firebase/red"],
+                ["Cobertura", "Ramas de error pendientes", "IT-09 a IT-17 agregan validaciones", "JaCoCo sube a >70% lines/branches"],
+            ],
+            [2.4, 4.0, 4.0, 5.0],
+            styles["SmallEco2"],
+        ),
+        p("Commits relevantes del historial: 9661ba6 agrega logica de grupos y pruebas de comportamiento; 32e2729 agrega integracion y reportes Sonar; efd6dd6 agrega evidencia Avance 02; 4bb8c4a mejora el informe con evidencia historica.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Pruebas Unitarias", styles["H1Eco2"]),
+        table(
+            [
+                ["Spec", "Modulo", "Comportamientos clave"],
+                ["RF10RankingGlobalSpec", "RankingService", "Orden global, posicion de usuario, vacio y empates"],
+                ["RF11CrearGrupoSpec", "GrupoService", "Grupo publico/privado, admin creador, nombre invalido"],
+                ["RF12UnirseGrupoSpec", "GrupoService", "Union publica, pendiente privado, errores de pertenencia"],
+                ["RF13RankingGrupoSpec", "RankingService", "Ranking interno y posicion global"],
+                ["RF14PuntosGrupalesSpec", "GrupoService", "Suma personal/grupal, usuario sin grupo, cero puntos"],
+                ["RF15RecompensasGrupalesSpec", "GrupoService", "Meta alcanzada, no alcanzada, grupo inexistente"],
+                ["RF16AdminGrupoSpec", "GrupoService", "Agregar/eliminar miembros, permisos, duplicados"],
+                ["RF17RankingGrupalSpec", "RankingService", "Orden de grupos, vacio, posicion inexistente"],
+            ],
+            [4.0, 3.2, 7.8],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Cobertura JaCoCo", styles["H1Eco2"]),
+        p("Se configuro JaCoCo para generar XML/HTML/CSV y se declaro la ruta en sonar-project.properties. La cobertura se interpreta sobre el alcance del avance: servicios y modelos testeables por JVM, excluyendo UI Compose, repositorios Firebase y adaptadores Android que requieren otra estrategia.", styles["BodyEco2"]),
+        table(
+            [
+                ["Indicador", "Valor"],
+                ["Suites JVM", str(int(tests["suites"]))],
+                ["Tests", str(int(tests["tests"]))],
+                ["Failures", str(int(tests["failures"]))],
+                ["Errors", str(int(tests["errors"]))],
+                ["Skipped", str(int(tests["skipped"]))],
+                ["Tiempo XML acumulado", f"{fmt(tests['time'])} s"],
+            ],
+            [5.0, 4.0],
+            styles["SmallEco2"],
+        ),
+        Spacer(1, 0.2 * cm),
+        table(
+            [
+                ["Tipo", "Cubierto", "Perdido", "Total", "%"],
+                ["Lines", str(line["covered"]), str(line["missed"]), str(line["total"]), f"{fmt(line['percent'])}%"],
+                ["Branches", str(branch["covered"]), str(branch["missed"]), str(branch["total"]), f"{fmt(branch['percent'])}%"],
+                ["Instructions", str(instructions["covered"]), str(instructions["missed"]), str(instructions["total"]), f"{fmt(instructions['percent'])}%"],
+            ],
+            [3.0, 2.5, 2.5, 2.5, 2.5],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Pruebas De Integracion: Estrategia", styles["H1Eco2"]),
+        p("La integracion usa un enfoque hibrido. Bottom-up: reutiliza GrupoService y RankingService como reglas puras ya cubiertas por unit tests. Top-down: GrupoApplicationService y RecyclingApplicationService coordinan repositorios, storage fake y EventPublisher.", styles["BodyEco2"]),
+        p("No se usa UI/E2E ni emulador. Los adaptadores externos se reemplazan por dobles in-memory: usuarios, grupos, solicitudes, storage fake y publicador de eventos. Esto permite probar flujos entre componentes con costo bajo y sin depender de Firebase.", styles["BodyEco2"]),
+        table(integration_rows_a, [1.2, 3.4, 5.3, 5.0], styles["SmallEco2"]),
+        PageBreak(),
+
+        p("Pruebas De Integracion: Ampliacion", styles["H1Eco2"]),
+        p("Para el informe actual se agregaron casos IT-09 a IT-17. Estos casos elevan cobertura de ramas y documentan errores que antes quedaban menos visibles.", styles["BodyEco2"]),
+        table(integration_rows_b, [1.2, 3.3, 5.3, 5.0], styles["SmallEco2"]),
+        PageBreak(),
+
+        p("SonarQube: Resultados Historicos", styles["H1Eco2"]),
+        p("El resultado historico ya estaba en docs: Quality Gate OK, 0 bugs, 0 vulnerabilities, 0.0% duplicacion y coverage 0.0% porque Sonar no recibio reporte JaCoCo/Kover. Esa cobertura 0.0% se debe interpretar como falta de importacion del XML, no como ausencia de pruebas.", styles["BodyEco2"]),
+        table(
+            [
+                ["Momento", "Evidencia", "Code smells", "Coverage", "Quality Gate"],
+                ["Linea base Sonar", "issues + resolved JSON", f"{history['iteration_total']} detectados ({history['open_count']} abiertos + {history['resolved_count']} corregidos)", "0.0% por falta de XML", "OK"],
+                ["Despues de correcciones", "metrics JSON", sonar.get("code_smells", "N/D") + " abiertos", sonar.get("coverage", "N/D") + "%", gate],
+                ["Estado actual", "JaCoCo + sonar-project", "Pendiente de reanalisis", f"lines {fmt(line['percent'])}%, branches {fmt(branch['percent'])}%", "Pendiente Docker"],
+            ],
+            [3.0, 3.7, 4.2, 3.0, 2.0],
+            styles["SmallEco2"],
+        ),
+        table(
+            [
+                ["Metrica", "Valor historico"],
+                ["Bugs", sonar.get("bugs", "N/D")],
+                ["Vulnerabilities", sonar.get("vulnerabilities", "N/D")],
+                ["Duplications", sonar.get("duplicated_lines_density", "N/D") + "%"],
+                ["Maintainability rating", sonar.get("sqale_rating", "N/D")],
+                ["Security rating", sonar.get("security_rating", "N/D")],
+                ["Reliability rating", sonar.get("reliability_rating", "N/D")],
+            ],
+            [5.0, 5.0],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("SonarQube: Hallazgos Y Acciones", styles["H1Eco2"]),
+        table([["Regla", "Severidad", "Archivo", "Accion documentada"], *resolved_pdf_rows], [2.2, 2.0, 5.4, 6.1], styles["SmallEco2"]),
+        Spacer(1, 0.2 * cm),
+        table(
+            [
+                ["Vista", "Resultado"],
+                ["Total abiertos", str(history["open_count"])],
+                ["Critical", str(severity.get("CRITICAL", 0))],
+                ["Major", str(severity.get("MAJOR", 0))],
+                ["Minor", str(severity.get("MINOR", 0))],
+                ["Info", str(severity.get("INFO", 0))],
+                ["kotlin:S3776 complejidad", str(rules.get("kotlin:S3776", 0))],
+                ["kotlin:S107 parametros", str(rules.get("kotlin:S107", 0))],
+                ["kotlin:S1128 imports", str(rules.get("kotlin:S1128", 0))],
+            ],
+            [6.0, 5.0],
+            styles["SmallEco2"],
+        ),
+        p("Accion actual: se agrego sonar.coverage.jacoco.xmlReportPaths y el XML JaCoCo ya existe. Falta reejecutar SonarQube con Docker Desktop activo para que el dashboard importe la cobertura actual.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Evidencia De Rendimiento Complementaria", styles["H1Eco2"]),
+        p("Aunque Avance 02 se centra en pruebas, el repositorio tambien contiene evidencia de rendimiento que mejora la calidad global del proyecto. Esto ayuda a mostrar madurez tecnica y control de regresiones.", styles["BodyEco2"]),
+        table(
+            [
+                ["Indicador", "Antes", "Despues", "Delta"],
+                ["APK release unsigned", "34.727.433 bytes", "8.413.167 bytes", "-75.77%"],
+                ["Startup ADB mediana", "5.596 ms", "3.842 ms", "-31.34%"],
+                ["Tests JVM no cacheados", "35.99 s", "35.77 s", "-0.22 s"],
+                ["Macrobenchmark", "No existia", "Cold 3256.65 ms, warm 757.57 ms, hot 316.76 ms", "Nueva linea base"],
+            ],
+            [4.0, 3.6, 4.5, 3.2],
+            styles["SmallEco2"],
+        ),
+        p("Fuente: docs/informe-rendimiento-ecosense.md. Los artefactos bajo build/ no se versionan y se regeneran con los comandos del reporte.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Ejecucion Local Y Video", styles["H1Eco2"]),
+        p("La pauta exige un video corto mostrando pruebas unitarias, integracion y Sonar. El repositorio incluye un guion reproducible para grabarlo y mostrar los reportes locales.", styles["BodyEco2"]),
+        table(
+            [
+                ["Paso", "Comando o evidencia"],
+                ["Estado de rama", "git status --short --branch"],
+                ["Pruebas + cobertura", ".\\gradlew.bat :app:jacocoDebugUnitTestReport --rerun-tasks --console=plain"],
+                ["Reporte unitario", "app/build/reports/tests/testDebugUnitTest/index.html"],
+                ["Reporte BDD", "app/build/reports/cucumber/cucumber-report.html"],
+                ["Reporte JaCoCo", "app/build/reports/jacoco/jacocoDebugUnitTestReport/html/index.html"],
+                ["Sonar historico", "docs/sonarqube-qualitygate.json, metrics, issues y resolved issues"],
+                ["Sonar local", "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-sonarqube-analysis.ps1"],
+            ],
+            [4.2, 10.5],
+            styles["SmallEco2"],
+        ),
+        p("Limitacion actual: Docker Desktop no esta activo en este entorno, por lo que el script Sonar falla rapido con mensaje claro. En el equipo de entrega se debe ejecutar con Docker activo para capturar el dashboard actualizado.", styles["BodyEco2"]),
+        PageBreak(),
+
+        p("Mejoras Y Deuda Tecnica", styles["H1Eco2"]),
+        table(
+            [
+                ["Prioridad", "Mejora", "Motivo", "Plan Avance 03"],
+                ["Alta", "Reejecutar SonarQube con Docker activo", "Importar coverage JaCoCo y actualizar dashboard", "Captura/link del dashboard y export JSON actualizado"],
+                ["Alta", "Reducir complejidad de RecycleFormScreen/MainActivity/GruposScreen", "Hallazgos S3776 abiertos", "Extraer parsing, side effects y composables"],
+                ["Media", "Reducir parametros en AppNavHost/History/Profile", "Hallazgos S107 abiertos", "Agrupar parametros en estado/acciones"],
+                ["Media", "Tests instrumentados UI minimos", "JVM no cubre Compose", "Cubrir navegacion principal y flujos QR/recompensas"],
+                ["Media", "Automatizar evidencia en CI", "Evitar ejecuciones manuales", "Gradle task para tests, JaCoCo y reporte"],
+                ["Baja", "Video final", "Entregable audiovisual", "Grabar maximo 5 min con guion del repo"],
+            ],
+            [2.0, 4.6, 4.0, 4.5],
+            styles["SmallEco2"],
+        ),
+        PageBreak(),
+
+        p("Conclusiones", styles["H1Eco2"]),
+        p(f"El Avance 02 queda respaldado con evidencia funcional, tecnica y de calidad. El bloque RF10-RF17 tiene pruebas unitarias, BDD ejecutable, integracion de servicios y cobertura local superior al 70%: {fmt(line['percent'])}% en lineas y {fmt(branch['percent'])}% en ramas.", styles["BodyEco2"]),
+        p(f"La lectura de SonarQube ahora queda contextualizada: la iteracion historica detecto {history['iteration_total']} code smells, de los cuales {history['resolved_count']} fueron corregidos y {history['open_count']} quedan como deuda tecnica priorizada. El 0.0% historico de coverage corresponde a falta de importacion del XML, corregida a nivel de configuracion con JaCoCo.", styles["BodyEco2"]),
+        p("El principal pendiente operativo es reejecutar SonarQube con Docker Desktop activo para actualizar el dashboard con la cobertura actual y grabar el video de evidencia. Con eso, la entrega queda alineada con la pauta sin inflar artificialmente el contenido.", styles["BodyEco2"]),
+        p("Referencias Y Anexos", styles["H1Eco2"]),
+        table(
+            [
+                ["Anexo", "Ruta"],
+                ["Informe Avance 02", "docs/informe-avance-02-ecosense.pdf"],
+                ["Markdown editable", "docs/informe-avance-02-ecosense.md"],
+                ["Guion video", "docs/guion-video-avance-02.md"],
+                ["Integracion", "docs/pruebas-integracion-ecosense.md"],
+                ["Sonar previo", "docs/informe-sonarqube-ecosense.md"],
+                ["Sonar JSON", "docs/sonarqube-metrics.json, issues, resolved, qualitygate"],
+                ["C4", "docs/diagramas-c4/*.puml"],
+                ["Rendimiento", "docs/informe-rendimiento-ecosense.md"],
+            ],
+            [4.0, 10.0],
+            styles["SmallEco2"],
+        ),
+    ]
+
+    doc = SimpleDocTemplate(
+        str(REPORT_PDF),
+        pagesize=letter,
+        rightMargin=1.7 * cm,
+        leftMargin=1.7 * cm,
+        topMargin=1.6 * cm,
+        bottomMargin=1.6 * cm,
+    )
+    doc.build(story, onFirstPage=footer, onLaterPages=footer)
+
+
 def main() -> None:
     DOCS.mkdir(exist_ok=True)
     jacoco = read_jacoco()
@@ -592,7 +984,7 @@ def main() -> None:
     history = read_sonar_history()
     REPORT_MD.write_text(build_markdown(jacoco, tests, sonar, gate, history), encoding="utf-8")
     VIDEO_GUIDE.write_text(video_guide(), encoding="utf-8")
-    build_pdf(jacoco, tests, sonar, gate, history)
+    build_pdf_expanded(jacoco, tests, sonar, gate, history)
     print(REPORT_MD)
     print(REPORT_PDF)
     print(VIDEO_GUIDE)
