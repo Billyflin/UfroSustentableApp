@@ -1,16 +1,26 @@
-$ErrorActionPreference = "Stop"
-
 param(
     [string]$SonarScannerUrl = "http://172.17.0.1:9000",
     [string]$SonarLogin = $(if ($env:SONAR_LOGIN) { $env:SONAR_LOGIN } else { "admin" }),
     [string]$SonarPassword = $(if ($env:SONAR_PASSWORD) { $env:SONAR_PASSWORD } else { "admin" })
 )
 
+$ErrorActionPreference = "Stop"
+
 $root = Resolve-Path (Join-Path $PSScriptRoot "..")
 $containerName = "ecosense-sonarqube"
 
 Push-Location $root
 try {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    docker info > $null 2> $null
+    $dockerExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+
+    if ($dockerExitCode -ne 0) {
+        throw "Docker Desktop debe estar activo para ejecutar SonarQube localmente."
+    }
+
     $existing = docker ps -a --filter "name=^/$containerName$" --format "{{.Names}}"
     if ($existing -eq $containerName) {
         docker start $containerName | Out-Null
