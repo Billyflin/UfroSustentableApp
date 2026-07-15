@@ -149,7 +149,8 @@ fun GruposScreen(
                         grupo = state.grupo,
                         esAdmin = state.esAdmin,
                         progreso = state.progreso,
-                        ranking = state.ranking
+                        ranking = state.ranking,
+                        nombresMiembros = state.nombresMiembros
                     )
                 }
             }
@@ -301,7 +302,8 @@ private fun EnGrupoContent(
     grupo: Grupo,
     esAdmin: Boolean,
     progreso: ProgresoRecompensa?,
-    ranking: List<EntradaRankingInterno>
+    ranking: List<EntradaRankingInterno>,
+    nombresMiembros: Map<String, String>
 ) {
     val colorScheme = MaterialTheme.colorScheme
     var tabIndex by remember { mutableIntStateOf(0) }
@@ -403,14 +405,14 @@ private fun EnGrupoContent(
         }
 
         when (tabIndex) {
-            0 -> MiembrosTab(grupo)
+            0 -> MiembrosTab(grupo, nombresMiembros)
             1 -> RankingInternoTab(ranking)
         }
     }
 }
 
 @Composable
-private fun MiembrosTab(grupo: Grupo) {
+private fun MiembrosTab(grupo: Grupo, nombresMiembros: Map<String, String>) {
     val colorScheme = MaterialTheme.colorScheme
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
@@ -438,7 +440,7 @@ private fun MiembrosTab(grupo: Grupo) {
                         tint = colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        text = miembro.usuarioId,
+                        text = nombresMiembros[miembro.usuarioId] ?: "Miembro",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )

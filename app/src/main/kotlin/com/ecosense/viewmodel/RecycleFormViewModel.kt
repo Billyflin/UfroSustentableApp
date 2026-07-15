@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ecosense.repository.RecyclingRepository
+import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 sealed class RecycleFormUiState {
     data object Idle     : RecycleFormUiState()
     data object Uploading: RecycleFormUiState()
-    data object Success  : RecycleFormUiState()
+    data class Success(val imageUploaded: Boolean) : RecycleFormUiState()
     data class Error(val message: String) : RecycleFormUiState()
 }
 
@@ -31,13 +32,21 @@ class RecycleFormViewModel(
     ) {
         viewModelScope.launch {
             _uiState.value = RecycleFormUiState.Uploading
-            recyclingRepository.uploadImage(image)
-                .onSuccess { photoUrl ->
-                    recyclingRepository.createRequest(userId, materialType, quantityKg, photoUrl, description)
-                        .onSuccess { _uiState.value = RecycleFormUiState.Success }
-                        .onFailure { _uiState.value = RecycleFormUiState.Error(it.message ?: "Error al crear la solicitud") }
+            val uploadResult = recyclingRepository.uploadImage(image, userId)
+            val uploadError = uploadResult.exceptionOrNull()
+            if (uploadError != null && !uploadError.isMissingStorageBucket()) {
+                _uiState.value = RecycleFormUiState.Error(uploadError.message ?: "Error al subir la imagen")
+                return@launch
+            }
+
+            val photoUrl = uploadResult.getOrNull().orEmpty()
+            recyclingRepository.createRequest(userId, materialType, quantityKg, photoUrl, description)
+                .onSuccess {
+                    _uiState.value = RecycleFormUiState.Success(imageUploaded = photoUrl.isNotEmpty())
                 }
-                .onFailure { _uiState.value = RecycleFormUiState.Error(it.message ?: "Error al subir la imagen") }
+                .onFailure {
+                    _uiState.value = RecycleFormUiState.Error(it.message ?: "Error al crear la solicitud")
+                }
         }
     }
 
@@ -46,4 +55,6 @@ class RecycleFormViewModel(
     }
 }
 
+private fun Throwable.isMissingStorageBucket(): Boolean =
+    (this as? StorageException)?.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND
 

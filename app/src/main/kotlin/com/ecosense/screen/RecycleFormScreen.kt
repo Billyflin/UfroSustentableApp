@@ -96,7 +96,13 @@ fun RecycleFormScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is RecycleFormUiState.Success -> {
-                Toast.makeText(context, "Solicitud creada exitosamente", Toast.LENGTH_SHORT).show()
+                val success = uiState as RecycleFormUiState.Success
+                val message = if (success.imageUploaded) {
+                    "Solicitud creada exitosamente"
+                } else {
+                    "Solicitud creada sin foto: almacenamiento de imágenes no disponible"
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 onNavigateToHistory()
                 viewModel.resetState()
             }

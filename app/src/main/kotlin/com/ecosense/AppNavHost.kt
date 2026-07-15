@@ -7,6 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -84,6 +87,7 @@ fun AppNavigation(
 ) {
     val effectiveUserId = user?.uid ?: if (BuildConfig.BENCHMARK_MODE) "benchmark-user" else ""
     val effectiveUserName = user?.displayName ?: "Usuario"
+    var historyRevision by remember { mutableIntStateOf(0) }
 
     NavDisplay(
         modifier  = modifier,
@@ -108,6 +112,7 @@ fun AppNavigation(
             entry<FormRecycle> { key ->
                 RecycleFormScreen(
                     onNavigateToHistory = {
+                        historyRevision++
                         // Pop hasta la raíz (ScreenHistory) tras enviar la solicitud
                         while (backStack.size > 1) backStack.removeLast()
                     },
@@ -136,7 +141,8 @@ fun AppNavigation(
             entry<ScreenHistory> {
                 RequestHistoryScreen(
                     onNavigateToDetail = { id -> backStack.add(ScreenRequestDetail(id)) },
-                    userId = effectiveUserId
+                    userId = effectiveUserId,
+                    refreshRevision = historyRevision
                 )
             }
 
@@ -178,6 +184,7 @@ fun AppNavigation(
                 if (req != null) {
                     HistoryScreen(
                         onBack            = { backStack.removeLastOrNull() },
+                        onHistoryChanged  = { historyRevision++ },
                         viewModel         = historyViewModel,
                         activeProgressBar = when (req.status) {
                             RequestStatus.PROCESSING -> 0

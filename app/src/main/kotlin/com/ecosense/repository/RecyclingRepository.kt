@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -76,15 +77,18 @@ class RecyclingRepository {
         }
     }
 
-    suspend fun uploadImage(bitmap: Bitmap): Result<String> = runCatching {
-        val ref = storage.reference.child("images/${UUID.randomUUID()}.jpg")
+    suspend fun uploadImage(bitmap: Bitmap, userId: String): Result<String> = runCatching {
+        val ref = storage.reference.child("images/$userId/${UUID.randomUUID()}.jpg")
         val bytes = withContext(Dispatchers.Default) {
             ByteArrayOutputStream().use { baos ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
                 baos.toByteArray()
             }
         }
-        ref.putBytes(bytes).await()
+        val metadata = StorageMetadata.Builder()
+            .setContentType("image/jpeg")
+            .build()
+        ref.putBytes(bytes, metadata).await()
         ref.downloadUrl.await().toString()
     }
 }

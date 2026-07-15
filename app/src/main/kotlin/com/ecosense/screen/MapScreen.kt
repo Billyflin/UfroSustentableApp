@@ -43,7 +43,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -72,12 +73,20 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
+    val isDarkMap = colorScheme.background.luminance() < 0.5f
+    val mapAccent = if (isDarkMap) Color(0xFF86D99F) else Color(0xFF176B3A)
+    val mapChipColor = if (isDarkMap) Color(0xFF26352B) else Color(0xFFF4F8F4)
+    val mapChipContentColor = if (isDarkMap) Color(0xFFE7EEE9) else Color(0xFF243129)
 
     val leafIcon = remember { mutableStateOf<BitmapDescriptor?>(null) }
     val locationPermissionGranted = remember { mutableStateOf(false) }
 
     LaunchedEffect(context) {
-        leafIcon.value = bitmapDescriptorFromVector(context, R.drawable.leaves_svgrepo_com)
+        leafIcon.value = bitmapDescriptorFromVector(
+            context = context,
+            vectorResId = R.drawable.leaves_svgrepo_com,
+            sizeDp = 30
+        )
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -113,7 +122,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
     }
 
     // Separated so permission changes don't trigger expensive JSON rebuild
-    val mapStyleOptions = remember(colorScheme) { createFromScheme(colorScheme) }
+    val mapStyleOptions = remember(isDarkMap) { createFromScheme(colorScheme) }
     val mapProperties = remember(locationPermissionGranted.value, mapStyleOptions) {
         MapProperties(
             isBuildingEnabled = true,
@@ -192,9 +201,9 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                         )
                     },
                     colors = SuggestionChipDefaults.elevatedSuggestionChipColors(
-                        containerColor = colorScheme.primaryContainer,
-                        labelColor = colorScheme.onPrimaryContainer,
-                        iconContentColor = colorScheme.primary
+                        containerColor = mapChipColor,
+                        labelColor = mapChipContentColor,
+                        iconContentColor = mapAccent
                     )
                 )
             }
@@ -269,58 +278,88 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
 }
 
 fun createFromScheme(colorScheme: ColorScheme): MapStyleOptions? {
+    val dark = colorScheme.background.luminance() < 0.5f
+    val styleJson = if (dark) DARK_MAP_STYLE else LIGHT_MAP_STYLE
     return try {
-        MapStyleOptions(
-            """
-        [
-            {"elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"}]},
-            {"elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)}"}]},
-            {"elementType":"labels.text.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"administrative.country","elementType":"geometry.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)}"}]},
-            {"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)}"}]},
-            {"featureType":"administrative.province","elementType":"geometry.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"}]},
-            {"featureType":"landscape.natural","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.surface.toArgb()).substring(2)}"}]},
-            {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"}]},
-            {"featureType":"poi","elementType":"labels.text.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"}]},
-            {"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.secondaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onSecondaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"road","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"}]},
-            {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onBackground.toArgb()).substring(2)}"}]},
-            {"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"}]},
-            {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"}]},
-            {"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onPrimary.toArgb()).substring(2)}"}]},
-            {"featureType":"road.highway","elementType":"labels.text.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.secondary.toArgb()).substring(2)}"}]},
-            {"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onSecondary.toArgb()).substring(2)}"}]},
-            {"featureType":"transit","elementType":"labels.text.stroke","stylers":[{"color":"#${Integer.toHexString(colorScheme.background.toArgb()).substring(2)}"}]},
-            {"featureType":"transit.line","elementType":"geometry.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.primary.toArgb()).substring(2)}"}]},
-            {"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.primaryContainer.toArgb()).substring(2)}"}]},
-            {"featureType":"water","elementType":"geometry","stylers":[{"color":"#${Integer.toHexString(colorScheme.surface.toArgb()).substring(2)}"}]},
-            {"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#${Integer.toHexString(colorScheme.onSurface.toArgb()).substring(2)}"}]}
-        ]
-    """.trimIndent()
-        )
+        MapStyleOptions(styleJson)
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
 }
 
-fun bitmapDescriptorFromVector(context: Context, @DrawableRes vectorResId: Int): BitmapDescriptor {
+fun bitmapDescriptorFromVector(
+    context: Context,
+    @DrawableRes vectorResId: Int,
+    sizeDp: Int = 30
+): BitmapDescriptor {
     MapsInitializer.initialize(context)
     val vectorDrawable = ContextCompat.getDrawable(context, vectorResId)
         ?: run {
             Log.e("MapScreen", "El recurso vectorial no se pudo cargar.")
             throw android.content.res.Resources.NotFoundException("El recurso vectorial no se pudo cargar.")
         }
-    vectorDrawable.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
+    val sizePx = (sizeDp * context.resources.displayMetrics.density).toInt()
+    vectorDrawable.setBounds(0, 0, sizePx, sizePx)
     val bitmap = Bitmap.createBitmap(
-        vectorDrawable.intrinsicWidth,
-        vectorDrawable.intrinsicHeight,
+        sizePx,
+        sizePx,
         Bitmap.Config.ARGB_8888
     )
     vectorDrawable.draw(android.graphics.Canvas(bitmap))
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
+
+private val DARK_MAP_STYLE =
+    """
+    [
+      {"elementType":"geometry","stylers":[{"color":"#202522"}]},
+      {"elementType":"labels.icon","stylers":[{"saturation":-35},{"lightness":-12}]},
+      {"elementType":"labels.text.fill","stylers":[{"color":"#C8D0CA"}]},
+      {"elementType":"labels.text.stroke","stylers":[{"color":"#202522"},{"weight":3}]},
+      {"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#5D6861"}]},
+      {"featureType":"administrative.land_parcel","elementType":"labels","stylers":[{"visibility":"off"}]},
+      {"featureType":"landscape.natural","elementType":"geometry","stylers":[{"color":"#1D241F"}]},
+      {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#252C27"}]},
+      {"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#AEB9B1"}]},
+      {"featureType":"poi.business","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+      {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#183A29"}]},
+      {"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#83C894"}]},
+      {"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#3A423D"}]},
+      {"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#171B18"}]},
+      {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#D8DDD9"}]},
+      {"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#526258"}]},
+      {"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#263029"}]},
+      {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#323A35"}]},
+      {"featureType":"transit.station","elementType":"labels.icon","stylers":[{"saturation":-45},{"lightness":-10}]},
+      {"featureType":"water","elementType":"geometry","stylers":[{"color":"#18313A"}]},
+      {"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#8CB8C5"}]}
+    ]
+    """.trimIndent()
+
+private val LIGHT_MAP_STYLE =
+    """
+    [
+      {"elementType":"geometry","stylers":[{"color":"#EDF1EE"}]},
+      {"elementType":"labels.icon","stylers":[{"saturation":-25},{"lightness":5}]},
+      {"elementType":"labels.text.fill","stylers":[{"color":"#3F4943"}]},
+      {"elementType":"labels.text.stroke","stylers":[{"color":"#F6F8F6"},{"weight":3}]},
+      {"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#AAB4AD"}]},
+      {"featureType":"administrative.land_parcel","elementType":"labels","stylers":[{"visibility":"off"}]},
+      {"featureType":"landscape.natural","elementType":"geometry","stylers":[{"color":"#EAF0EB"}]},
+      {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#E1E8E2"}]},
+      {"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#526058"}]},
+      {"featureType":"poi.business","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+      {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#CCE8D3"}]},
+      {"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#347245"}]},
+      {"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#FFFFFF"}]},
+      {"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#D9E0DB"}]},
+      {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#46514A"}]},
+      {"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#DDEBE1"}]},
+      {"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#C1D2C6"}]},
+      {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#D6DDD8"}]},
+      {"featureType":"transit.station","elementType":"labels.icon","stylers":[{"saturation":-35},{"lightness":5}]},
+      {"featureType":"water","elementType":"geometry","stylers":[{"color":"#CDE6ED"}]},
+      {"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#497985"}]}
+    ]
+    """.trimIndent()

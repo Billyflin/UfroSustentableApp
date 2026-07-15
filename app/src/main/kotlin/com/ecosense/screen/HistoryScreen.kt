@@ -80,12 +80,13 @@ import java.util.Locale
 fun RequestHistoryScreen(
     onNavigateToDetail: (String) -> Unit,
     userId: String,
+    refreshRevision: Int = 0,
     viewModel: HistoryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(userId) {
-        viewModel.loadRequests(userId)
+    LaunchedEffect(userId, refreshRevision) {
+        viewModel.loadRequests(userId, forceRefresh = refreshRevision > 0)
     }
 
     Column(
@@ -371,6 +372,7 @@ fun HistoryScreen(
     status: RequestStatus = RequestStatus.PROCESSING,
     onCancel: () -> Unit,
     onBack: () -> Unit,
+    onHistoryChanged: () -> Unit = {},
     viewModel: HistoryViewModel = viewModel()
 ) {
     val redeemState by viewModel.redeemState.collectAsStateWithLifecycle()
@@ -388,6 +390,7 @@ fun HistoryScreen(
     LaunchedEffect(redeemState) {
         if (redeemState is RedeemState.Success) {
             activeProgressBar2 = 3
+            onHistoryChanged()
         }
     }
 
