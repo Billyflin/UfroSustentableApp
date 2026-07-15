@@ -1,0 +1,34 @@
+{
+  "collection": "recycling_points",
+  "projectId": "ecosense-40628",
+  "documents": [
+    {
+      "id": "ufro-rectoria",
+      "latitude": -38.74621,
+      "longitude": -72.61554,
+      "description": "Rectoría UFRO",
+      "qrEnabled": true
+    },
+    {
+      "id": "ufro-biblioteca",
+      "latitude": -38.74553,
+      "longitude": -72.61482,
+      "description": "Biblioteca Central UFRO",
+      "qrEnabled": true
+    },
+    {
+      "id": "ufro-ingenieria",
+      "latitude": -38.74801,
+      "longitude": -72.61627,
+      "description": "Facultad de Ingeniería y Ciencias",
+      "qrEnabled": true
+    },
+    {
+      "id": "ufro-casino-norte",
+      "latitude": -38.74468,
+      "longitude": -72.61594,
+      "description": "Casino Norte UFRO",
+      "qrEnabled": true
+    }
+  ]
+}

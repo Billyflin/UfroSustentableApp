@@ -32,10 +32,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,13 +54,30 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ecosense.model.BarcodeAnalyzer
+import java.util.concurrent.Executors
 
 private const val TAG = "QrScannerScreen"
 
 @Composable
 fun CameraScreen(onDocumentFound: (String?) -> Unit) {
     val context  = LocalContext.current
-    val executor = remember { ContextCompat.getMainExecutor(context) }
+    val mainExecutor = remember { ContextCompat.getMainExecutor(context) }
+    val analysisExecutor = remember {
+        Executors.newSingleThreadExecutor { runnable ->
+            Thread(runnable, "qr-analysis").apply { isDaemon = true }
+        }
+    }
+    val currentOnDocumentFound by rememberUpdatedState(onDocumentFound)
+    val barcodeAnalyzer = remember(context.applicationContext) {
+        BarcodeAnalyzer(context.applicationContext) { currentOnDocumentFound(it) }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            barcodeAnalyzer.close()
+            analysisExecutor.shutdown()
+        }
+    }
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -136,9 +155,10 @@ fun CameraScreen(onDocumentFound: (String?) -> Unit) {
                         val preview = Preview.Builder().build().also {
                             it.setSurfaceProvider(previewView.surfaceProvider)
                         }
-                        val imageAnalysis = ImageAnalysis.Builder().build().apply {
-                            setAnalyzer(executor, BarcodeAnalyzer(ctx, onDocumentFound))
-                        }
+                        val imageAnalysis = ImageAnalysis.Builder()
+                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                            .apply { setAnalyzer(analysisExecutor, barcodeAnalyzer) }
                         cameraProvider.unbindAll()
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner,
@@ -149,10 +169,18 @@ fun CameraScreen(onDocumentFound: (String?) -> Unit) {
                     } catch (e: Exception) {
                         Log.e(TAG, "Error al iniciar la cámara", e)
                     }
-                }, executor)
+                }, mainExecutor)
                 previewView
             }
         )
+
+        DisposableEffect(lifecycleOwner) {
+            onDispose {
+                if (cameraProviderFuture.isDone) {
+                    runCatching { cameraProviderFuture.get().unbindAll() }
+                }
+            }
+        }
 
         // Overlay oscuro + ventana de escaneo
         Canvas(modifier = Modifier.fillMaxSize()) {

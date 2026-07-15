@@ -1,12 +1,6 @@
 package com.ecosense.screen
 
 import android.os.Build
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,47 +16,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.ecosense.R
-import com.ecosense.repository.SeedRepository
 import com.ecosense.ui.theme.ContrastLevel
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.launch
-
-private sealed interface SeedState {
-    data object Idle    : SeedState
-    data object Loading : SeedState
-    data class Done(val count: Int) : SeedState
-    data class Error(val msg: String) : SeedState
-}
 
 @Composable
 fun ProfileScreen(
@@ -77,9 +53,6 @@ fun ProfileScreen(
     onVerPremios: () -> Unit = {},
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val scope       = rememberCoroutineScope()
-    val seedRepo    = remember { SeedRepository() }
-    var seedState   by remember { mutableStateOf<SeedState>(SeedState.Idle) }
 
     Column(
         modifier = Modifier
@@ -188,121 +161,6 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // ──── Datos de prueba ────────────────────────────────────────
-        ElevatedCard(
-            shape    = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text(
-                    text  = "Datos de prueba",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text  = "Carga solicitudes de reciclaje de ejemplo en tu cuenta para probar la app.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                AnimatedContent(
-                    targetState = seedState,
-                    transitionSpec = {
-                        fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) togetherWith
-                        fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
-                    },
-                    label = "seedState"
-                ) { state ->
-                    when (state) {
-                        is SeedState.Idle -> {
-                            OutlinedButton(
-                                onClick = {
-                                    val uid = user?.uid ?: return@OutlinedButton
-                                    seedState = SeedState.Loading
-                                    scope.launch {
-                                        seedRepo.seedRequestsForUser(uid)
-                                            .onSuccess { n ->
-                                                seedState = if (n == 0)
-                                                    SeedState.Done(-1)   // ya existían
-                                                else
-                                                    SeedState.Done(n)
-                                            }
-                                            .onFailure { e ->
-                                                seedState = SeedState.Error(e.message ?: "Error desconocido")
-                                            }
-                                    }
-                                },
-                                shape    = MaterialTheme.shapes.large,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Cargar solicitudes de prueba")
-                            }
-                        }
-
-                        is SeedState.Loading -> {
-                            Row(
-                                verticalAlignment    = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp
-                                )
-                                Spacer(Modifier.size(10.dp))
-                                Text("Cargando datos...", style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
-
-                        is SeedState.Done -> {
-                            Row(
-                                verticalAlignment    = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = null,
-                                    tint = colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(Modifier.size(8.dp))
-                                Text(
-                                    text = if (state.count == -1)
-                                        "Los datos ya estaban cargados"
-                                    else
-                                        "${state.count} solicitudes añadidas a tu historial",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = colorScheme.primary
-                                )
-                            }
-                        }
-
-                        is SeedState.Error -> {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text      = "Error: ${state.msg}",
-                                    style     = MaterialTheme.typography.bodySmall,
-                                    color     = colorScheme.error,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                OutlinedButton(
-                                    onClick  = { seedState = SeedState.Idle },
-                                    shape    = MaterialTheme.shapes.large,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) { Text("Reintentar") }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
         // ──── Apariencia ─────────────────────────────────────────────
         ElevatedCard(
             shape    = MaterialTheme.shapes.extraLarge,
@@ -401,4 +259,3 @@ fun SettingRow(
         )
     }
 }
-

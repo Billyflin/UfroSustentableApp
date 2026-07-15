@@ -27,7 +27,8 @@ sealed class GruposUiState {
         val grupo: Grupo,
         val esAdmin: Boolean,
         val progreso: ProgresoRecompensa?,
-        val ranking: List<EntradaRankingInterno>
+        val ranking: List<EntradaRankingInterno>,
+        val nombresMiembros: Map<String, String>
     ) : GruposUiState()
 }
 
@@ -47,6 +48,13 @@ internal object GrupoState {
     val rankingService = RankingService()
     var currentUser: Usuario? = null
     val grupoIds = mutableListOf("G001", "G002", "G003", "G004")
+    val nombresMiembros = mutableMapOf(
+        "admin_g1" to "Camila Soto",
+        "u_lucia" to "Lucía Rojas",
+        "admin_g2" to "Martín Salazar",
+        "admin_g3" to "Valentina Muñoz",
+        "admin_g4" to "Diego Contreras"
+    )
 }
 
 // ── ViewModel ─────────────────────────────────────────────────────────────────
@@ -62,9 +70,13 @@ class GruposViewModel : ViewModel() {
     // ── Inicialización ────────────────────────────────────────────────────────
 
     fun initialize(userId: String, nombre: String) {
+        val displayName = nombre.trim().ifBlank { "Usuario" }
         if (GrupoState.currentUser == null || GrupoState.currentUser?.id != userId) {
-            GrupoState.currentUser = Usuario(id = userId, email = "", nombre = nombre, puntos = 50)
+            GrupoState.currentUser = Usuario(id = userId, email = "", nombre = displayName, puntos = 50)
+        } else if (GrupoState.currentUser?.nombre != displayName) {
+            GrupoState.currentUser = GrupoState.currentUser?.copy(nombre = displayName)
         }
+        GrupoState.nombresMiembros[userId] = displayName
         refreshState()
     }
 
@@ -85,7 +97,10 @@ class GruposViewModel : ViewModel() {
             val progreso = GrupoState.service.progresoHaciaRecompensa(grupoId)
             val rankingResult = GrupoState.rankingService.obtenerRankingInterno(grupo, listOf(user))
             val ranking = (rankingResult as? ResultadoRankingGrupo.Exitoso)?.ranking ?: emptyList()
-            _uiState.value = GruposUiState.EnGrupo(grupo, esAdmin, progreso, ranking)
+            val nombres = grupo.miembros.associate { miembro ->
+                miembro.usuarioId to (GrupoState.nombresMiembros[miembro.usuarioId] ?: "Miembro")
+            }
+            _uiState.value = GruposUiState.EnGrupo(grupo, esAdmin, progreso, ranking, nombres)
         }
     }
 

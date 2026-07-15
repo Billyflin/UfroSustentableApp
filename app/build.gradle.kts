@@ -1,9 +1,14 @@
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.androidx.baselineprofile)
+    jacoco
 }
 
 android {
@@ -37,11 +42,21 @@ android {
             ndk {
                 abiFilters += listOf("arm64-v8a", "armeabi-v7a")
             }
+            buildConfigField("boolean", "BENCHMARK_MODE", "false")
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            isProfileable = true
+            buildConfigField("boolean", "BENCHMARK_MODE", "true")
         }
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
             // Debug conserva x86_64 para poder correr en emuladores
+            buildConfigField("boolean", "BENCHMARK_MODE", "false")
         }
     }
     compileOptions {
@@ -50,11 +65,9 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
-        jniLibs {
-            useLegacyPackaging = false
-        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/LICENSE*.md"
@@ -75,6 +88,67 @@ android {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+tasks.withType<Test>().configureEach {
+    extensions.configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoDebugUnitTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(true)
+    }
+
+    val coverageExclusions = listOf(
+        "**/BuildConfig.*",
+        "**/R.class",
+        "**/R$*.class",
+        "**/AppNavHost*.*",
+        "**/MainActivity*.*",
+        "**/PreferencesManager*.*",
+        "**/presentation/**",
+        "**/repository/**",
+        "**/screen/**",
+        "**/ui/**",
+        "**/viewmodel/**",
+        "**/model/BarcodeAnalyzer*.*",
+        "**/model/GoogleButtonTheme*.*"
+    )
+
+    classDirectories.setFrom(
+        files(
+            fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+                exclude(coverageExclusions)
+            },
+            fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
+                exclude(coverageExclusions)
+            },
+            fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
+                exclude(coverageExclusions)
+            }
+        )
+    )
+    sourceDirectories.setFrom(files("src/main/kotlin", "src/main/java"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "outputs/code_coverage/debugUnitTest/testDebugUnitTest.exec"
+            )
+        }
+    )
+}
+
 dependencies {
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.ktx)
@@ -91,16 +165,13 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.play.services.mlkit.barcode.scanning)
-    implementation(libs.play.services.mlkit.text.recognition)
-    implementation(libs.androidx.benchmark.macro)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     testImplementation(libs.junit)
@@ -119,8 +190,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.core)
-    implementation(libs.zxing.android.embedded)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.datetime)
 
@@ -130,7 +199,6 @@ dependencies {
     implementation(libs.onetapcompose)
     implementation(libs.guava)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.gson)
     implementation(libs.maps.compose)
     implementation(libs.maps.ktx)
     implementation(libs.coil.compose)
@@ -139,4 +207,5 @@ dependencies {
     implementation("androidx.credentials:credentials:1.6.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+    baselineProfile(project(":benchmark"))
 }

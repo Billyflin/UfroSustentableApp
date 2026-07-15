@@ -7,6 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,6 +85,10 @@ fun AppNavigation(
     contrastLevel:        ContrastLevel,
     onChangeContrastLevel:(ContrastLevel) -> Unit
 ) {
+    val effectiveUserId = user?.uid ?: if (BuildConfig.BENCHMARK_MODE) "benchmark-user" else ""
+    val effectiveUserName = user?.displayName ?: "Usuario"
+    var historyRevision by remember { mutableIntStateOf(0) }
+
     NavDisplay(
         modifier  = modifier,
         backStack = backStack,
@@ -105,6 +112,7 @@ fun AppNavigation(
             entry<FormRecycle> { key ->
                 RecycleFormScreen(
                     onNavigateToHistory = {
+                        historyRevision++
                         // Pop hasta la raíz (ScreenHistory) tras enviar la solicitud
                         while (backStack.size > 1) backStack.removeLast()
                     },
@@ -117,7 +125,7 @@ fun AppNavigation(
                     onNavigateToConfirmation = { title, cost, points ->
                         backStack.add(ScreenRewardConfimation(title, cost, points))
                     },
-                    userId = user?.uid ?: ""
+                    userId = effectiveUserId
                 )
             }
 
@@ -133,7 +141,8 @@ fun AppNavigation(
             entry<ScreenHistory> {
                 RequestHistoryScreen(
                     onNavigateToDetail = { id -> backStack.add(ScreenRequestDetail(id)) },
-                    userId = user?.uid ?: ""
+                    userId = effectiveUserId,
+                    refreshRevision = historyRevision
                 )
             }
 
@@ -154,8 +163,8 @@ fun AppNavigation(
             entry<ScreenGrupos> {
                 GruposScreen(
                     onNavigateToRanking = { backStack.add(ScreenRanking) },
-                    userId   = user?.uid ?: "",
-                    userName = user?.displayName ?: "Usuario"
+                    userId   = effectiveUserId,
+                    userName = effectiveUserName
                 )
             }
 
@@ -175,6 +184,7 @@ fun AppNavigation(
                 if (req != null) {
                     HistoryScreen(
                         onBack            = { backStack.removeLastOrNull() },
+                        onHistoryChanged  = { historyRevision++ },
                         viewModel         = historyViewModel,
                         activeProgressBar = when (req.status) {
                             RequestStatus.PROCESSING -> 0
@@ -189,7 +199,7 @@ fun AppNavigation(
                         description  = req.description,
                         status       = req.status,
                         reward       = req.reward,
-                        userId       = user?.uid ?: "",
+                        userId       = effectiveUserId,
                         requestId    = key.requestId,
                         onCancel     = {}
                     )

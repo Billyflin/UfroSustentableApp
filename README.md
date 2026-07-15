@@ -2,6 +2,48 @@
 
 UFRO Sustentable App is a mobile application designed to promote recycling among students at the Universidad de La Frontera. The app incentivizes recycling by awarding points for recycling activities, which can be exchanged for rewards.
 
+## Entrega Avance 02
+
+Evidencias principales:
+
+- Informe consolidado: `docs/informe-avance-02-ecosense.pdf`
+- Informe editable: `docs/informe-avance-02-ecosense.md`
+- Guion de video: `docs/guion-video-avance-02.md`
+- Escenarios BDD: `app/src/test/resources/features`
+- Glue code Cucumber: `app/src/test/kotlin/steps`
+- Reporte de cobertura local: `app/build/reports/jacoco/jacocoDebugUnitTestReport/html/index.html`
+- Reporte Cucumber: `app/build/reports/cucumber/cucumber-report.html`
+- Logs reproducibles: `docs/evidencias-avance-02/`
+- Resumen JaCoCo versionado: `docs/evidencias-avance-02/jacoco-summary.txt`
+- Evidencia Sonar: `docs/sonarqube-metrics.json`, `docs/sonarqube-qualitygate.json`, `docs/sonarqube-issues.json`, `docs/sonarqube-resolved-issues.json`
+
+Estado resumido:
+
+- Alcance: 8 de 20 CU/RF implementados y evidenciados (`RF10` a `RF17`), equivalente al 40%.
+- Pruebas: 83 tests JVM, 0 failures, 0 errors.
+- Cobertura local: JaCoCo lines 89.23% y branches 77.88%.
+- SonarQube: evidencia historica con Quality Gate OK; reanalisis local requiere Docker Desktop activo.
+
+Comandos reproducibles en Windows:
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest --rerun-tasks --console=plain
+```
+
+```powershell
+.\gradlew.bat :app:jacocoDebugUnitTestReport --rerun-tasks --console=plain
+```
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest --tests "com.ecosense.integration.EcoSenseIntegrationSpec" --rerun-tasks --console=plain
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-sonarqube-analysis.ps1
+```
+
+Nota: SonarQube requiere Docker Desktop activo. El reporte JaCoCo XML queda en `app/build/reports/jacoco/jacocoDebugUnitTestReport/jacocoDebugUnitTestReport.xml` y la ruta ya esta declarada en `sonar-project.properties`.
+
 ## Features
 
 - **Login with Google**: Secure login using Google accounts.

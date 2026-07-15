@@ -6,6 +6,7 @@ import com.ecosense.model.RewardItem
 import com.ecosense.repository.RewardsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 data class RewardsUiState(
@@ -21,10 +22,17 @@ class RewardsViewModel(
 
     private val _uiState = MutableStateFlow(RewardsUiState())
     val uiState: StateFlow<RewardsUiState> = _uiState
+    private var initializedUserId: String? = null
+    private var pointsJob: Job? = null
 
     fun initialize(userId: String) {
-        loadRewards()
-        observeUserPoints(userId)
+        if (_uiState.value.rewards.isEmpty()) {
+            loadRewards()
+        }
+        if (initializedUserId != userId) {
+            initializedUserId = userId
+            observeUserPoints(userId)
+        }
     }
 
     private fun loadRewards() {
@@ -43,7 +51,8 @@ class RewardsViewModel(
     }
 
     private fun observeUserPoints(userId: String) {
-        viewModelScope.launch {
+        pointsJob?.cancel()
+        pointsJob = viewModelScope.launch {
             rewardsRepository.getUserPointsFlow(userId).collect { points ->
                 _uiState.value = _uiState.value.copy(userPoints = points)
             }

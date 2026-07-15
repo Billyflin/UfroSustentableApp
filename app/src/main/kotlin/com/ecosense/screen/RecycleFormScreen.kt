@@ -81,21 +81,28 @@ fun RecycleFormScreen(
 
     var expanded by remember { mutableStateOf(false) }
     var selectedMaterial by remember { mutableStateOf("") }
-    val materials = listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos")
+    val materials = remember { listOf("Plástico", "Vidrio", "Papel", "Metal", "Electrónicos") }
     var kilos by remember { mutableStateOf("") }
     var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
 
-    var recyclingPoint: RecyclingPoint? = null
-    try {
-        recyclingPoint = data?.let { Json.decodeFromString<RecyclingPoint>(it) }
-    } catch (e: Exception) {
-        Log.d("RecycleFormScreen", "Error parsing QR data: ${e.message}")
+    val recyclingPoint = remember(data) {
+        runCatching {
+            data?.let { Json.decodeFromString<RecyclingPoint>(it) }
+        }.onFailure { e ->
+            Log.d("RecycleFormScreen", "Error parsing QR data: ${e.message}")
+        }.getOrNull()
     }
 
     LaunchedEffect(uiState) {
         when (uiState) {
             is RecycleFormUiState.Success -> {
-                Toast.makeText(context, "Solicitud creada exitosamente", Toast.LENGTH_SHORT).show()
+                val success = uiState as RecycleFormUiState.Success
+                val message = if (success.imageUploaded) {
+                    "Solicitud creada exitosamente"
+                } else {
+                    "Solicitud creada sin foto: almacenamiento de imágenes no disponible"
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 onNavigateToHistory()
                 viewModel.resetState()
             }

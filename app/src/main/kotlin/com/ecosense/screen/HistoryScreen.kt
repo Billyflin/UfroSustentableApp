@@ -80,12 +80,13 @@ import java.util.Locale
 fun RequestHistoryScreen(
     onNavigateToDetail: (String) -> Unit,
     userId: String,
+    refreshRevision: Int = 0,
     viewModel: HistoryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(userId) {
-        viewModel.loadRequests(userId)
+    LaunchedEffect(userId, refreshRevision) {
+        viewModel.loadRequests(userId, forceRefresh = refreshRevision > 0)
     }
 
     Column(
@@ -199,7 +200,9 @@ fun RequestHistoryScreen(
                             )
                         }
                     } else {
-                        val sortedRequests = state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
+                        val sortedRequests = remember(state.requests) {
+                            state.requests.sortedBy { it.status == RequestStatus.REEDEMED }
+                        }
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             contentPadding = PaddingValues(bottom = 20.dp),
@@ -369,10 +372,11 @@ fun HistoryScreen(
     status: RequestStatus = RequestStatus.PROCESSING,
     onCancel: () -> Unit,
     onBack: () -> Unit,
+    onHistoryChanged: () -> Unit = {},
     viewModel: HistoryViewModel = viewModel()
 ) {
     val redeemState by viewModel.redeemState.collectAsStateWithLifecycle()
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val formatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault()) }
 
     val formattedRequestTime = requestTime?.toInstant()
         ?.atZone(ZoneId.systemDefault())?.toLocalDateTime()?.format(formatter) ?: "Desconocido"
@@ -386,6 +390,7 @@ fun HistoryScreen(
     LaunchedEffect(redeemState) {
         if (redeemState is RedeemState.Success) {
             activeProgressBar2 = 3
+            onHistoryChanged()
         }
     }
 
